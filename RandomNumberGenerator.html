@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Integer Generator</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .container {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .generator-card {
+      width: 100%;
+      max-width: 500px;
+      padding: 3rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      text-align: center;
+      opacity: 0.7;
+      margin: 0 0 2.5rem 0;
+      font-weight: 400;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .input-wrapper {
+      flex: 1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-display {
+      text-align: center;
+      padding: 2.5rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .sample-results {
+      width: 100%;
+    }
+
+    .sample-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 0.75rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .sample-number {
+      padding: 0.75rem 0.5rem;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.2s;
+      border: 2px solid;
+    }
+
+    .sample-number:hover {
+      transform: scale(1.05);
+    }
+
+    .result-placeholder {
+      font-size: 1.25rem;
+      opacity: 0.5;
+      font-weight: 500;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 1.125rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .generate-btn:active {
+      transform: translateY(0);
+    }
+
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .generator-card {
+        padding: 2rem;
+      }
+
+      .result-number {
+        font-size: 3rem;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <div class="generator-card">
+    <h1 id="title">Random Integer Generator</h1>
+    <p class="subtitle" id="subtitle">Generate random numbers within your range</p>
+    <div class="input-group">
+     <div class="input-wrapper"><label for="population-input" id="population-label">Population Size</label> <input type="number" id="population-input" value="1000" min="1" aria-label="Total population size">
+     </div>
+     <div class="input-wrapper"><label for="sample-input" id="sample-label">Sample Size</label> <input type="number" id="sample-input" value="10" min="1" aria-label="Number of samples to generate">
+     </div>
+    </div>
+    <div class="result-display" id="result-display">
+     <p class="result-placeholder" id="result-placeholder">Click generate to create sample</p>
+     <div class="sample-results" id="sample-results" style="display: none;">
+      <div class="sample-grid" id="sample-grid"></div>
+     </div>
+    </div><button class="generate-btn" id="generate-btn">Generate</button>
+    <div class="error-message" id="error-message"></div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: '#f0f4ff',
+      card_color: '#ffffff',
+      text_color: '#1e293b',
+      primary_action_color: '#3b82f6',
+      secondary_surface_color: '#e0e7ff',
+      font_family: 'Inter',
+      font_size: 16,
+      title_text: 'Random Integer Generator',
+      button_text: 'Generate'
+    };
+
+    let config = { ...defaultConfig };
+
+    const populationInput = document.getElementById('population-input');
+    const sampleInput = document.getElementById('sample-input');
+    const generateBtn = document.getElementById('generate-btn');
+    const resultDisplay = document.getElementById('result-display');
+    const sampleResults = document.getElementById('sample-results');
+    const sampleGrid = document.getElementById('sample-grid');
+    const resultPlaceholder = document.getElementById('result-placeholder');
+    const errorMessage = document.getElementById('error-message');
+
+    function generateRandomSample(populationSize, sampleSize) {
+      const sample = new Set();
+      
+      while (sample.size < sampleSize) {
+        const randomNum = Math.floor(Math.random() * populationSize) + 1;
+        sample.add(randomNum);
+      }
+      
+      return Array.from(sample).sort((a, b) => a - b);
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+      setTimeout(() => {
+        errorMessage.classList.remove('show');
+      }, 3000);
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const populationSize = parseInt(populationInput.value);
+      const sampleSize = parseInt(sampleInput.value);
+
+      if (isNaN(populationSize) || isNaN(sampleSize)) {
+        showError('Please enter valid numbers');
+        return;
+      }
+
+      if (populationSize < 1) {
+        showError('Population size must be at least 1');
+        return;
+      }
+
+      if (sampleSize < 1) {
+        showError('Sample size must be at least 1');
+        return;
+      }
+
+      if (sampleSize > populationSize) {
+        showError('Sample size cannot be larger than population size');
+        return;
+      }
+
+      const sampleNumbers = generateRandomSample(populationSize, sampleSize);
+      
+      resultPlaceholder.style.display = 'none';
+      sampleResults.style.display = 'block';
+      
+      sampleGrid.innerHTML = '';
+      
+      sampleNumbers.forEach((num, index) => {
+        const numberElement = document.createElement('div');
+        numberElement.className = 'sample-number';
+        numberElement.textContent = num;
+        numberElement.style.opacity = '0';
+        numberElement.style.transform = 'scale(0.8)';
+        sampleGrid.appendChild(numberElement);
+        
+        setTimeout(() => {
+          numberElement.style.opacity = '1';
+          numberElement.style.transform = 'scale(1)';
+        }, index * 50);
+      });
+    });
+
+    async function onConfigChange(newConfig) {
+      const container = document.querySelector('.container');
+      const card = document.querySelector('.generator-card');
+      const title = document.getElementById('title');
+      const subtitle = document.getElementById('subtitle');
+      const labels = document.querySelectorAll('label');
+      const inputs = document.querySelectorAll('input[type="number"]');
+      const button = document.getElementById('generate-btn');
+      const resultDisplayEl = document.getElementById('result-display');
+      const resultNum = document.getElementById('result-number');
+      const resultPlaceholderEl = document.getElementById('result-placeholder');
+      const errorMsg = document.getElementById('error-message');
+
+      const backgroundColor = newConfig.background_color || defaultConfig.background_color;
+      const cardColor = newConfig.card_color || defaultConfig.card_color;
+      const textColor = newConfig.text_color || defaultConfig.text_color;
+      const primaryColor = newConfig.primary_action_color || defaultConfig.primary_action_color;
+      const surfaceColor = newConfig.secondary_surface_color || defaultConfig.secondary_surface_color;
+      const fontFamily = newConfig.font_family || defaultConfig.font_family;
+      const baseFontSize = newConfig.font_size || defaultConfig.font_size;
+      const titleText = newConfig.title_text || defaultConfig.title_text;
+      const buttonText = newConfig.button_text || defaultConfig.button_text;
+
+      container.style.background = backgroundColor;
+      card.style.background = cardColor;
+      
+      document.body.style.fontFamily = `${fontFamily}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      document.body.style.color = textColor;
+      
+      title.textContent = titleText;
+      title.style.fontSize = `${baseFontSize * 2}px`;
+      title.style.color = textColor;
+      
+      subtitle.style.fontSize = `${baseFontSize}px`;
+      subtitle.style.color = textColor;
+      
+      labels.forEach(label => {
+        label.style.fontSize = `${baseFontSize * 0.875}px`;
+        label.style.color = textColor;
+      });
+      
+      inputs.forEach(input => {
+        input.style.fontSize = `${baseFontSize}px`;
+        input.style.borderColor = surfaceColor;
+        input.style.color = textColor;
+        input.style.background = cardColor;
+      });
+      
+      resultDisplayEl.style.background = surfaceColor;
+      
+      const sampleNumbers = document.querySelectorAll('.sample-number');
+      sampleNumbers.forEach(num => {
+        num.style.background = cardColor;
+        num.style.color = primaryColor;
+        num.style.borderColor = primaryColor;
+      });
+      
+      resultPlaceholderEl.style.fontSize = `${baseFontSize * 1.25}px`;
+      resultPlaceholderEl.style.color = textColor;
+      
+      button.textContent = buttonText;
+      button.style.background = primaryColor;
+      button.style.color = cardColor;
+      button.style.fontSize = `${baseFontSize * 1.125}px`;
+      
+      errorMsg.style.background = surfaceColor;
+      errorMsg.style.color = textColor;
+      errorMsg.style.fontSize = `${baseFontSize * 0.875}px`;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_surface_color || defaultConfig.secondary_surface_color,
+              set: (value) => {
+                config.secondary_surface_color = value;
+                window.elementSdk.setConfig({ secondary_surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.card_color || defaultConfig.card_color,
+              set: (value) => {
+                config.card_color = value;
+                window.elementSdk.setConfig({ card_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['title_text', config.title_text || defaultConfig.title_text],
+          ['button_text', config.button_text || defaultConfig.button_text]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99a168ddd6253b68',t:'MTc2MjM5ODc1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
