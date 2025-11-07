@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ola Ayeni - GRC Analyst</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8fafc;
+        }
+        
+        .tab-navigation {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .tab-nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 1.2rem 2rem;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #f1f5f9;
+            color: #3b82f6;
+        }
+        
+        .tab-btn.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+            color: white;
+            padding: 4rem 2rem;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .profile-image-container {
+            position: relative;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e40af;
+            font-size: 4rem;
+            font-weight: bold;
+        }
+        
+        .upload-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            font-size: 1.2rem;
+            transition: background 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background: #2563eb;
+        }
+        
+        #imageUpload {
+            display: none;
+        }
+        
+        .hero-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-text .title {
+            font-size: 1.3rem;
+            color: #93c5fd;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-text .tagline {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+        
+        .contact-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .contact-links a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        
+        .contact-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        section {
+            margin-bottom: 3rem;
+        }
+        
+        h2 {
+            color: #0f172a;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #3b82f6;
+            display: inline-block;
+        }
+        
+        .summary-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid #3b82f6;
+        }
+        
+        .summary-box p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #475569;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        
+        .strength-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .strength-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .strength-header h3 {
+            color: #0f172a;
+            font-size: 1.2rem;
+        }
+        
+        .strength-level {
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .strength-bar {
+            background: #e2e8f0;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+        
+        .strength-fill {
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-out;
+        }
+        
+        .strength-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .cert-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .experience-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .experience-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #cbd5e1;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.6rem;
+            top: 0;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #cbd5e1;
+        }
+        
+        .timeline-item h3 {
+            color: #0f172a;
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .timeline-item .company {
+            color: #3b82f6;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .timeline-item .date {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .timeline-item .highlight {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+            color: #475569;
+        }
+        
+        footer {
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .project-content {
+            padding: 1.5rem;
+        }
+        
+        .project-title {
+            color: #0f172a;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-category {
+            display: inline-block;
+            background: #eff6ff;
+            color: #3b82f6;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .project-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .project-tag {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.3rem 0.7rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: gap 0.3s;
+        }
+        
+        .project-link:hover {
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+            
+            .profile-image-container {
+                margin: 0 auto;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .contact-links {
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-btn {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="hero-content">
+            <div class="profile-image-container">
+                <div class="profile-image" id="profileImage">OA</div>
+                <input type="file" id="imageUpload" accept="image/*">
+                <button class="upload-btn" onclick="document.getElementById('imageUpload').click()">📷</button>
+            </div>
+            <div class="hero-text">
+                <h1>Ola Ayeni</h1>
+                <div class="title">GRC Analyst | CISM, CISA, ISC² CC</div>
+                <div class="tagline">Transforming cybersecurity compliance into business value through strategic risk management and governance excellence</div>
+                <div class="contact-links">
+                    <a href="mailto:olaiiayeni@gmail.com">✉️ Email</a>
+                    <a href="tel:+19062314040">📱 Call</a>
+                    <a href="#">📍 DMV Area</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-navigation">
+        <div class="tab-nav-inner">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
+        </div>
+    </div>
+    
+    <div id="overview" class="tab-content active">
+        <div class="container">
+        <section id="summary">
+            <h2>Executive Summary</h2>
+            <div class="summary-box">
+                <p>Strategic GRC professional with 7+ years driving enterprise compliance and risk management initiatives across banking, federal, and private sectors. Proven track record of reducing organizational risk by 40% while improving operational efficiency through automation and process optimization. Expert in translating complex regulatory requirements into actionable business strategies, ensuring audit readiness, and fostering security-aware cultures.</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">7+</div>
+                    <div class="stat-label">Years Experience</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">750+</div>
+                    <div class="stat-label">Locations Secured</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">40%</div>
+                    <div class="stat-label">Risk Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">20+</div>
+                    <div class="stat-label">Vendors Managed</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="strengths">
+            <h2>Core Strengths</h2>
+            
+            <div class="strength-item">
+                <div class="strength-header">
+                    <h3>Governance & Compliance Leadership</h3>
+                    <span class="strength-level">Expert</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 95%"></div>
+                </div>
+                <div class="strength-description">
+                    Architected and implemented NIST CSF 2.0, ISO 27001, SOC 2, and HIPAA frameworks across enterprise environments. Expert in translating regulatory requirements into executable compliance programs with measurable outcomes.
+                </div>
+            </div>
+            
+            <div class="strength-item">
+                <div class="strength-header">
+                    <h3>Risk Management & Assessment</h3>
+                    <span class="strength-level">Expert</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 92%"></div>
+                </div>
+                <div class="strength-description">
+                    Conducted comprehensive enterprise risk assessments, vendor risk evaluations, and third-party security reviews. Proven ability to identify control gaps and develop systematic mitigation strategies that reduce organizational exposure.
+                </div>
+            </div>
+            
+            <div class="strength-item">
+                <div class="strength-header">
+                    <h3>Audit & Control Testing</h3>
+                    <span class="strength-level">Advanced</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 90%"></div>
+                </div>
+                <div class="strength-description">
+                    Managed IT general controls (ITGCs) audits, coordinated internal/external audit responses, and maintained audit-ready documentation. Successfully completed external audits with zero major findings through meticulous preparation and control implementation.
+                </div>
+            </div>
+            
+            <div class="strength-item">
+                <div class="strength-header">
+                    <h3>Technical Security & Infrastructure</h3>
+                    <span class="strength-level">Advanced</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 88%"></div>
+                </div>
+                <div class="strength-description">
+                    Deep technical foundation in network security, enterprise IT infrastructure, and vulnerability management. CCNA/CCDA-trained with hands-on experience deploying security monitoring across 750+ locations and managing Active Directory, firewalls, and cloud environments.
+                </div>
+            </div>
+            
+            <div class="strength-item">
+                <div class="strength-header">
+                    <h3>Process Automation & Optimization</h3>
+                    <span class="strength-level">Advanced</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 85%"></div>
+                </div>
+                <div class="strength-description">
+                    Automated GRC workflows reducing administrative overhead by 40-50% using SharePoint, Power BI, and custom dashboards. Expert in eliminating manual processes and creating real-time compliance monitoring systems.
+                </div>
+            </div>
+            
+            <div class="strength-item">
+                <div class="strength-header">
+                    <h3>Security Awareness & Training</h3>
+                    <span class="strength-level">Proficient</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 82%"></div>
+                </div>
+                <div class="strength-description">
+                    Designed and delivered comprehensive security awareness programs with phishing simulations, improving organizational security culture metrics by 35%. Skilled at communicating complex security concepts to diverse audiences.
+                </div>
+            </div>
+        </section>
+        
+        <section id="certifications">
+            <h2>Professional Certifications</h2>
+            <div class="cert-badges">
+                <div class="badge">ISACA CISM</div>
+                <div class="badge">ISACA CISA</div>
+                <div class="badge">ISC² CC</div>
+                <div class="badge">Fortinet Certified</div>
+                <div class="badge">CRISC (In Progress)</div>
+                <div class="badge">Security+ (2025)</div>
+            </div>
+        </section>
+        
+        <section id="experience">
+            <h2>Professional Journey</h2>
+            <div class="experience-timeline">
+                <div class="timeline-item">
+                    <h3>Policy & Reporting Specialist</h3>
+                    <div class="company">NOAA Sea Grant (Federal Fellowship)</div>
+                    <div class="date">Feb 2025 - Present</div>
+                    <div class="highlight">
+                        Leading compliance strategy for 34 distributed offices, translating federal policy into executive guidance and coordinating governance across multi-stakeholder federal programs.
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <h3>GRC & IT Governance Specialist</h3>
+                    <div class="company">Hopcyku</div>
+                    <div class="date">Aug 2021 - Jul 2023</div>
+                    <div class="highlight">
+                        Architected NIST CSF/ISO 27001 governance framework, reduced risk by 40%, automated compliance tracking, and managed vendor risk program for 20+ partners. Achieved zero major audit findings through comprehensive control implementation.
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <h3>IT Audit & Security Engineer</h3>
+                    <div class="company">Telnet Nigeria Ltd.</div>
+                    <div class="date">Oct 2018 - Jun 2021</div>
+                    <div class="highlight">
+                        Deployed enterprise security monitoring across 750+ banking locations, conducted ITGC audits for PCI-DSS compliance, and improved incident response capabilities by 35% through automation and observability tools.
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="education">
+            <h2>Education</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label" style="margin-bottom: 0.5rem;">Master of Science</div>
+                    <div style="font-size: 1.1rem; color: #0f172a; font-weight: 600; margin-bottom: 0.3rem;">Engineering Management</div>
+                    <div style="color: #3b82f6; font-weight: 600;">GPA: 3.85</div>
+                    <div class="stat-label">Michigan Tech | 2023-2024</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" style="margin-bottom: 0.5rem;">Bachelor of Technology</div>
+                    <div style="font-size: 1.1rem; color: #0f172a; font-weight: 600; margin-bottom: 0.3rem;">Computer Engineering</div>
+                    <div style="color: #3b82f6; font-weight: 600;">GPA: 3.65/5.0</div>
+                    <div class="stat-label">LAUTECH, Nigeria</div>
+                </div>
+            </div>
+        </section>
+    </div>
+    </div>
+    
+    <div id="projects" class="tab-content">
+        <div class="container">
+            <section>
+                <h2>Featured Projects</h2>
+                <p style="color: #64748b; margin-bottom: 2rem;">Showcasing hands-on implementations of GRC frameworks, automation solutions, and security initiatives</p>
+                
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">🔐</div>
+                        <div class="project-content">
+                            <div class="project-category">Governance Framework</div>
+                            <h3 class="project-title">NIST CSF 2.0 Implementation</h3>
+                            <p class="project-description">
+                                Designed and deployed comprehensive NIST Cybersecurity Framework across enterprise environment, improving security posture and audit readiness by 30%.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">NIST CSF</span>
+                                <span class="project-tag">Risk Assessment</span>
+                                <span class="project-tag">Policy Development</span>
+                            </div>
+                            <a href="#" class="project-link">View Details →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-image">📊</div>
+                        <div class="project-content">
+                            <div class="project-category">Process Automation</div>
+                            <h3 class="project-title">GRC Workflow Automation</h3>
+                            <p class="project-description">
+                                Automated compliance tracking and reporting using SharePoint and Power BI, reducing manual overhead by 40% and enabling real-time monitoring.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Power BI</span>
+                                <span class="project-tag">SharePoint</span>
+                                <span class="project-tag">Automation</span>
+                            </div>
+                            <a href="#" class="project-link">View Details →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-image">🏦</div>
+                        <div class="project-content">
+                            <div class="project-category">Enterprise Security</div>
+                            <h3 class="project-title">Banking Security Monitoring</h3>
+                            <p class="project-description">
+                                Deployed vulnerability management and threat detection across 750+ banking branches, enhancing security visibility and compliance monitoring nationwide.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Nessus</span>
+                                <span class="project-tag">SolarWinds</span>
+                                <span class="project-tag">PCI-DSS</span>
+                            </div>
+                            <a href="#" class="project-link">View Details →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-image">✅</div>
+                        <div class="project-content">
+                            <div class="project-category">Audit & Compliance</div>
+                            <h3 class="project-title">ISO 27001 Certification</h3>
+                            <p class="project-description">
+                                Led organization through successful ISO 27001 audit with zero major findings through comprehensive policy development and control implementation.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">ISO 27001</span>
+                                <span class="project-tag">Documentation</span>
+                                <span class="project-tag">ISMS</span>
+                            </div>
+                            <a href="#" class="project-link">View Details →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-image">🤝</div>
+                        <div class="project-content">
+                            <div class="project-category">Vendor Risk Management</div>
+                            <h3 class="project-title">Third-Party Risk Program</h3>
+                            <p class="project-description">
+                                Established comprehensive vendor risk management program covering 20+ strategic partners with documented assessments and ongoing monitoring.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">TPRM</span>
+                                <span class="project-tag">Risk Assessments</span>
+                                <span class="project-tag">Due Diligence</span>
+                            </div>
+                            <a href="#" class="project-link">View Details →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-image">🎓</div>
+                        <div class="project-content">
+                            <div class="project-category">Security Awareness</div>
+                            <h3 class="project-title">Security Training Initiative</h3>
+                            <p class="project-description">
+                                Developed and delivered security awareness program with phishing simulations, improving organizational security culture metrics by 35%.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Training</span>
+                                <span class="project-tag">Phishing Simulation</span>
+                                <span class="project-tag">Culture Change</span>
+                            </div>
+                            <a href="#" class="project-link">View Details →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Ola Ayeni | GRC Analyst</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">Driving cybersecurity excellence through strategic governance and compliance</p>
+    </footer>
+    
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'profile-image';
+                    img.style.width = '200px';
+                    img.style.height = '200px';
+                    img.style.borderRadius = '50%';
+                    img.style.objectFit = 'cover';
+                    img.style.border = '5px solid white';
+                    img.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
+                    
+                    const container = document.querySelector('.profile-image-container');
+                    const oldImage = document.getElementById('profileImage');
+                    container.replaceChild(img, oldImage);
+                    img.id = 'profileImage';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Animate strength bars on load
+        window.addEventListener('load', function() {
+            const fills = document.querySelectorAll('.strength-fill');
+            fills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
