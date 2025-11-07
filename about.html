@@ -343,10 +343,10 @@
      Ola Ayeni
     </div>
     <ul class="nav-links">
-     <li><a href="./index" id="nav-home">Home</a></li>
-     <li><a href="" id="nav-about">About</a></li>
-     <li><a href="./projects" class="active" id="nav-work">Work</a></li>
-     <li><a href="./contact" id="nav-contact">Contact</a></li>
+     <li><a href="#home" id="nav-home">Home</a></li>
+     <li><a href="#about" id="nav-about">About</a></li>
+     <li><a href="#work" class="active" id="nav-work">Work</a></li>
+     <li><a href="#contact" id="nav-contact">Contact</a></li>
     </ul>
    </nav><!-- Hero Section -->
    <section class="hero" id="hero">
@@ -573,7 +573,8 @@
       }
     }
 
-    if (window.elementSdk) {
+    // Initialize SDK only if available
+    if (window.elementSdk && typeof window.elementSdk.init === 'function') {
       window.elementSdk.init({
         defaultConfig,
         onConfigChange,
@@ -642,6 +643,9 @@
       });
 
       onConfigChange(window.elementSdk.config);
+    } else {
+      // Fallback when SDK is not available
+      onConfigChange(defaultConfig);
     }
 
     // Smooth scrolling for navigation
@@ -657,10 +661,12 @@
 
     // Responsive font size adjustment
     window.addEventListener('resize', () => {
-      if (window.elementSdk) {
+      if (window.elementSdk && window.elementSdk.config) {
         onConfigChange(window.elementSdk.config);
+      } else {
+        onConfigChange(defaultConfig);
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99a96327b23320b1',t:'MTc2MjQ4MjQwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99a967a806500605',t:'MTc2MjQ4MjU4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
