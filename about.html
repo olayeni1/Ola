@@ -211,7 +211,7 @@
 
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1.5rem;
     }
 
@@ -237,6 +237,48 @@
       font-size: 0.9rem;
       opacity: 0.8;
       line-height: 1.6;
+    }
+
+    /* Awards Section */
+    .awards {
+      padding: 2rem 0;
+    }
+
+    .awards h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 2rem 0;
+      letter-spacing: -1px;
+    }
+
+    .awards-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .award-item {
+      padding: 1.5rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .award-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .award-content h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .award-content p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin: 0;
     }
 
     /* Contact Section */
@@ -332,7 +374,7 @@
         position: static;
       }
 
-      .story h2, .experience h2, .skills h2, .contact-section h2 {
+      .story h2, .experience h2, .skills h2, .awards h2, .contact-section h2 {
         font-size: 2rem;
       }
 
@@ -363,75 +405,123 @@
     <div class="circle-decoration circle-2" id="circle-2"></div>
     <div class="hero-content">
      <h1 id="hero-title">About Me</h1>
-     <p id="hero-subtitle">Passionate about creating meaningful digital experiences that connect people and solve real problems</p>
+     <p id="hero-subtitle">IT Auditor and Governance, Risk &amp; Compliance Analyst with 7+ years of experience in technology risk management</p>
     </div>
    </section><!-- Profile Section -->
    <section class="profile-section" id="profile-section">
     <div class="profile-container">
      <div class="profile-image" id="profile-image">
-      👨‍💻
+      🛡️
      </div>
      <div class="profile-content"><!-- Story Section -->
       <div class="story">
        <h2 id="story-title">My Story</h2>
-       <p id="story-text">I'm a product designer with over 5 years of experience creating digital solutions that make a difference. My journey began with a fascination for how design can bridge the gap between complex technology and human needs. I believe great design is invisible – it just works, feels natural, and solves problems elegantly.</p>
+       <p id="story-text">I'm a strategic and analytical Technology Risk &amp; IT Audit Professional with over 7 years of experience driving governance, risk, and compliance (GRC) across cloud and enterprise environments. I specialize in bridging technical systems with regulatory controls, ensuring audit readiness, and guiding enterprise-level risk decisions. My expertise spans SOC 2, ISO 27001, and NIST 800-53 assessments, vulnerability management, and control assurance reporting.</p>
       </div><!-- Experience Section -->
       <div class="experience">
-       <h2 id="experience-title">Experience</h2>
+       <h2 id="experience-title">Experience &amp; Education</h2>
        <div class="experience-grid">
         <div class="experience-item" id="experience-item-1">
-         <h3 id="job-title-1">Senior Product Designer</h3>
+         <h3 id="job-title-1">IT Auditor &amp; GRC Analyst</h3>
          <div class="company" id="company-1">
-          Tech Innovations Inc.
+          Enterprise Technology Risk
          </div>
          <div class="duration">
-          2021 - Present
+          7+ Years Experience
          </div>
         </div>
         <div class="experience-item" id="experience-item-2">
-         <h3 id="job-title-2">UX Designer</h3>
+         <h3 id="job-title-2">Master's Engineering Management</h3>
          <div class="company" id="company-2">
-          Digital Solutions Co.
+          Michigan Technological University
          </div>
          <div class="duration">
-          2019 - 2021
+          MEM Degree
          </div>
         </div>
        </div>
       </div><!-- Skills Section -->
       <div class="skills">
-       <h2 id="skills-title">Skills &amp; Expertise</h2>
+       <h2 id="skills-title">Core Competencies</h2>
        <div class="skills-grid">
-        <div class="skill-category" id="skill-1"><span class="skill-icon">🎨</span>
-         <h3>Design</h3>
+        <div class="skill-category" id="skill-1"><span class="skill-icon">🔍</span>
+         <h3>IT Audit &amp; Assurance</h3>
          <div class="skill-list">
-          UI/UX Design<br>
-          Prototyping<br>
-          Design Systems
+          SOC 1/2, ISO 27001<br>
+          NIST 800-53, COBIT<br>
+          SOX ITGC
          </div>
         </div>
-        <div class="skill-category" id="skill-2"><span class="skill-icon">🔍</span>
-         <h3>Research</h3>
+        <div class="skill-category" id="skill-2"><span class="skill-icon">⚖️</span>
+         <h3>Risk &amp; Control Management</h3>
          <div class="skill-list">
-          User Research<br>
-          Usability Testing<br>
-          Data Analysis
+          Control Design<br>
+          Risk Assessment<br>
+          Remediation Tracking
          </div>
         </div>
-        <div class="skill-category" id="skill-3"><span class="skill-icon">🛠️</span>
-         <h3>Tools</h3>
+        <div class="skill-category" id="skill-3"><span class="skill-icon">📋</span>
+         <h3>Governance &amp; Compliance</h3>
          <div class="skill-list">
-          Figma<br>
-          Adobe Creative Suite<br>
-          Principle
+          Policy Documentation<br>
+          Audit Readiness<br>
+          Reporting Frameworks
          </div>
         </div>
-        <div class="skill-category" id="skill-4"><span class="skill-icon">💡</span>
-         <h3>Strategy</h3>
+        <div class="skill-category" id="skill-4"><span class="skill-icon">☁️</span>
+         <h3>Network &amp; Cloud Security</h3>
          <div class="skill-list">
-          Product Strategy<br>
-          Design Thinking<br>
-          Workshop Facilitation
+          AWS &amp; Azure Security<br>
+          Cisco Configuration<br>
+          Firewalls &amp; VPNs
+         </div>
+        </div>
+        <div class="skill-category" id="skill-5"><span class="skill-icon">🛠️</span>
+         <h3>Tools &amp; Technologies</h3>
+         <div class="skill-list">
+          Nessus, Splunk<br>
+          ServiceNow GRC<br>
+          Power BI, Excel
+         </div>
+        </div>
+        <div class="skill-category" id="skill-6"><span class="skill-icon">👥</span>
+         <h3>Leadership &amp; Management</h3>
+         <div class="skill-list">
+          Cross-functional Collaboration<br>
+          Executive Reporting<br>
+          Stakeholder Management
+         </div>
+        </div>
+       </div>
+      </div><!-- Awards Section -->
+      <div class="awards">
+       <h2>Fellowships &amp; Awards</h2>
+       <div class="awards-grid">
+        <div class="award-item" id="award-1">
+         <div class="award-icon">
+          🏆
+         </div>
+         <div class="award-content">
+          <h3>U.S. Department of State TechWomen Fellow</h3>
+          <p>2017 - International leadership program for emerging women leaders in STEM</p>
+         </div>
+        </div>
+        <div class="award-item" id="award-2">
+         <div class="award-icon">
+          🌍
+         </div>
+         <div class="award-content">
+          <h3>Obama Foundation: Obama African Leader</h3>
+          <p>2018 - Leadership development program for emerging African leaders</p>
+         </div>
+        </div>
+        <div class="award-item" id="award-3">
+         <div class="award-icon">
+          🌊
+         </div>
+         <div class="award-content">
+          <h3>NOAA Knauss Fellow</h3>
+          <p>2025 - National Oceanic and Atmospheric Administration fellowship program</p>
          </div>
         </div>
        </div>
@@ -441,8 +531,8 @@
    </section><!-- Contact Section -->
    <section class="contact-section" id="contact-section">
     <div class="contact-content">
-     <h2 id="contact-title">Let's Work Together</h2>
-     <p id="contact-text">I'm always interested in new opportunities and collaborations. Whether you have a project in mind or just want to chat about design, I'd love to hear from you.</p><a href="mailto:hello@olaayeni.com" class="contact-button" id="contact-button">Get In Touch</a>
+     <h2 id="contact-title">Let's Connect</h2>
+     <p id="contact-text">I'm always interested in discussing technology risk management, compliance frameworks, and governance strategies. Whether you have questions about IT audit or want to explore collaboration opportunities, I'd love to hear from you.</p><a href="mailto:hello@olaayeni.com" class="contact-button" id="contact-button">Get In Touch</a>
     </div>
    </section>
   </div>
@@ -457,17 +547,17 @@
       font_size: 16,
       name: "Ola Ayeni",
       hero_title: "About Me",
-      hero_subtitle: "Passionate about creating meaningful digital experiences that connect people and solve real problems",
+      hero_subtitle: "IT Auditor and Governance, Risk & Compliance Analyst with 7+ years of experience in technology risk management",
       story_title: "My Story",
-      story_text: "I'm a product designer with over 5 years of experience creating digital solutions that make a difference. My journey began with a fascination for how design can bridge the gap between complex technology and human needs. I believe great design is invisible – it just works, feels natural, and solves problems elegantly.",
-      experience_title: "Experience",
-      job_title_1: "Senior Product Designer",
-      company_1: "Tech Innovations Inc.",
-      job_title_2: "UX Designer",
-      company_2: "Digital Solutions Co.",
-      skills_title: "Skills & Expertise",
-      contact_title: "Let's Work Together",
-      contact_text: "I'm always interested in new opportunities and collaborations. Whether you have a project in mind or just want to chat about design, I'd love to hear from you."
+      story_text: "I'm a strategic and analytical Technology Risk & IT Audit Professional with over 7 years of experience driving governance, risk, and compliance (GRC) across cloud and enterprise environments. I specialize in bridging technical systems with regulatory controls, ensuring audit readiness, and guiding enterprise-level risk decisions. My expertise spans SOC 2, ISO 27001, and NIST 800-53 assessments, vulnerability management, and control assurance reporting.",
+      experience_title: "Experience & Education",
+      job_title_1: "IT Auditor & GRC Analyst",
+      company_1: "Enterprise Technology Risk",
+      job_title_2: "Master's Engineering Management",
+      company_2: "Michigan Technological University",
+      skills_title: "Core Competencies",
+      contact_title: "Let's Connect",
+      contact_text: "I'm always interested in discussing technology risk management, compliance frameworks, and governance strategies. Whether you have questions about IT audit or want to explore collaboration opportunities, I'd love to hear from you."
     };
 
     async function onConfigChange(config) {
@@ -512,6 +602,11 @@
       const skillCategories = document.querySelectorAll('.skill-category');
       skillCategories.forEach(category => {
         category.style.backgroundColor = backgroundColor;
+      });
+
+      const awardItems = document.querySelectorAll('.award-item');
+      awardItems.forEach(item => {
+        item.style.backgroundColor = backgroundColor;
       });
 
       const contactButton = document.getElementById('contact-button');
@@ -659,5 +754,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99a19277803857da',t:'MTc2MjQwMDQ1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99a8d17ce4a4c9a3',t:'MTc2MjQ3NjQzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
