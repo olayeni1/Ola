@@ -325,13 +325,12 @@
     }
 
     function goHome() {
-      window.location.href = 'https://olayeni1.github.io/Ola/';
       // Try to go back in history first
       if (window.history.length > 1) {
-        window.location.href = '/';
+        window.history.back();
       } else {
         // If no history, try to go to root
-        window.history.back();
+        window.location.href = '/';
       }
     }
 
