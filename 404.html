@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    .container {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      padding: 2rem;
+    }
+
+    .error-content {
+      max-width: 600px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .error-code {
+      font-size: 8rem;
+      font-weight: 900;
+      margin: 0;
+      line-height: 1;
+      letter-spacing: -4px;
+      opacity: 0.9;
+    }
+
+    .error-heading {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+
+    .error-description {
+      font-size: 1.2rem;
+      margin: 1.5rem 0 2.5rem 0;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    .home-button {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      margin-bottom: 3rem;
+    }
+
+    .home-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .footer-text {
+      font-size: 0.9rem;
+      opacity: 0.6;
+      margin-top: 2rem;
+    }
+
+    /* Decorative Elements */
+    .circle-decoration {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.03;
+      z-index: 1;
+    }
+
+    .circle-1 {
+      width: 400px;
+      height: 400px;
+      top: 10%;
+      right: -150px;
+    }
+
+    .circle-2 {
+      width: 300px;
+      height: 300px;
+      bottom: 15%;
+      left: -100px;
+    }
+
+    .circle-3 {
+      width: 200px;
+      height: 200px;
+      top: 60%;
+      right: 10%;
+    }
+
+    /* Floating Animation */
+    .floating-element {
+      position: absolute;
+      opacity: 0.1;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-1 {
+      top: 20%;
+      left: 15%;
+      font-size: 2rem;
+      animation-delay: 0s;
+    }
+
+    .floating-2 {
+      top: 70%;
+      right: 20%;
+      font-size: 1.5rem;
+      animation-delay: 2s;
+    }
+
+    .floating-3 {
+      top: 40%;
+      left: 80%;
+      font-size: 1.8rem;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .error-code {
+        font-size: 6rem;
+      }
+
+      .error-heading {
+        font-size: 2rem;
+      }
+
+      .error-description {
+        font-size: 1.1rem;
+      }
+
+      .home-button {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+      }
+
+      .circle-1, .circle-2, .circle-3 {
+        display: none;
+      }
+
+      .floating-element {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .error-code {
+        font-size: 4.5rem;
+      }
+
+      .error-heading {
+        font-size: 1.8rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container" id="container"><!-- Decorative Elements -->
+   <div class="circle-decoration circle-1" id="circle-1"></div>
+   <div class="circle-decoration circle-2" id="circle-2"></div>
+   <div class="circle-decoration circle-3" id="circle-3"></div><!-- Floating Elements -->
+   <div class="floating-element floating-1">
+    🔍
+   </div>
+   <div class="floating-element floating-2">
+    📄
+   </div>
+   <div class="floating-element floating-3">
+    ❔
+   </div><!-- Error Content -->
+   <div class="error-content">
+    <h1 class="error-code" id="error-code">404</h1>
+    <h2 class="error-heading" id="error-heading">Oops! Page Not Found</h2>
+    <p class="error-description" id="error-description">The page you're looking for is not here.</p><a href="#" class="home-button" id="home-button" onclick="goHome()">Take Me Home</a>
+    <p class="footer-text" id="footer-text">Need help? <a href="mailto:support@example.com" id="contact-link">Contact our support team</a></p>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: "#0f1f0f",
+      surface_color: "#1a2e1a",
+      text_color: "#f0f9f0",
+      primary_action_color: "#22c55e",
+      secondary_action_color: "#16a34a",
+      font_family: "Inter",
+      font_size: 16,
+      error_code: "404",
+      main_heading: "Oops! Page Not Found",
+      description: "he page you're looking for is not here.",
+      button_text: "Take Me Home",
+      footer_text: "Need help? Contact our support team"
+    };
+
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif';
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      // Apply colors
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryActionColor = config.primary_action_color || defaultConfig.primary_action_color;
+
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = textColor;
+
+      const container = document.getElementById('container');
+      container.style.backgroundColor = backgroundColor;
+
+      const circles = document.querySelectorAll('.circle-decoration');
+      circles.forEach(circle => {
+        circle.style.backgroundColor = primaryActionColor;
+      });
+
+      const homeButton = document.getElementById('home-button');
+      homeButton.style.backgroundColor = primaryActionColor;
+      homeButton.style.color = backgroundColor;
+
+      const contactLink = document.getElementById('contact-link');
+      contactLink.style.color = primaryActionColor;
+
+      // Apply fonts and text content
+      const elements = [
+        { id: 'error-code', size: 8, content: config.error_code || defaultConfig.error_code },
+        { id: 'error-heading', size: 2.5, content: config.main_heading || defaultConfig.main_heading },
+        { id: 'error-description', size: 1.2, content: config.description || defaultConfig.description },
+        { id: 'home-button', size: 1.1, content: config.button_text || defaultConfig.button_text },
+        { id: 'footer-text', size: 0.9, content: config.footer_text || defaultConfig.footer_text }
+      ];
+
+      elements.forEach(element => {
+        const el = document.getElementById(element.id);
+        if (el) {
+          el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+          el.style.fontSize = `${baseSize * element.size}px`;
+          el.style.color = textColor;
+          
+          if (element.id === 'home-button') {
+            el.style.color = backgroundColor;
+          }
+          
+          if (element.id !== 'home-button') {
+            el.textContent = element.content;
+          } else {
+            // For button, we need to preserve the onclick
+            const currentOnClick = el.getAttribute('onclick');
+            el.innerHTML = element.content;
+            el.setAttribute('onclick', currentOnClick);
+          }
+        }
+      });
+
+      // Update contact link text within footer
+      const footerEl = document.getElementById('footer-text');
+      if (footerEl) {
+        const footerContent = config.footer_text || defaultConfig.footer_text;
+        if (footerContent.includes('Contact')) {
+          footerEl.innerHTML = footerContent.replace(
+            'Contact our support team',
+            `<a href="mailto:support@example.com" id="contact-link" style="color: ${primaryActionColor};">Contact our support team</a>`
+          );
+        } else {
+          footerEl.textContent = footerContent;
+        }
+      }
+
+      // Responsive adjustments
+      if (window.innerWidth <= 768) {
+        document.getElementById('error-code').style.fontSize = `${baseSize * 6}px`;
+        document.getElementById('error-heading').style.fontSize = `${baseSize * 2}px`;
+        document.getElementById('error-description').style.fontSize = `${baseSize * 1.1}px`;
+        document.getElementById('home-button').style.fontSize = `${baseSize}px`;
+      }
+
+      if (window.innerWidth <= 480) {
+        document.getElementById('error-code').style.fontSize = `${baseSize * 4.5}px`;
+        document.getElementById('error-heading').style.fontSize = `${baseSize * 1.8}px`;
+      }
+    }
+
+    function goHome() {
+      window.location.href = '/';
+      // Try to go back in history first
+      if (window.history.length > 1) {
+        window.location.href = '/';
+      } else {
+        // If no history, try to go to root
+        window.history.back();
+      }
+    }
+
+    // Initialize SDK only if available
+    if (window.elementSdk && typeof window.elementSdk.init === 'function') {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["error_code", config.error_code || defaultConfig.error_code],
+          ["main_heading", config.main_heading || defaultConfig.main_heading],
+          ["description", config.description || defaultConfig.description],
+          ["button_text", config.button_text || defaultConfig.button_text],
+          ["footer_text", config.footer_text || defaultConfig.footer_text]
+        ])
+      });
+
+      onConfigChange(window.elementSdk.config);
+    } else {
+      // Fallback when SDK is not available
+      onConfigChange(defaultConfig);
+    }
+
+    // Responsive font size adjustment
+    window.addEventListener('resize', () => {
+      if (window.elementSdk && window.elementSdk.config) {
+        onConfigChange(window.elementSdk.config);
+      } else {
+        onConfigChange(defaultConfig);
+      }
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99a99e397498c814',t:'MTc2MjQ4NDgyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
