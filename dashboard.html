@@ -9,7 +9,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{display:flex;min-height:100vh;background:#f4f6f8;color:#1e293b;transition:0.3s;}
-body.dark{background:#1e293b;color:#f4f6f8;}
+body.dark{background:#1e2937;color:#f4f6f8;}
 .sidebar{width:260px;background:#1e293b;color:white;flex-shrink:0;display:flex;flex-direction:column;transition:width 0.3s;}
 .sidebar.collapsed{width:70px;}
 .sidebar .brand{padding:2rem;font-size:1.8rem;font-weight:bold;text-align:center;background:#111827;}
@@ -24,11 +24,11 @@ body.dark{background:#1e293b;color:#f4f6f8;}
 .topbar-right{display:flex;align-items:center;gap:1rem;}
 .main{flex:1;display:flex;flex-direction:column;}
 .content{padding:2rem;flex:1;overflow-y:auto;}
-.cards{display:grid;grid-template-columns: repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.cards{display:grid;grid-template-columns: repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:2rem;}
 .card{background:white;padding:1rem;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);transition: transform 0.2s;position:relative;}
-.card:hover{transform: translateY(-4px);cursor:pointer;}
+.card:hover{transform: translateY(-4px);}
 .card h3{font-size:1rem;color:#64748b;margin-bottom:0.5rem;}
-.card p{font-size:1.3rem;font-weight:bold;color:#1e40af;margin-bottom:0.5rem;}
+.card p{font-size:1.1rem;font-weight:bold;color:#1e40af;margin-bottom:0.5rem;}
 .card canvas{width:100%!important;height:60px!important;}
 .card.dark{background:#1f2937;color:white;}
 .progress-bar{background:#e2e8f0;height:10px;border-radius:8px;overflow:hidden;margin-top:0.5rem;}
@@ -48,7 +48,7 @@ input:checked + .slider{background:#3b82f6;}
 input:checked + .slider:before{transform:translateX(24px);}
 input, select{padding:0.45rem 0.75rem;border-radius:6px;border:1px solid #cbd5e1;outline:none;font-size:0.9rem;margin-top:0.5rem;width:100%;}
 input:focus, select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,0.2);}
-.chart{background:white;border-radius:12px;padding:1rem;height:260px;display:flex;align-items:center;justify-content:center;color:#64748b;box-shadow:0 3px 10px rgba(0,0,0,0.05);margin-bottom:2rem;}
+.chart{background:white;border-radius:12px;padding:1rem;height:120px;display:flex;align-items:center;justify-content:center;color:#64748b;box-shadow:0 3px 10px rgba(0,0,0,0.05);margin-bottom:1rem;}
 .chart.dark{background:#1f2937;color:white;}
 .modal{display:none;position:fixed;z-index:200;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.5);}
 .modal-content{background:white;margin:8% auto;padding:2rem;border-radius:12px;width:90%;max-width:600px;}
@@ -69,8 +69,8 @@ input:focus, select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,
         <li class="active" onclick="showPage('overview', this)"><i>🏠</i> <span class="label">Overview</span></li>
         <li onclick="showPage('analytics', this)"><i>📊</i> <span class="label">Analytics</span></li>
         <li onclick="showPage('projects', this)"><i>📁</i> <span class="label">Projects</span></li>
-        <li onclick="showPage('users', this)"><i>👥</i> <span class="label">Users</span></li>
         <li onclick="showPage('reports', this)"><i>📝</i> <span class="label">Reports</span></li>
+        <li onclick="showPage('users', this)"><i>👥</i> <span class="label">Users</span></li>
         <li onclick="showPage('settings', this)"><i>⚙️</i> <span class="label">Settings</span></li>
     </ul>
 </div>
@@ -93,31 +93,11 @@ input:focus, select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,
         <!-- Overview -->
         <div class="page" id="overview">
             <h2>Overview</h2>
-            <div class="cards">
-                <div class="card tooltip">
-                    <h3>Total Users</h3><p>1,245</p>
-                    <canvas id="miniUsersChart"></canvas>
-                    <span class="tooltiptext">Mini trend chart</span>
-                </div>
-                <div class="card tooltip">
-                    <h3>Active Projects</h3><p>32</p>
-                    <canvas id="miniProjectsChart"></canvas>
-                    <span class="tooltiptext">Mini trend chart</span>
-                </div>
-                <div class="card tooltip">
-                    <h3>Revenue</h3><p>$78k</p>
-                    <canvas id="miniRevenueChart"></canvas>
-                    <span class="tooltiptext">Mini trend chart</span>
-                </div>
-                <div class="card tooltip">
-                    <h3>New Signups</h3><p>87</p>
-                    <canvas id="miniSignupsChart"></canvas>
-                    <span class="tooltiptext">Mini trend chart</span>
-                </div>
-            </div>
+            <div id="overviewContainer" class="cards"></div>
+            <button class="btn" onclick="addOverviewCard()">Add Overview Widget</button>
         </div>
 
-        <!-- Analytics with filters -->
+        <!-- Analytics -->
         <div class="page" id="analytics" style="display:none;">
             <h2>Analytics</h2>
             <div class="filter-container">
@@ -129,103 +109,37 @@ input:focus, select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,
                     <option value="week4">Week 4</option>
                 </select>
             </div>
-            <div class="cards">
-                <div class="card">
-                    <h3>Weekly Traffic</h3><p id="trafficValue">12,345 Visits</p>
-                    <canvas id="analyticsTrafficChart"></canvas>
-                </div>
-                <div class="card">
-                    <h3>Conversion Rate</h3><p id="conversionValue">6.8%</p>
-                    <canvas id="analyticsConversionChart"></canvas>
-                </div>
-                <div class="card">
-                    <h3>User Growth</h3><p id="userValue">270 Active Users</p>
-                    <canvas id="analyticsUserChart"></canvas>
-                </div>
-            </div>
+            <div id="analyticsContainer" class="cards"></div>
+            <button class="btn" onclick="addAnalyticsCard()">Add Analytics Widget</button>
         </div>
 
-        <!-- Projects (drag-and-drop) -->
+        <!-- Projects -->
         <div class="page" id="projects" style="display:none;">
             <h2>Projects</h2>
-            <div id="projectsContainer" class="cards">
-                <div class="card" draggable="true" ondragstart="dragStart(event)">
-                    <h3>Project Apollo</h3>
-                    <p>80% Complete</p>
-                    <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
-                    <button class="btn" onclick="editCard(this)">Edit</button>
-                </div>
-                <div class="card" draggable="true" ondragstart="dragStart(event)">
-                    <h3>Project Zeus</h3>
-                    <p>45% Complete</p>
-                    <div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div>
-                    <button class="btn" onclick="editCard(this)">Edit</button>
-                </div>
-                <div class="card" draggable="true" ondragstart="dragStart(event)">
-                    <h3>Project Hera</h3>
-                    <p>60% Complete</p>
-                    <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
-                    <button class="btn" onclick="editCard(this)">Edit</button>
-                </div>
-            </div>
+            <div id="projectsContainer" class="cards"></div>
+            <button class="btn" onclick="addProject()">Add Project</button>
         </div>
 
-        <!-- Reports (drag-and-drop) -->
+        <!-- Reports -->
         <div class="page" id="reports" style="display:none;">
             <h2>Reports</h2>
-            <div id="reportsContainer" class="cards">
-                <div class="card" draggable="true" ondragstart="dragStart(event)">
-                    <h3>Revenue Report</h3>
-                    <p>Owner: John</p>
-                    <button class="btn" onclick="editCard(this)">Edit</button>
-                    <button class="btn">Download</button>
-                </div>
-                <div class="card" draggable="true" ondragstart="dragStart(event)">
-                    <h3>Traffic Report</h3>
-                    <p>Owner: Lisa</p>
-                    <button class="btn" onclick="editCard(this)">Edit</button>
-                    <button class="btn">Download</button>
-                </div>
-            </div>
+            <div id="reportsContainer" class="cards"></div>
+            <button class="btn" onclick="addReport()">Add Report</button>
         </div>
 
-        <!-- Users Page -->
+        <!-- Users -->
         <div class="page" id="users" style="display:none;">
             <h2>Users</h2>
-            <table id="usersTable">
-                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
-                <tbody>
-                    <tr><td>John Doe</td><td>john@example.com</td><td>Admin</td><td>Active</td></tr>
-                    <tr><td>Jane Smith</td><td>jane@example.com</td><td>Editor</td><td>Inactive</td></tr>
-                    <tr><td>Bob Johnson</td><td>bob@example.com</td><td>Viewer</td><td>Active</td></tr>
-                    <tr><td>Lisa Wong</td><td>lisa@example.com</td><td>Admin</td><td>Active</td></tr>
-                </tbody>
-            </table>
+            <div id="usersContainer" class="cards"></div>
+            <button class="btn" onclick="addUser()">Add User</button>
         </div>
 
-        <!-- Settings Page -->
+        <!-- Settings -->
         <div class="page" id="settings" style="display:none;">
             <h2>Settings</h2>
-            <div class="cards">
-                <div class="card">
-                    <h3>Profile</h3>
-                    <label>Username: <input type="text" id="username" value="Admin"></label>
-                    <label>Email: <input type="email" id="email" value="admin@example.com"></label>
-                    <button class="btn" onclick="alert('Profile saved')">Save</button>
-                </div>
-                <div class="card">
-                    <h3>Notifications</h3>
-                    <label>Email <label class="switch"><input type="checkbox" checked><span class="slider"></span></label></label>
-                    <label>SMS <label class="switch"><input type="checkbox"><span class="slider"></span></label></label>
-                    <label>Push <label class="switch"><input type="checkbox" checked><span class="slider"></span></label></label>
-                </div>
-                <div class="card">
-                    <h3>Theme</h3>
-                    <button class="btn" onclick="toggleTheme()">Toggle Light/Dark</button>
-                </div>
-            </div>
+            <div id="settingsContainer" class="cards"></div>
+            <button class="btn" onclick="addSettingsCard()">Add Setting</button>
         </div>
-
     </div>
 </div>
 
@@ -249,13 +163,15 @@ input:focus, select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,
 </div>
 
 <script>
-// Sidebar
+// --- Sidebar & Theme ---
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('show');}
-function showPage(pageId, element){
+function showPage(pageId, el){
     document.querySelectorAll('.page').forEach(p=>p.style.display='none');
-    document.getElementById(pageId).style.display='block';
+    const page = document.getElementById(pageId);
+    if (!page) return;
+    page.style.display='block';
     document.querySelectorAll('.sidebar li').forEach(li=>li.classList.remove('active'));
-    element.classList.add('active');
+    el.classList.add('active');
 }
 function toggleTheme(){
     document.body.classList.toggle('dark');
@@ -264,64 +180,140 @@ function toggleTheme(){
 function openModal(id){document.getElementById(id).style.display='block';}
 function closeModal(id){document.getElementById(id).style.display='none';}
 
-// Notifications (live)
-let notifications=["New user registered","Project Apollo milestone","Revenue target achieved"];
+// --- Notifications ---
+let notifications = JSON.parse(localStorage.getItem('notifications')) || ["Welcome to ProDash!"];
 const notifList=document.getElementById("notifList");
 function renderNotifications(){
     notifList.innerHTML="";
     notifications.forEach(n=>{
         const li=document.createElement("li"); li.textContent=n; notifList.appendChild(li);
     });
+    localStorage.setItem('notifications', JSON.stringify(notifications));
 }
 renderNotifications();
-setInterval(()=>{
-    const newNotif="Live update "+Math.floor(Math.random()*100);
-    notifications.unshift(newNotif); if(notifications.length>5) notifications.pop();
+function pushNotification(msg){
+    notifications.unshift(msg); 
+    if(notifications.length>10) notifications.pop();
     renderNotifications();
-},5000);
+}
 
-// Drag-and-drop
-function dragStart(e){e.dataTransfer.setData("text/plain",e.target.id);}
-new Sortable(document.getElementById('projectsContainer'),{animation:150});
-new Sortable(document.getElementById('reportsContainer'),{animation:150});
-
-// Edit modals
-let currentEditCard=null;
+// --- Edit modal ---
+let currentEditCard = null;
 function editCard(btn){
-    currentEditCard=btn.closest(".card");
-    document.getElementById("editTitle").value=currentEditCard.querySelector("h3").innerText;
-    let p=currentEditCard.querySelector("p");
-    document.getElementById("editValue").value=p?p.innerText:"";
+    currentEditCard = btn.closest(".card");
+    document.getElementById("editTitle").value = currentEditCard.querySelector("h3").innerText;
+    let p = currentEditCard.querySelector("p");
+    document.getElementById("editValue").value = p ? p.innerText : "";
     openModal('editModal');
 }
 function saveCardEdit(){
     if(currentEditCard){
-        currentEditCard.querySelector("h3").innerText=document.getElementById("editTitle").value;
-        let p=currentEditCard.querySelector("p");
-        if(p) p.innerText=document.getElementById("editValue").value;
+        currentEditCard.querySelector("h3").innerText = document.getElementById("editTitle").value;
+        let p = currentEditCard.querySelector("p");
+        if(p) p.innerText = document.getElementById("editValue").value;
+        saveAllData();
         closeModal('editModal');
     }
 }
 
-// Analytics filter
-function filterAnalytics(){
-    const week=document.getElementById("filterWeek").value;
-    document.getElementById("trafficValue").innerText=week==="week1"?"10,000 Visits":week==="week2"?"12,500 Visits":week==="week3"?"14,000 Visits":"12,345 Visits";
-    document.getElementById("conversionValue").innerText=week==="week1"?"5.5%":week==="week2"?"6.0%":week==="week3"?"7.0%":"6.8%";
-    document.getElementById("userValue").innerText=week==="week1"?"200 Users":week==="week2"?"250 Users":week==="week3"?"300 Users":"270 Users";
+// --- Drag-and-drop ---
+function makeSortable(id){
+    const container = document.getElementById(id);
+    if(container) new Sortable(container, {animation:150, onEnd: saveAllData});
+}
+['projectsContainer','reportsContainer'].forEach(makeSortable);
+
+// --- Data ---
+let overviewData = JSON.parse(localStorage.getItem('overviewData')) || [
+    {title:"Total Users", value:"1245", chart:[100,120,130,145]},
+    {title:"Revenue", value:"$78k", chart:[50,60,70,78]},
+    {title:"Active Projects", value:"32", chart:[5,8,12,15]}
+];
+let analyticsData = JSON.parse(localStorage.getItem('analyticsData')) || [
+    {title:"Traffic", value:"12345", chart:[3000,3200,3500,4000,3450]},
+    {title:"Conversion", value:"6.8%", chart:[5.5,6,6.5,7,6.8]},
+    {title:"User Growth", value:"270", chart:[200,220,240,260,270]}
+];
+let projectsData = JSON.parse(localStorage.getItem('projectsData')) || [
+    {title:"Project Apollo", value:"80% Complete", chart:[80,82,84,85]},
+    {title:"Project Zeus", value:"45% Complete", chart:[40,42,44,45]},
+    {title:"Project Hera", value:"60% Complete", chart:[55,57,60,60]}
+];
+let reportsData = JSON.parse(localStorage.getItem('reportsData')) || [
+    {title:"Revenue Report", value:"Owner: John", chart:[70,75,78,78]},
+    {title:"Traffic Report", value:"Owner: Lisa", chart:[3000,3200,3400,3450]}
+];
+let usersData = JSON.parse(localStorage.getItem('usersData')) || [
+    {title:"John Doe", value:"Admin", chart:[5,6,6,7]},
+    {title:"Jane Smith", value:"Editor", chart:[2,3,3,4]},
+    {title:"Lisa Wong", value:"Admin", chart:[6,6,7,7]}
+];
+let settingsData = JSON.parse(localStorage.getItem('settingsData')) || [
+    {title:"Profile", value:"Admin Account", chart:[0,0,0,0]},
+    {title:"Notifications", value:"Email, Push", chart:[0,0,0,0]},
+    {title:"Theme", value:"Light/Dark", chart:[0,0,0,0]}
+];
+
+// --- Render with charts ---
+function renderCards(containerId, data){
+    const container = document.getElementById(containerId);
+    container.innerHTML="";
+    data.forEach((item,i)=>{
+        const card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<h3>${item.title}</h3>
+            <p>${item.value}</p>
+            <canvas id="${containerId+i}Chart"></canvas>
+            <button class="btn" onclick="editCard(this)">Edit</button>
+            <button class="btn" onclick="deleteCard('${containerId}',${i})">Delete</button>`;
+        container.appendChild(card);
+
+        // mini chart
+        new Chart(document.getElementById(containerId+i+"Chart").getContext('2d'),{
+            type:'line',
+            data:{labels:['Mon','Tue','Wed','Thu','Fri'], datasets:[{data:item.chart,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)',fill:true,pointRadius:0}]},
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},elements:{line:{tension:0.4}}}
+        });
+    });
 }
 
-// Charts (mini)
-const miniChartOptions={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},elements:{point:{radius:0}}};
-new Chart(document.getElementById('miniUsersChart').getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu'],datasets:[{data:[100,120,130,145],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)'}]},options:miniChartOptions});
-new Chart(document.getElementById('miniProjectsChart').getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu'],datasets:[{data:[5,8,12,15],borderColor:'#f43f5e',backgroundColor:'rgba(244,63,94,0.2)'}]},options:miniChartOptions});
-new Chart(document.getElementById('miniRevenueChart').getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu'],datasets:[{data:[50,60,70,78],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.2)'}]},options:miniChartOptions});
-new Chart(document.getElementById('miniSignupsChart').getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu'],datasets:[{data:[20,25,40,50],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.2)'}]},options:miniChartOptions});
+// --- Save / Delete / Add ---
+function saveAllData(){
+    localStorage.setItem('overviewData', JSON.stringify(overviewData));
+    localStorage.setItem('analyticsData', JSON.stringify(analyticsData));
+    localStorage.setItem('projectsData', JSON.stringify(projectsData));
+    localStorage.setItem('reportsData', JSON.stringify(reportsData));
+    localStorage.setItem('usersData', JSON.stringify(usersData));
+    localStorage.setItem('settingsData', JSON.stringify(settingsData));
+    renderAll();
+}
+function addOverviewCard(){overviewData.push({title:"New Widget",value:"0",chart:[0,0,0,0]});pushNotification("Added overview widget");saveAllData();}
+function addAnalyticsCard(){analyticsData.push({title:"New Analytics",value:"0",chart:[0,0,0,0]});pushNotification("Added analytics widget");saveAllData();}
+function addProject(){projectsData.push({title:"New Project",value:"0% Complete",chart:[0,0,0,0]});pushNotification("Added project");saveAllData();}
+function addReport(){reportsData.push({title:"New Report",value:"Owner: Unknown",chart:[0,0,0,0]});pushNotification("Added report");saveAllData();}
+function addUser(){usersData.push({title:"New User",value:"Role",chart:[0,0,0,0]});pushNotification("Added user");saveAllData();}
+function addSettingsCard(){settingsData.push({title:"New Setting",value:"Value",chart:[0,0,0,0]});pushNotification("Added setting");saveAllData();}
+function deleteCard(containerId,index){
+    if(containerId==='overviewContainer') overviewData.splice(index,1);
+    if(containerId==='analyticsContainer') analyticsData.splice(index,1);
+    if(containerId==='projectsContainer') projectsData.splice(index,1);
+    if(containerId==='reportsContainer') reportsData.splice(index,1);
+    if(containerId==='usersContainer') usersData.splice(index,1);
+    if(containerId==='settingsContainer') settingsData.splice(index,1);
+    pushNotification("Deleted item from "+containerId);
+    saveAllData();
+}
 
-// Analytics charts
-new Chart(document.getElementById('analyticsTrafficChart').getContext('2d'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri'],datasets:[{label:'Visits',data:[3000,3200,3500,4000,3450],backgroundColor:'#3b82f6'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-new Chart(document.getElementById('analyticsConversionChart').getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri'],datasets:[{label:'Conversion',data:[5.5,6,6.5,7,6.8],borderColor:'#f43f5e',backgroundColor:'rgba(244,63,94,0.2)',fill:true}]}});
-new Chart(document.getElementById('analyticsUserChart').getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri'],datasets:[{label:'Users',data:[200,220,240,260,270],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.2)',fill:true}]}});
+// --- Initial render ---
+function renderAll(){
+    renderCards('overviewContainer',overviewData);
+    renderCards('analyticsContainer',analyticsData);
+    renderCards('projectsContainer',projectsData);
+    renderCards('reportsContainer',reportsData);
+    renderCards('usersContainer',usersData);
+    renderCards('settingsContainer',settingsData);
+}
+renderAll();
 </script>
 
 </body>
