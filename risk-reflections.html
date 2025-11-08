@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Insider Threat You Didn’t See Coming</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7faff;
+      color: #1b1f3b;
+      margin: 0;
+      padding: 0;
+      line-height: 1.7;
+    }
+
+    nav {
+      background-color: #0d47a1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav .logo {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: white;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li {
+      margin-left: 25px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #bbdefb;
+    }
+
+    header {
+      text-align: center;
+      background: white;
+      padding: 60px 20px 40px;
+    }
+
+    header img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.2em;
+      color: #0d47a1;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1em;
+      color: #1565c0;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 50px auto;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 40px;
+    }
+
+    h2 {
+      color: #0d47a1;
+      margin-top: 40px;
+      font-size: 1.5em;
+      border-left: 4px solid #1565c0;
+      padding-left: 10px;
+    }
+
+    h3 {
+      color: #1565c0;
+      margin-top: 30px;
+      font-size: 1.2em;
+    }
+
+    p {
+      margin: 15px 0;
+    }
+
+    ul {
+      margin-left: 25px;
+      padding-left: 0;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    blockquote {
+      border-left: 4px solid #1565c0;
+      background: #f0f5ff;
+      padding: 15px 20px;
+      margin: 25px 0;
+      font-style: italic;
+      color: #1b1f3b;
+    }
+
+    footer {
+      background-color: #0d47a1;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      margin-top: 50px;
+    }
+
+    .author {
+      margin-top: 40px;
+      font-weight: bold;
+      color: #0d47a1;
+    }
+
+    .tags {
+      margin-top: 20px;
+      background: #e3f2fd;
+      padding: 10px 15px;
+      border-radius: 8px;
+      color: #0d47a1;
+      font-size: 0.9em;
+    }
+
+    .tags span {
+      margin-right: 10px;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      nav ul {
+        flex-direction: column;
+        width: 100%;
+      }
+      nav ul li {
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">Ola Ayeni</div>
+    <ul>
+      <li><a href="./index">Home</a></li>
+      <li><a href="./index">Projects</a></li>
+      <li><a href="mailto:pearlrecycling@gmail.com">Contact</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <img src="https://lh3.googleusercontent.com/sitesv/AAzXCkdhMhyV_PiRx4sGVVgPt-vrei3qB-uNWRJSsLbPRINiIReg7ctva3BtkvvyQ0v17PQkYmbPpSYzPU7q_GOWPk1_dmmAJvfDihY9Nkbvf-PGzoHtd98rSB21YOW8JOHS1gS7MDj8Qv5k9fzfCwCuRPgoUFW8yK7JjQ15-I3pypF8KNsMOxljg0tIGLWxPkJ4N7jNp-85-eKN39ZgoLdYhJ0rtpf4aSG8awKG=w1280" alt="AI and Data Security" />
+    <h1>The Insider Threat You Didn’t See Coming</h1>
+    <p>How AI Is Quietly Bypassing Your DLP</p>
+  </header>
+
+  <main>
+    <p>
+      Many organizations believe their Data Loss Prevention (DLP) strategy is airtight — firewalls, endpoint agents, encrypted data, access controls. But there’s a new insider threat quietly bypassing all of it: employees using artificial intelligence tools, often without approval, and unknowingly exfiltrating sensitive data.
+    </p>
+
+    <p>
+      Employees are increasingly turning to AI to summarize reports, draft documents, analyze data, or generate code. In doing so, they often paste customer data, internal analytics, or proprietary content into prompts of third-party AI tools that log and reuse information for training. Your DLP doesn’t flag this, because it’s not an obvious breach. It’s productivity. And that’s what makes it dangerous.
+    </p>
+
+    <h2>The Hidden Insider Threat</h2>
+    <p>
+      NIST defines insider threat as the risk that an insider will use authorized access, wittingly or unwittingly, to harm the organization. This new class of insider threat sits squarely in that “unwitting” category. When an employee feeds sensitive data into an unauthorized AI platform, they effectively transfer organizational assets to an external entity—sometimes even to tools designed as decoys or data sniffers.
+    </p>
+
+    <p>
+      Even companies that have embraced enterprise AI are not immune. Many have yet to block unapproved AI domains or enforce policy controls around prompt data sharing. Others resist adopting a unified, approved AI altogether, creating a vacuum where employees rely on consumer-grade tools with unknown data-handling practices.
+    </p>
+
+    <h2>Why Traditional DLP Is Failing Here</h2>
+    <p>
+      Conventional DLP solutions were never designed for this scenario. They monitor emails, USB drives, and cloud uploads — not conversational interfaces. Browser-based AI tools create a blind spot where users manually input data into chat windows. From the system’s perspective, nothing abnormal occurs. But from a governance standpoint, it’s unmonitored data exfiltration.
+    </p>
+
+    <p>
+      Human behavior compounds the problem. Employees rarely perceive “using AI to help at work” as risky. Yet that very convenience channel is undermining your data protection architecture.
+    </p>
+
+    <h2>What Security Leaders Must Do</h2>
+    <h3>1. Block unauthorized AI tools</h3>
+    <p>
+      Restrict access to unsanctioned AI domains, APIs, and extensions through web proxies, DNS filtering, and endpoint policies. Make AI tools unreachable unless they are enterprise-approved and under governance. COBIT’s DSS05 and NIST SP 800-53 emphasize limiting external connections to approved channels.
+    </p>
+
+    <h3>2. Extend data classification to AI prompts</h3>
+    <p>
+      Update DLP rules to tag “data submitted to AI” as a monitored category. Integrate prompt-monitoring where feasible. NIST 800-171 and ISO 27001 both stress knowing where sensitive data flows, not just where it’s stored.
+    </p>
+
+    <h3>3. Build an AI Governance and Insider-Threat Framework</h3>
+    <p>
+      Move AI usage governance from IT policy to enterprise-level risk management. Use COBIT’s EDM principles to formalize oversight. Include AI-driven behavior in your insider-threat program and monitor for anomalies such as bulk copy-pasting of internal content into chat tools.
+    </p>
+
+    <h3>4. Strengthen awareness and behavioral controls</h3>
+    <p>
+      Educate employees on why uploading sensitive data to AI is equivalent to sending it outside the firewall. Embed “just-in-time” learning: when a user attempts to access blocked AI, display a brief reminder of policy and risk.
+    </p>
+
+    <h3>5. Update incident response for AI data breaches</h3>
+    <p>
+      Incorporate AI-related data submission into your response plans. NIST SP 1800-29 outlines clear guidance on detecting and recovering from confidentiality loss. Ensure AI vendors can delete or quarantine your data on demand.
+    </p>
+
+    <h2>The Framework Connection</h2>
+    <p>
+      Under the NIST Cybersecurity Framework (CSF), organizations must move beyond reactive defense to structured, cyclical resilience. This begins with <strong>Identify</strong>, mapping where AI tools intersect with data flows. Next is <strong>Protect</strong>, instituting access controls to prevent data from leaving approved AI environments. Then comes <strong>Detect</strong>, monitoring for unsanctioned AI activity. <strong>Respond</strong> follows, deploying incident protocols. Finally, <strong>Recover</strong>, reinforcing awareness and vendor accountability.
+    </p>
+
+    <p>
+      COBIT complements this by embedding governance into the conversation. It reminds us that technology cannot secure what leadership has not defined. Executives must set a clear AI risk appetite and institutionalize ongoing oversight.
+    </p>
+
+    <h2>Leadership Imperative</h2>
+    <p>
+      Executives must recognize this isn’t just a “security configuration” issue—it’s a business risk. When employees unknowingly expose data to external AIs, the organization risks violating laws, losing IP, and eroding trust.
+    </p>
+
+    <blockquote>
+      “Your DLP isn’t being breached, it’s being bypassed by trusted users through the convenience of AI.”
+    </blockquote>
+
+    <p>
+      The threat isn’t malicious actors outside your perimeter; it’s ungoverned intelligence inside it. AI has transformed productivity, but without structured governance, it can just as easily transform your organization into a data-leak waiting to happen.
+    </p>
+
+    <p class="author">(C) Ola Ayeni CISM, CISA, MEM</p>
+
+    <div class="tags">
+      <span>#CyberSecurity</span>
+      <span>#DataLossPrevention</span>
+      <span>#InsiderThreat</span>
+      <span>#AI</span>
+      <span>#Governance</span>
+      <span>#NIST</span>
+      <span>#COBIT</span>
+      <span>#DataProtection</span>
+      <span>#RiskManagement</span>
+      <span>#CyberAwareness</span>
+    </div>
+  </main>
+
+  <footer>
+    Protect your data. Govern your AI. Don’t let innovation become your Trojan horse.
+  </footer>
+</body>
+</html>
