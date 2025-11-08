@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIST Cybersecurity Framework Implementation | HIPAA Compliance Initiative</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7faff;
+      color: #1b1f3b;
+      margin: 0;
+      padding: 0;
+      line-height: 1.7;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      background-color: #0d47a1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav .logo {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: white;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li {
+      margin-left: 25px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #bbdefb;
+    }
+
+    .container {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    aside {
+      width: 250px;
+      position: sticky;
+      top: 90px;
+      align-self: flex-start;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-right: 30px;
+      height: fit-content;
+    }
+
+    aside h3 {
+      color: #0d47a1;
+      font-size: 1em;
+      margin-top: 0;
+    }
+
+    aside ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0 0;
+    }
+
+    aside ul li {
+      margin: 8px 0;
+    }
+
+    aside ul li a {
+      text-decoration: none;
+      color: #1b1f3b;
+      font-size: 0.95em;
+      transition: color 0.3s;
+    }
+
+    aside ul li a:hover {
+      color: #1565c0;
+    }
+
+    main {
+      flex: 1;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      color: #0d47a1;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: #1565c0;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    h2 {
+      color: #0d47a1;
+      border-left: 4px solid #1565c0;
+      padding-left: 10px;
+      margin-top: 50px;
+      font-size: 1.5em;
+    }
+
+    h3 {
+      color: #1565c0;
+      margin-top: 25px;
+      font-size: 1.2em;
+    }
+
+    p, li {
+      margin: 10px 0;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    blockquote {
+      border-left: 4px solid #1565c0;
+      background: #f0f5ff;
+      padding: 15px 20px;
+      margin: 25px 0;
+      font-style: italic;
+      color: #1b1f3b;
+    }
+
+    footer {
+      background-color: #0d47a1;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      margin-top: 50px;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+      }
+      aside {
+        width: 100%;
+        margin-bottom: 30px;
+        position: relative;
+        top: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">Cyber Governance</div>
+    <ul>
+      <li><a href="./index">Home</a></li>
+      <li><a href="./index">Projects</a></li>
+      <li><a href="mailto:pearlrecycling@gmail.com">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <aside>
+      <h3>Sections</h3>
+      <ul>
+        <li><a href="#summary">Executive Summary</a></li>
+        <li><a href="#challenge">Challenge</a></li>
+        <li><a href="#approach">Approach & Leadership</a></li>
+        <li><a href="#implementations">Key Implementations & Results</a></li>
+        <li><a href="#outcomes">Quantifiable Outcomes</a></li>
+        <li><a href="#challenges">Key Challenges & Solutions</a></li>
+        <li><a href="#tools">Tools & Frameworks</a></li>
+        <li><a href="#lessons">Lessons & Best Practices</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <header>
+        <h1>NIST Cybersecurity Framework Implementation</h1>
+        <p>8-Week HIPAA Compliance Initiative</p>
+      </header>
+
+      <section id="summary">
+        <h2>Executive Summary</h2>
+        <p>
+          Directed an accelerated NIST Cybersecurity Framework (CSF) implementation for a mid-sized healthcare organization facing urgent HIPAA compliance risks. Delivered full security transformation within 8 weeks, closing 37 critical gaps, deploying 24/7 monitoring, and establishing sustainable governance, while maintaining uninterrupted clinical operations across 2,400+ assets.
+        </p>
+        <p><strong>Result:</strong> Security maturity advanced from Tier 1 (Partial) to Tier 2 (Risk-Informed); zero patient care disruptions.</p>
+      </section>
+
+      <section id="challenge">
+        <h2>Challenge</h2>
+        <p><strong>Compliance Pressure:</strong> Annual risk analysis revealed major HIPAA gaps and $2.3M+ potential OCR exposure.</p>
+        <p><strong>Constraints:</strong> 3-person security team, limited expertise, zero downtime tolerance.</p>
+        <p><strong>Environment:</strong> 2,400+ assets (EHR–Epic, PACS, 340 networked medical devices, cloud services) with no MFA, no SIEM, flat network, and signature-only AV.</p>
+      </section>
+
+      <section id="approach">
+        <h2>Approach & Leadership</h2>
+        <h3>Governance & Mobilization</h3>
+        <p>
+          Formed cross-functional steering committee (CISO, CMO, Privacy, Legal, Operations). Created RACI for 98 NIST CSF subcategories, secured $500K emergency budget, and instituted daily standups with weekly board briefings.
+        </p>
+
+        <h3>Evidence-Based Assessment</h3>
+        <p>
+          Led 3-day intensive workshop to validate real security posture. Mapped HIPAA Security Rule to NIST CSF, prioritized 37 high-impact gaps via risk matrix (patient safety → regulatory → threat → feasibility), and produced visual heat map of maturity levels.
+        </p>
+
+        <h3>Risk Quantification</h3>
+        <p>
+          Modeled ransomware ($2M+) and PHI breach ($1.5M) scenarios. Quantified downtime at $150K/hr and linked control implementations to measurable risk reduction.
+        </p>
+      </section>
+
+      <section id="implementations">
+        <h2>Key Implementations & Results</h2>
+
+        <h3>IDENTIFY – Asset & Risk Management</h3>
+        <ul>
+          <li>Cataloged 2,400+ devices, mapped PHI exposure, and updated Security Risk Analysis.</li>
+          <li>Built HIPAA-aligned risk register (89 risks, treatment owners assigned).</li>
+          <li>Established vendor risk program for 127 third parties (BAAs updated).</li>
+        </ul>
+        <blockquote>Leadership gained first complete view of organizational cyber risk.</blockquote>
+
+        <h3>PROTECT – Foundational Security Controls</h3>
+        <ul>
+          <li>Deployed MFA (100% remote, 85% internal); removed 847 excessive privileges.</li>
+          <li>Encrypted 100% mobile devices and backups; DLP blocked 47 PHI exfiltration attempts in 30 days.</li>
+          <li>Implemented 5-tier segmentation, next-gen firewalls, VPN with MFA.</li>
+        </ul>
+        <blockquote>Attack surface reduced 60%; eliminated weak authentication and lateral movement paths.</blockquote>
+
+        <h3>DETECT – Security Operations</h3>
+        <ul>
+          <li>Deployed SIEM (Splunk) covering 85% of critical assets; integrated 12 log sources.</li>
+          <li>Established 24/7 SOC via MSSP; launched vulnerability management with defined SLAs.</li>
+        </ul>
+        <blockquote>MTTD improved to 4.2 hours; detected and contained 3 incidents.</blockquote>
+
+        <h3>RESPOND – Incident Management</h3>
+        <ul>
+          <li>Developed healthcare-specific IR playbooks (ransomware, PHI breach, medical device compromise).</li>
+          <li>Conducted tabletop exercise simulating EHR ransomware.</li>
+        </ul>
+        <blockquote>Organization gained functional, tested incident response capability.</blockquote>
+
+        <h3>RECOVER – Resilience & Continuity</h3>
+        <ul>
+          <li>Defined RTO/RPO (EHR: 4hr / 15min); validated recovery via live drills.</li>
+          <li>Implemented paper-chart contingency and manual workflows.</li>
+        </ul>
+        <blockquote>Verified recovery capability through testing, not assumptions.</blockquote>
+      </section>
+
+      <section id="outcomes">
+        <h2>Quantifiable Outcomes</h2>
+        <ul>
+          <li>Security Maturity: Tier 1 → Tier 2 across all CSF functions.</li>
+          <li>Gaps Closed: 37/37 (100%) within 8 weeks.</li>
+          <li>HIPAA Compliance: Full Security Rule alignment.</li>
+          <li>Risk Reduction: 60% decrease; prevented $2.3M+ potential breach costs.</li>
+          <li>Cyber Insurance: 15% premium reduction.</li>
+          <li>Operations: 100% uptime maintained.</li>
+        </ul>
+        <p><strong>Key Metrics:</strong></p>
+        <ul>
+          <li>MFA coverage: 0% → 100% (remote), 0% → 85% (internal)</li>
+          <li>Security monitoring: 0% → 85% of critical assets</li>
+          <li>Phishing click rate: 28% → 12% (target &lt;5%)</li>
+        </ul>
+      </section>
+
+      <section id="challenges">
+        <h2>Key Challenges & Solutions</h2>
+        <ul>
+          <li><strong>Aggressive Timeline:</strong> Compressed 12-month roadmap to 8 weeks via parallel workstreams and external augmentation.</li>
+          <li><strong>Clinical Continuity:</strong> CMO oversight ensured zero disruptions.</li>
+          <li><strong>Medical Device Constraints:</strong> Segmented 340 restricted devices into isolated VLANs.</li>
+          <li><strong>Limited Resources:</strong> Engaged MSSP, cross-trained staff, delegated authority.</li>
+        </ul>
+      </section>
+
+      <section id="tools">
+        <h2>Tools & Frameworks</h2>
+        <p><strong>Frameworks:</strong> NIST CSF 1.1, NIST SP 800-53, HIPAA Security Rule, RMF</p>
+        <p><strong>Security Tools:</strong> CrowdStrike Falcon, CyberArk, Duo, Splunk, Proofpoint, Symantec DLP, Tenable Nessus, Palo Alto Firewalls</p>
+        <p><strong>Platforms:</strong> Epic EHR, AD / Azure AD, AWS, Azure, Microsoft 365</p>
+      </section>
+
+      <section id="lessons">
+        <h2>Lessons & Best Practices</h2>
+        <h3>Success Factors</h3>
+        <ul>
+          <li>Executive mandate ensured alignment and resource flow.</li>
+          <li>Clinical partnership: security framed as patient safety.</li>
+          <li>Risk-based prioritization and quick wins sustained momentum.</li>
+          <li>Transparent communication: daily standups, weekly board briefs.</li>
+        </ul>
+
+        <h3>Future Improvements</h3>
+        <ul>
+          <li>Ideal timeline: 12–16 weeks for deeper testing.</li>
+          <li>Earlier baseline metrics collection for richer comparisons.</li>
+        </ul>
+
+        <p><strong>Portfolio Artifacts (De-identified):</strong> Gap Analysis Heat Map | Risk Register | Policy Framework | Incident Playbooks | Metrics Dashboard | Network Architecture</p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    (C) Ola Ayeni CISM, CISA, MEM — NIST CSF | HIPAA Implementation Case Study
+  </footer>
+</body>
+</html>
