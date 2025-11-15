@@ -482,7 +482,6 @@
             padding: 2.5rem;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            margin-bottom: 2rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 5px solid #3b82f6;
             position: relative;
@@ -555,6 +554,12 @@
             color: #64748b;
             font-size: 0.95rem;
             line-height: 1.7;
+        }
+        
+        .strengths-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
         }
         
         .cert-badges {
@@ -701,7 +706,7 @@
             position: relative;
         }
         
-        .project-card::after {
+        /* .project-card::after {
             content: '✓ Verified';
             position: absolute;
             top: 12px;
@@ -717,7 +722,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(10px);
             z-index: 10;
-        }
+        } */
         
         .project-card:hover {
             transform: translateY(-15px) rotateY(2deg);
@@ -879,10 +884,11 @@
             <div class="hero-text">
                 <h1>Ola Ayeni</h1>
                 <div class="title">Ola Ayeni - GRC Analyst | IT Audit | Risk Analyst | CISM, CISA, ISC² CC</div>
-                <div class="tagline">Results-driven GRC Analyst with a Network Infrastructure and Computer Engineering background, leveraging 7+ years’ experience implementing NIST, ISO 27001, COBIT, SOC 2, and GDPR frameworks to align technical controls with business risk and ensure audit readiness and compliance.</div>
+                <div class="tagline">Results-driven GRC Analyst with a Network Infrastructure and Computer Engineering background, leveraging 5+ years’ experience implementing NIST, ISO 27001, COBIT, SOC 2, and GDPR frameworks to align technical controls with business risk and ensure audit readiness and compliance.</div>
                 <div class="contact-links">
                     <a href="mailto:pearlrecycling@gmail.com">✉️ Email</a>
                     <a href="#">📍 DMV, USA</a>
+                    <a href="https://linkedin.com/in/olamideiayeni">LinkedIn</a>
                 </div>
             </div>
         </div>
@@ -900,13 +906,13 @@
         <section id="summary">
             <h2>Executive Summary</h2>
             <div class="summary-box">
-                <p>Strategic GRC professional with 7+ years driving enterprise compliance and risk management initiatives across banking, federal, and private sectors. Proven track record of reducing organizational risk by 40% while improving operational efficiency through automation and process optimization. Expert in translating complex regulatory requirements into actionable business strategies, ensuring audit readiness, and fostering security-aware cultures.</p>
+                <p>Strategic GRC professional with 5+ years driving enterprise compliance and risk management initiatives across banking, federal, and private sectors. Proven track record of reducing organizational risk by 40% while improving operational efficiency through automation and process optimization. Expert in translating complex regulatory requirements into actionable business strategies, ensuring audit readiness, and fostering security-aware cultures.</p>
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
-                <div style="background: linear-gradient(135deg, #fef3c7, #fef08a); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #f59e0b;">
-                    <p style="color: #92400e; font-weight: 700; margin-bottom: 0.5rem;">🎯 Track Record</p>
-                    <p style="color: #b45309; font-size: 0.9rem;">0 major audit findings | 40% risk reduction | 750+ locations secured</p>
+                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #3b82f6;">
+                    <p style="color: #0c4a6e; font-weight: 700; margin-bottom: 0.5rem;">🎯 Track Record</p>
+                    <p style="color: #0369a1; font-size: 0.9rem;">0 major audit findings | 40% risk reduction | 250+ locations secured</p>
                 </div>
                 <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #3b82f6;">
                     <p style="color: #0c4a6e; font-weight: 700; margin-bottom: 0.5rem;">📊 Impact</p>
@@ -916,11 +922,11 @@
             
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number">7+</div>
+                    <div class="stat-number">5+</div>
                     <div class="stat-label">Years Experience</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">750+</div>
+                    <div class="stat-number">250+</div>
                     <div class="stat-label">Locations Secured</div>
                 </div>
                 <div class="stat-card">
@@ -937,10 +943,10 @@
      <section id="certifications">
             <h2>Professional Certifications</h2>
             <div class="cert-badges">
-                <div class="badge" title="Certified Information Security Manager">✓ ISACA CISM</div>
-                <div class="badge" title="Certified Information Systems Auditor">✓ ISACA CISA</div>
-                <div class="badge" title="Certified Security Certification">✓ ISC² CC</div>
-                <div class="badge" title="Fortinet Certified Professional">✓ Fortinet Certified</div>
+                <div class="badge" title="Certified Information Security Manager"><a href="https://www.credly.com/badges/70d12b25-8641-4cd2-912d-d6bab69710a3/public_url" style="text-decoration: none;">✓ ISACA CISM</a></div>
+                <div class="badge" title="Certified Information Systems Auditor"><a href="https://www.credly.com/badges/76b266d7-171e-4943-807f-f8b5d17077e7" style="text-decoration: none;">✓ ISACA CISA</a></div>
+                <div class="badge" title="Certified Security Certification"><a href="https://www.credly.com/badges/f80d699e-c247-48ca-9105-5ad0e7c2be9f" style="text-decoration: none;">✓ ISC² CC</a></div>
+                <div class="badge" title="Fortinet Certified Professional"><a href="https://www.credly.com/badges/92db0546-7541-4ce5-b33c-a7e381c07511/public_url" style="text-decoration: none;">✓ Fortinet Certified</a></div>
                 <div class="badge" title="Certified Risk and Information Systems Control - In Progress">◐ CRISC (In Progress)</div>
                 <div class="badge" title="CompTIA Security+ Coming 2025">⌛ Security+ (2025)</div>
             </div>
@@ -954,6 +960,7 @@
         <section id="strengths">
             <h2>Core Strengths</h2>
             
+            <div class="strengths-grid">
             <div class="strength-item">
                 <div class="strength-header">
                     <h3>Governance & Compliance Leadership</h3>
@@ -1002,7 +1009,7 @@
                     <div class="strength-fill" style="width: 88%"></div>
                 </div>
                 <div class="strength-description">
-                    Deep technical foundation in network security, enterprise IT infrastructure, and vulnerability management. CCNA/CCDA-trained with hands-on experience deploying security monitoring across 750+ locations and managing Active Directory, firewalls, and cloud environments.
+                    Deep technical foundation in network security, enterprise IT infrastructure, and vulnerability management. CCNA/CCDA-trained with hands-on experience deploying security monitoring across 250+ locations and managing Active Directory, firewalls, and cloud environments.
                 </div>
             </div>
             
@@ -1030,6 +1037,7 @@
                 <div class="strength-description">
                     Designed and delivered comprehensive security awareness programs with phishing simulations, improving organizational security culture metrics by 35%. Skilled at communicating complex security concepts to diverse audiences.
                 </div>
+            </div>
             </div>
         </section>
         
@@ -1059,7 +1067,7 @@
                     <div class="company">Telnet Nigeria Ltd.</div>
                     <div class="date">Oct 2018 - Jun 2021</div>
                     <div class="highlight">
-                        Deployed enterprise security monitoring across 750+ banking locations, conducted ITGC audits for PCI-DSS compliance, and improved incident response capabilities by 35% through automation and observability tools.
+                        Deployed enterprise security monitoring across 250+ banking locations, conducted ITGC audits for PCI-DSS compliance, and improved incident response capabilities by 35% through automation and observability tools.
                     </div>
                 </div>
             </div>
@@ -1087,9 +1095,9 @@
     
 <div id="projects" class="tab-content">
     <div class="container">
-        <!-- Featured Projects Section -->
+        <!-- Projects Handled Section -->
         <section>
-            <h2>Featured Projects</h2>
+            <h2>Projects Handled</h2>
             <p style="color: #64748b; margin-bottom: 2rem;">Showcasing hands-on implementations of GRC frameworks, automation solutions, and security initiatives</p>
             
             <div class="projects-grid">
@@ -1131,7 +1139,7 @@
                         <div class="project-category">Enterprise Security</div>
                         <h3 class="project-title">Banking Security Monitoring</h3>
                         <p class="project-description">
-                            Deployed vulnerability management and threat detection across 750+ banking branches, enhancing security visibility and compliance monitoring nationwide.
+                            Deployed vulnerability management and threat detection across 250+ banking branches, enhancing security visibility and compliance monitoring nationwide.
                         </p>
                         <div class="project-tags">
                             <span class="project-tag">Nessus</span>
@@ -1279,7 +1287,7 @@
                 <div>
                     <h3 style="font-size: 1.1rem; margin-bottom: 0.8rem;">✓ Verified Expertise</h3>
                     <ul style="list-style: none; font-size: 0.9rem; line-height: 1.8; opacity: 0.9;">
-                        <li>✓ 7+ years GRC experience</li>
+                        <li>✓ 5+ years GRC experience</li>
                         <li>✓ Multiple industry certifications</li>
                         <li>✓ Zero major audit findings</li>
                         <li>✓ Enterprise frameworks deployed</li>
@@ -1288,7 +1296,7 @@
                 <div>
                     <h3 style="font-size: 1.1rem; margin-bottom: 0.8rem;">📍 Get in Touch</h3>
                     <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.8rem;">
-                        <a href="mailto:pearlrecycling@gmail.com" style="color: #93c5fd; text-decoration: none; font-weight: 600;">pearlrecycling@gmail.com</a>
+                        <a href="https://linkedin.com/in/olamideiayeni" style="color: #93c5fd; text-decoration: none; font-weight: 600;">Contact</a>
                     </p>
                     <p style="font-size: 0.9rem; opacity: 0.9;">Based in DMV, USA</p>
                 </div>
