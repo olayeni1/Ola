@@ -932,6 +932,116 @@
                 font-size: 1.7rem;
             }
         }
+        
+        /* Fortinet Modal Styles */
+        .fortinet-modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        
+        .fortinet-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .fortinet-modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .fortinet-modal.active .fortinet-modal-content {
+            transform: scale(1);
+        }
+        
+        .fortinet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .fortinet-modal-header h3 {
+            color: #0f172a;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        
+        .fortinet-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            transition: color 0.3s ease;
+        }
+        
+        .fortinet-modal-close:hover {
+            color: #3b82f6;
+        }
+        
+        .fortinet-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .fortinet-link-item {
+            display: flex;
+            align-items: center;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: #0f172a;
+        }
+        
+        .fortinet-link-item:hover {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+        
+        .fortinet-link-item-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .fortinet-link-item-text {
+            flex: 1;
+        }
+        
+        .fortinet-link-item-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+        
+        .fortinet-link-item-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -949,6 +1059,39 @@
                     <a href="#">📍 DMV, USA</a>
                     <a href="https://linkedin.com/in/olamideiayeni">LinkedIn</a>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fortinet Certifications Modal -->
+    <div id="fortinelModal" class="fortinet-modal" onclick="closeFortinelModal(event)">
+        <div class="fortinet-modal-content" onclick="event.stopPropagation()">
+            <div class="fortinet-modal-header">
+                <h3>Fortinet Certifications</h3>
+                <button class="fortinet-modal-close" onclick="closeFortinelModal()">×</button>
+            </div>
+            <div class="fortinet-links-list">
+                <a href="https://www.credly.com/badges/92db0546-7541-4ce5-b33c-a7e381c07511/public_url" target="_blank" class="fortinet-link-item">
+                    <div class="fortinet-link-item-icon">🔐</div>
+                    <div class="fortinet-link-item-text">
+                        <span class="fortinet-link-item-title">Fortinet Certified Fundamentals Cybersecurity</span>
+                        <span class="fortinet-link-item-desc">Verify credential on Credly</span>
+                    </div>
+                </a>
+                <a href="https://www.credly.com/badges/daa0e399-6988-4bbf-a538-be6c7096054a/public_url" target="_blank" class="fortinet-link-item">
+                    <div class="fortinet-link-item-icon">📚</div>
+                    <div class="fortinet-link-item-text">
+                        <span class="fortinet-link-item-title">Introduction to the Threat Landscape 3.0</span>
+                        <span class="fortinet-link-item-desc">Verify credential on Credly</span>
+                    </div>
+                </a>
+                <a href="https://www.credly.com/badges/52c0c9a6-7bf8-4f65-8f0f-b0d8b84a63e3" target="_blank" class="fortinet-link-item">
+                    <div class="fortinet-link-item-icon">🛡️</div>
+                    <div class="fortinet-link-item-text">
+                        <span class="fortinet-link-item-title">Technical Introduction to Cybersecurity 2.0</span>
+                        <span class="fortinet-link-item-desc">Verify credential on Credly</span>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
@@ -1007,8 +1150,8 @@
                 <div class="badge" title="Certified Information Security Manager"><a href="https://www.credly.com/badges/70d12b25-8641-4cd2-912d-d6bab69710a3/public_url" style="text-decoration: none; color: white;">✓ ISACA CISM</a></div>
                 <div class="badge" title="Certified Information Systems Auditor"><a href="https://www.credly.com/badges/76b266d7-171e-4943-807f-f8b5d17077e7" style="text-decoration: none; color: white;">✓ ISACA CISA</a></div>
                 <div class="badge" title="Certified Security Certification"><a href="https://www.credly.com/badges/f80d699e-c247-48ca-9105-5ad0e7c2be9f" style="text-decoration: none; color: white;">✓ ISC² CC</a></div>
-                <div class="badge" title="Fortinet Certified Professional"><a href="https://www.credly.com/badges/92db0546-7541-4ce5-b33c-a7e381c07511/public_url" style="text-decoration: none; color: white;">✓ Fortinet Certified</a></div>
-                <div class="badge" title="Certified Risk and Information Systems Control - In Progress" style="color: white;">◐ CRISC (In Progress)</div>
+                <div class="badge" title="Fortinet Certified Professional" style="cursor: pointer;" onclick="openFortinelModal()">✓ Fortinet Certified</div>
+                <div class="badge" title="Certified Risk and Information Systems Control - In Progress" style="color: white;">◐ CRISC</div>
                 <div class="badge" title="CompTIA Security+ Coming 2025" style="color: white;">⌛ Security+ (2025)</div>
             </div>
             
@@ -1566,6 +1709,37 @@
             header.addEventListener('mouseleave', function() {
                 this.style.color = '#0f172a';
             });
+        });
+        
+        // Fortinet Modal Functions
+        function openFortinelModal() {
+            console.log('Opening Fortinet modal');
+            const modal = document.getElementById('fortinelModal');
+            if (modal) {
+                modal.classList.add('active');
+            } else {
+                console.error('Modal element not found');
+            }
+        }
+        
+        function closeFortinelModal(event) {
+            console.log('Closing Fortinet modal');
+            const modal = document.getElementById('fortinelModal');
+            if (modal) {
+                if (!event || event.target.id === 'fortinelModal') {
+                    modal.classList.remove('active');
+                }
+            }
+        }
+        
+        // Close modal when pressing Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('fortinelModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
         });
     </script>
 </body>
