@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compliance Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
     body {
@@ -595,8 +593,8 @@
      </div>
     </div>
    </div><!-- Toast Notification -->
-   <div id="toast" class="fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl hidden z-50 animate-fade-in font-semibold"><span id="toast-message">Success!</span>
-   </div>
+  <div id="toast" class="fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl hidden z-50 animate-fade-in font-semibold"><span id="toast-message">Success!</span>
+  </div>
   </div>
   <script>
     // Configuration
@@ -610,7 +608,108 @@
     let currentUserRole = 'admin';
     let currentUserId = 'demo@example.com';
     let currentTrainingRecord = null;
-
+   
+    if (!window.elementSdk) {
+      window.elementSdk = (function() {
+        let config = { ...defaultConfig };
+        let onConfigChange = null;
+        return {
+          init(options) {
+            if (options && options.defaultConfig) {
+              config = { ...config, ...options.defaultConfig };
+            }
+            if (options && typeof options.onConfigChange === 'function') {
+              onConfigChange = options.onConfigChange;
+              onConfigChange(config);
+            }
+            return { isOk: true };
+          },
+          async setConfig(newConfig) {
+            config = { ...config, ...newConfig };
+            if (onConfigChange) {
+              await onConfigChange(config);
+            }
+            return { isOk: true };
+          }
+        };
+      })();
+    }
+   
+    if (!window.dataSdk) {
+      window.dataSdk = (function() {
+        let handler = null;
+        const storageKey = 'compliance_command_center_data';
+       
+        function load() {
+          try {
+            if (typeof localStorage === 'undefined') return;
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              allData = parsed;
+            }
+          } catch (e) {
+          }
+        }
+       
+        function save() {
+          try {
+            if (typeof localStorage === 'undefined') return;
+            localStorage.setItem(storageKey, JSON.stringify(allData));
+          } catch (e) {
+          }
+        }
+       
+        function notify() {
+          if (handler && typeof handler.onDataChanged === 'function') {
+            handler.onDataChanged(allData.slice());
+          }
+        }
+       
+        function ensureId(record) {
+          if (!record.__backendId) {
+            record.__backendId = 'rec-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+          }
+          return record;
+        }
+       
+        return {
+          async init(h) {
+            handler = h;
+            load();
+            notify();
+            return { isOk: true };
+          },
+          async create(record) {
+            const newRecord = ensureId({ ...record });
+            allData = allData.concat([newRecord]);
+            save();
+            notify();
+            return { isOk: true, record: newRecord };
+          },
+          async update(record) {
+            if (!record.__backendId) {
+              return { isOk: false, error: { message: 'Missing record id' } };
+            }
+            allData = allData.map(r => r.__backendId === record.__backendId ? { ...r, ...record } : r);
+            save();
+            notify();
+            return { isOk: true };
+          },
+          async delete(record) {
+            if (!record || !record.__backendId) {
+              return { isOk: false, error: { message: 'Missing record id' } };
+            }
+            allData = allData.filter(r => r.__backendId !== record.__backendId);
+            save();
+            notify();
+            return { isOk: true };
+          }
+        };
+      })();
+    }
+   
     // Sample assessment questions for different frameworks
     const assessmentQuestions = {
       'ISO 27001': [
@@ -2530,8 +2629,8 @@
         } else {
           showToast('Failed to update vendor', 'error');
         }
-      }
+    }
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd08ba8a70bde8e',t:'MTc2ODI2MTcxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
