@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compliance Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
     body {
@@ -99,70 +100,12 @@
    <div class="shape w-48 h-48 bg-white rounded-full" style="top: 60%; right: 15%; animation-delay: 5s;"></div>
    <div class="shape w-32 h-32 bg-white rounded-full" style="bottom: 20%; left: 50%; animation-delay: 10s;"></div>
   </div>
-  <!-- Auth Modal -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="card-glass rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Compliance Dashboard</h1>
-      <p class="text-gray-600 mb-8">Sign in or create an account</p>
-      
-      <div id="auth-form-container">
-        <!-- Sign In Form -->
-        <form id="signin-form" onsubmit="handleSignIn(event)" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input type="email" id="signin-email" placeholder="your@email.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input type="password" id="signin-password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-          </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 rounded-lg transition-all">
-            Sign In
-          </button>
-        </form>
-        
-        <div class="my-4 text-center text-gray-500">or</div>
-        
-        <button onclick="toggleAuthForm()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-lg transition-all">
-          Create New Account
-        </button>
-      </div>
-      
-      <div id="signup-form-container" class="hidden space-y-4">
-        <!-- Sign Up Form -->
-        <form id="signup-form" onsubmit="handleSignUp(event)" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input type="email" id="signup-email" placeholder="your@email.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input type="password" id="signup-password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-            <input type="password" id="signup-password-confirm" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-          </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 rounded-lg transition-all">
-            Create Account
-          </button>
-        </form>
-        
-        <button onclick="toggleAuthForm()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-lg transition-all">
-          Back to Sign In
-        </button>
-      </div>
-      
-      <p id="auth-error" class="text-red-500 text-sm mt-4 hidden"></p>
-    </div>
-  </div>
-
-  <div id="app" class="min-h-full p-4 md:p-6 lg:p-8 relative z-10 hidden"><!-- Header -->
+  <div id="app" class="min-h-full p-4 md:p-6 lg:p-8 relative z-10"><!-- Header -->
    <header class="mb-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
      <div>
       <h1 id="app-title" class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Compliance Command Center</h1>
-      <div class="admin-content"><input type="text" id="org-name-input" value="Your Organization" placeholder="Enter organization name" class="bg-white/20 text-white placeholder-white/60 border-2 border-white/30 rounded-lg px-4 py-2 text-lg focus:outline-none focus:border-white/60 transition-all" oninput="debouncedUpdateOrgName(this.value)">
+      <div class="admin-content"><input type="text" id="org-name-input" value="Your Organization" placeholder="Enter organization name" class="bg-white/20 text-white placeholder-white/60 border-2 border-white/30 rounded-lg px-4 py-2 text-lg focus:outline-none focus:border-white/60 transition-all" onchange="updateOrganizationName(this.value)">
       </div>
       <p id="org-name" class="text-white/80 mt-2 text-lg employee-content hidden">Your Organization</p>
      </div>
@@ -172,8 +115,6 @@
       <div id="employee-selector-container" class="card-glass rounded-xl px-4 py-2 hidden"><select id="employee-view-selector" onchange="changeEmployeeView(this.value)" class="bg-transparent text-gray-800 font-medium focus:outline-none cursor-pointer"> <option value="">Select employee...</option> </select>
       </div><button onclick="toggleNotifications()" class="relative card-glass rounded-xl px-4 py-2 hover:bg-white transition-all">
        <div class="flex items-center gap-2"><span>🔔</span> <span class="text-sm font-medium text-gray-800">Alerts</span> <span id="notification-badge" class="hidden bg-red-500 text-white text-xs rounded-full px-2 py-0.5">0</span>
-       </div></button><button onclick="handleLogout()" class="card-glass rounded-xl px-4 py-2 hover:bg-white transition-all">
-       <div class="flex items-center gap-2"><span>🚪</span> <span class="text-sm font-medium text-gray-800">Logout</span>
        </div></button>
       <div class="text-sm text-white/90 font-medium" id="current-date"></div>
      </div>
@@ -645,7 +586,7 @@
     <div class="card-glass rounded-2xl p-8 w-full max-w-md animate-fade-in shadow-2xl">
      <div class="text-center">
       <div class="text-6xl mb-4">
-       🗑️
+       ����️
       </div>
       <h3 class="text-2xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
       <p class="text-gray-700 mb-6" id="delete-message">Are you sure you want to delete this item? This action cannot be undone.</p>
@@ -664,17 +605,11 @@
       organization_name: 'Your Organization'
     };
 
-    // State - Use window object for all global state
+    // State
+    let allData = [];
     let currentUserRole = 'admin';
-    let currentTab = 'dashboard';
     let currentUserId = 'demo@example.com';
     let currentTrainingRecord = null;
-    let pendingDeleteAction = null;
-    let pendingDeleteRecord = null;
-    
-    // Initialize window.allData immediately
-    window.allData = [];
-    window.currentEditRecord = null;
 
     // Sample assessment questions for different frameworks
     const assessmentQuestions = {
@@ -782,328 +717,33 @@
       ]
     };
 
-    // Supabase Configuration
-    const SUPABASE_URL = 'https://vprwrmauwjuovxecaexg.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_86vwhzGar6Cvey7MUdhzBQ_ZW3uLKZN';
-    
-    let supabaseClient = null;
-    
-    // Initialize Supabase
-    async function initSupabase() {
-      try {
-        const { createClient } = window.supabase;
-        supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('Supabase initialized');
-        return true;
-      } catch (err) {
-        console.error('Supabase initialization failed:', err);
-        return false;
+    // Initialize SDKs
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+          document.getElementById('org-name').textContent = config.organization_name || defaultConfig.organization_name;
+          document.getElementById('org-name-input').value = config.organization_name || defaultConfig.organization_name;
+        },
+        mapToCapabilities: () => ({ recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined }),
+        mapToEditPanelValues: (config) => new Map([
+          ['app_title', config.app_title || defaultConfig.app_title],
+          ['organization_name', config.organization_name || defaultConfig.organization_name]
+        ])
+      });
+    }
+
+    async function updateOrganizationName(name) {
+      if (window.elementSdk) {
+        await window.elementSdk.setConfig({ organization_name: name });
+        showToast('✅ Organization name updated!');
       }
     }
 
-    // Supabase Storage Manager - supports multiple tables
-    const storageManager = window.storageManager || {
-      // Map record types to table names
-      tableMap: {
-        'employee': 'employees',
-        'training': 'trainings',
-        'control': 'controls',
-        'vendor': 'vendors',
-        'notification': 'notifications'
-      },
-
-      // Define allowed columns for each table to prevent 400 errors
-      // STRICTLY MATCHES SUPABASE SCHEMA
-      allowedColumns: {
-        'employees': ['employee_name', 'employee_email', 'department', 'status', 'created_by', 'updated_at', 'created_at'],
-        'trainings': ['training_id', 'training_name', 'framework', 'employee_id', 'employee_email', 'supervisor_email', 'content_type', 'content_url', 'due_date', 'status', 'score', 'completion_date', 'created_by', 'updated_at', 'created_at'],
-        'controls': ['control_id', 'control_name', 'framework', 'control_status', 'created_by', 'created_at'],
-        'vendors': ['vendor_name', 'vendor_email', 'vendor_service', 'risk_score', 'certificate_name', 'expiry_date', 'certificate_file_name', 'vendor_poc', 'internal_owner', 'created_by', 'created_at'],
-        'notifications': ['notification_type', 'notification_message', 'notification_recipient', 'notification_date', 'notification_read', 'created_by', 'updated_at', 'created_at']
-      },
-
-      filterDataForTable(tableName, data) {
-        if (tableName === 'compliance_records') return data; // Legacy table allows everything
-        const allowed = this.allowedColumns[tableName];
-        if (!allowed) {
-            console.warn(`No allowed columns defined for ${tableName}, allowing all.`);
-            return data;
-        }
-        
-        const filtered = {};
-        Object.keys(data).forEach(key => {
-          if (allowed.includes(key)) {
-            filtered[key] = data[key];
-          }
-        });
-        return filtered;
-      },
-
-      getTableName(recordType) {
-        return this.tableMap[recordType] || 'compliance_records';
-      },
-
-      async getAllData() {
-        try {
-          if (!supabaseClient) return [];
-          
-          let allRecords = [];
-          
-          for (const [type, table] of Object.entries(this.tableMap)) {
-            try {
-              const { data, error } = await supabaseClient
-                .from(table)
-                .select('*');
-              
-              if (error) {
-                console.warn(`Could not fetch from ${table}:`, error.message);
-                continue;
-              }
-              
-              console.log(`Fetched ${(data || []).length} records from ${table}`);
-              const tagged = (data || []).map(r => ({
-                ...r,
-                record_type: type,
-                _source_table: table
-              }));
-              allRecords = allRecords.concat(tagged);
-            } catch (err) {
-              console.warn(`Error fetching ${table}:`, err);
-            }
-          }
-          
-          try {
-            const { data, error } = await supabaseClient
-              .from('compliance_records')
-              .select('*');
-            
-            if (!error && data) {
-              console.log(`Fetched ${(data || []).length} records from compliance_records`);
-              const taggedLegacy = (data || []).map(r => ({
-                ...r,
-                _source_table: 'compliance_records'
-              }));
-              allRecords = allRecords.concat(taggedLegacy);
-            }
-          } catch (err) {
-            console.warn('Error fetching from compliance_records:', err);
-          }
-          
-          console.log('Total loaded records:', allRecords.length, allRecords);
-          return allRecords;
-        } catch (err) {
-          console.error('Failed to get data from Supabase:', err);
-          return [];
-        }
-      },
-      
-      async saveData(data) {
-        // Not used with Supabase - data is saved immediately
-        await this.triggerDataChange();
-      },
-     
-      async create(record) {
-        try {
-          if (!supabaseClient) return { isOk: false, error: 'No Supabase client' };
-          
-          // Get current user
-          const { data: { user } } = await supabaseClient.auth.getUser();
-          
-          const recordType = record.record_type;
-          const tableName = this.getTableName(recordType);
-          
-          const { record_type, ...insertData } = record;
-          insertData.created_at = new Date().toISOString();
-          
-          // Explicitly set created_by if user is logged in
-          if (user) {
-            insertData.created_by = user.id;
-          }
-          
-          // Filter data to match table schema
-          const filteredInsertData = this.filterDataForTable(tableName, insertData);
-          
-          console.log('Creating record in', tableName, 'with owner:', insertData.created_by);
-          
-          const { data, error } = await supabaseClient
-            .from(tableName)
-            .insert([filteredInsertData])
-            .select();
-          
-          if (error) {
-            console.error('Error creating record:', error.message);
-            return { isOk: false };
-          }
-          await this.triggerDataChange();
-          return { isOk: true, data: data[0] };
-        } catch (err) {
-          console.error('❌ Failed to create record:', err);
-          return { isOk: false };
-        }
-      },
-      
-      async update(updates) {
-        try {
-          if (!supabaseClient || !updates.id) return { isOk: false, error: 'No client or ID' };
-          
-          // Get current user
-          const { data: { user } } = await supabaseClient.auth.getUser();
-          console.log('Current Auth User:', user ? user.id : 'Not logged in');
-          console.log('Record created_by:', updates.created_by);
-          
-          if (user && updates.created_by && user.id !== updates.created_by) {
-            console.warn('⚠️ ownership mismatch! Updating created_by to current user.');
-            // Claim ownership of the record if user is updating it
-            updates.created_by = user.id;
-          }
-
-          const recordType = updates.record_type;
-          let tableName = this.getTableName(recordType);
-          
-          // Only allow _source_table to override if it is 'compliance_records' (legacy support)
-          if (updates._source_table === 'compliance_records') {
-            tableName = 'compliance_records';
-          }
-          
-          console.log('Updating record:', updates.id, 'in table:', tableName);
-          
-          const { record_type, _source_table, ...updateData } = updates;
-          updateData.updated_at = new Date().toISOString();
-          // Ensure created_by is set to current user
-          if (user) {
-            updateData.created_by = user.id;
-          }
-          
-          console.log('Sending update data:', updateData);
-          
-          // Filter data to match table schema to avoid 400 errors
-          const filteredUpdateData = this.filterDataForTable(tableName, updateData);
-          console.log('Filtered update data:', filteredUpdateData);
-          
-          // Use select() to confirm the row was actually updated
-          const { data, error } = await supabaseClient
-            .from(tableName)
-            .update(filteredUpdateData)
-            .eq('id', updates.id)
-            .select();
-          
-          if (error) {
-            console.error('Error updating record:', error);
-            return { isOk: false, error: error.message };
-          }
-          
-          // Check if any row was returned
-          if (!data || data.length === 0) {
-            console.error('❌ Update succeeded but no rows were modified. RLS policy likely blocked the update.');
-            return { isOk: false, error: 'Access denied: RLS policy blocked the update. Check console for details.' };
-          }
-          
-          console.log('✅ Update successful');
-          await this.triggerDataChange();
-          return { isOk: true };
-        } catch (err) {
-          console.error('Failed to update record:', err);
-          return { isOk: false, error: err.message };
-        }
-      },
-      
-      async delete(id, recordType = null) {
-        try {
-          if (!supabaseClient) return { isOk: false, error: 'No client' };
-          
-          // Get current user
-          const { data: { user } } = await supabaseClient.auth.getUser();
-          
-          let tableName = 'compliance_records';
-          // Accept either a string recordType or a full record object
-          let record = recordType && typeof recordType === 'object' ? recordType : (window.allData || []).find(r => String(r.id) === String(id));
-          
-          if (record) {
-             console.log('Current Auth User:', user ? user.id : 'Not logged in');
-             console.log('Record created_by:', record.created_by);
-             
-             if (user && record.created_by && user.id !== record.created_by) {
-                console.warn('⚠️ ownership mismatch! First updating ownership then deleting.');
-                // First, claim ownership by updating the record's created_by
-                const updateResult = await supabaseClient
-                  .from(tableName || 'compliance_records')
-                  .update({ created_by: user.id })
-                  .eq('id', id)
-                  .select();
-                  
-                if (updateResult.error) {
-                  console.error('Failed to claim ownership:', updateResult.error);
-                  // Try to delete anyway - might work with different RLS
-                }
-             }
-          }
-          
-          if (record && record._source_table === 'compliance_records') {
-            tableName = 'compliance_records';
-          } else if (record && record.record_type) {
-            tableName = this.getTableName(record.record_type);
-          } else if (recordType && typeof recordType === 'string') {
-            tableName = this.getTableName(recordType);
-          } else if (record && record._source_table) {
-             // Fallback for cases where record_type might be missing but source_table exists
-             tableName = record._source_table;
-          }
-          
-          console.log('Deleting record:', id, 'from table:', tableName);
-          
-          // Use select() to confirm the row was actually deleted
-          const { data, error } = await supabaseClient
-            .from(tableName)
-            .delete()
-            .eq('id', id)
-            .select();
-          
-          if (error) {
-            console.error('Error deleting record:', error);
-            return { isOk: false, error: error.message };
-          }
-          
-          // Check if any row was returned
-          if (!data || data.length === 0) {
-            console.error('❌ Delete succeeded but no rows were modified. RLS policy likely blocked the delete.');
-            return { isOk: false, error: 'Access denied: RLS policy blocked the delete. Check console for details.' };
-          }
-          
-          console.log('✅ Delete successful');
-          await this.triggerDataChange();
-          return { isOk: true };
-        } catch (err) {
-          console.error('Failed to delete record:', err);
-          return { isOk: false, error: err.message };
-        }
-      },
-      
-      async triggerDataChange() {
-        try {
-          const updatedData = await this.getAllData();
-          console.log('Data updated. Total records:', updatedData.length);
-          // Update global allData
-          window.allData = updatedData;
-          // Call onDataChanged if available
-          if (typeof window.onDataChanged === 'function') {
-            window.onDataChanged(updatedData);
-          }
-        } catch (err) {
-          console.error('Failed to trigger data change:', err);
-        }
-      }
-    };
-    
-    window.storageManager = storageManager;
-
-      // Global function to handle data changes
-    function onDataChanged(data) {
-      window.allData = data;
-      console.log('onDataChanged called with', data.length, 'records');
-      const empRecords = data.filter(r => r.record_type === 'employee');
-      console.log('Employee records:', empRecords);
-      empRecords.forEach(e => console.log('Employee ID:', e.id, 'Name:', e.employee_name, 'created_by:', e.created_by));
-      try {
+    const dataHandler = {
+      onDataChanged(data) {
+        allData = data;
         updateDashboard();
         renderEmployees();
         renderTrainings();
@@ -1113,313 +753,26 @@
         renderVendors();
         updateEmployeeDropdowns();
         updateNotifications();
-      } catch (err) {
-        console.error('Error in onDataChanged:', err);
-      }
-    }
-
-    // Make it globally accessible
-    window.onDataChanged = onDataChanged;
-
-    const dataHandler = {
-      onDataChanged: onDataChanged
-    };
-
-    window.dataHandler = dataHandler;
-
-    // Config Manager using Supabase
-    const configManager = {
-      currentConfig: { ...defaultConfig },
-      
-      async getConfig() {
-        try {
-          if (!supabaseClient) return { ...defaultConfig };
-          
-          const { data, error } = await supabaseClient
-            .from('app_config')
-            .select('*')
-            .single();
-          
-          // Handle RLS/permission errors gracefully
-          if (error) {
-            console.warn('Warning fetching config:', error.code, error.message);
-            // Return default config on any error (RLS blocks, no data, etc)
-            return { ...defaultConfig };
-          }
-          
-          if (data) {
-            this.currentConfig = { ...defaultConfig, ...data };
-            console.log('✅ Config loaded from Supabase');
-          }
-          return this.currentConfig;
-        } catch (err) {
-          console.warn('Failed to get config (expected with RLS):', err.message);
-          return { ...defaultConfig };
-        }
-      },
-      
-      async setConfig(config) {
-        try {
-          if (!supabaseClient) return this.currentConfig;
-          
-          const updated = { ...this.currentConfig, ...config };
-          
-          const { error } = await supabaseClient
-            .from('app_config')
-            .upsert(updated);
-          
-          if (error) {
-            console.error('Error saving config:', error);
-            return this.currentConfig;
-          }
-          
-          this.currentConfig = updated;
-          this.notifyConfigChange(updated);
-          console.log('Config saved to Supabase');
-          return updated;
-        } catch (err) {
-          console.error('Failed to set config:', err);
-          return this.currentConfig;
-        }
-      },
-      
-      notifyConfigChange(config) {
-        document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
-        document.getElementById('org-name').textContent = config.organization_name || defaultConfig.organization_name;
-        document.getElementById('org-name-input').value = config.organization_name || defaultConfig.organization_name;
       }
     };
-
-    async function updateOrganizationName(name) {
-      configManager.setConfig({ organization_name: name });
-      showToast('✅ Organization name updated!');
-    }
-
-    // Initialize all dropdowns with default values
-    function initializeDropdowns() {
-      try {
-        updateDepartmentDropdowns();
-        updateFrameworkDropdowns();
-        updateEmployeeDropdowns();
-        console.log('Dropdowns initialized');
-      } catch (err) {
-        console.error('Error initializing dropdowns:', err);
-      }
-    }
-
-    // Auth functions
-    function toggleAuthForm() {
-      document.getElementById('auth-form-container').classList.toggle('hidden');
-      document.getElementById('signup-form-container').classList.toggle('hidden');
-      document.getElementById('auth-error').classList.add('hidden');
-    }
-
-    function showAuthError(message) {
-      const errorEl = document.getElementById('auth-error');
-      errorEl.textContent = message;
-      errorEl.classList.remove('hidden');
-    }
-
-    async function handleSignUp(event) {
-      event.preventDefault();
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-      const confirm = document.getElementById('signup-password-confirm').value;
-
-      if (password !== confirm) {
-        showAuthError('Passwords do not match');
-        return;
-      }
-
-      if (password.length < 6) {
-        showAuthError('Password must be at least 6 characters');
-        return;
-      }
-
-      try {
-        const { data, error } = await supabaseClient.auth.signUp({
-          email,
-          password
-        });
-
-        if (error) {
-          showAuthError(error.message);
-          return;
-        }
-
-        showToast('✅ Account created! Please sign in.', 'success');
-        toggleAuthForm();
-      } catch (err) {
-        showAuthError(err.message);
-      }
-    }
-
-    async function handleSignIn(event) {
-      event.preventDefault();
-      const email = document.getElementById('signin-email').value;
-      const password = document.getElementById('signin-password').value;
-
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          showAuthError(error.message);
-          return;
-        }
-
-        currentUserId = email;
-        document.getElementById('auth-modal').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        await initApp();
-      } catch (err) {
-        showAuthError(err.message);
-      }
-    }
-
-    async function handleLogout() {
-      try {
-        const { error } = await supabaseClient.auth.signOut();
-        if (error) {
-          showToast('Error logging out: ' + error.message, 'error');
-          return;
-        }
-        
-        showToast('✅ Logged out successfully!', 'success');
-        document.getElementById('app').classList.add('hidden');
-        document.getElementById('auth-modal').classList.remove('hidden');
-        
-        // Reset form
-        document.getElementById('signin-form').reset();
-        document.getElementById('signup-form').reset();
-        document.getElementById('auth-error').classList.add('hidden');
-        document.getElementById('auth-form-container').classList.remove('hidden');
-        document.getElementById('signup-form-container').classList.add('hidden');
-        
-        // Clear data
-        window.allData = [];
-        currentUserId = 'demo@example.com';
-      } catch (err) {
-        showToast('Error logging out: ' + err.message, 'error');
-      }
-    }
-
-    async function checkAuth() {
-      try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-          currentUserId = session.user.email;
-          document.getElementById('auth-modal').classList.add('hidden');
-          document.getElementById('app').classList.remove('hidden');
-          await initApp();
-        }
-      } catch (err) {
-        console.error('Auth check error:', err);
-      }
-    }
 
     async function initApp() {
-      try {
-        // Initialize Supabase first
-        const supabaseReady = await initSupabase();
-        if (!supabaseReady) {
-          showToast('Database connection failed', 'error');
-          return;
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) {
+          showToast('Failed to initialize system', 'error');
         }
-        
-        // Restore UI state from localStorage
-        const savedState = loadUIState();
-        currentUserRole = savedState.currentUserRole || 'admin';
-        currentTab = savedState.currentTab || 'dashboard';
-        
-        // Check current user
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        console.log('Current user:', user?.id, user?.email);
-        
-        // Load config
-        const config = await configManager.getConfig();
-        configManager.notifyConfigChange(config);
-        
-        // Initialize dropdowns first (with empty data)
-        initializeDropdowns();
-        
-        // Load data from Supabase
-        window.allData = await storageManager.getAllData();
-        console.log('App initialized. Loaded records:', window.allData.length);
-        dataHandler.onDataChanged(window.allData);
-        
-        // Restore UI role and tab
-        document.getElementById('user-role-selector').value = currentUserRole;
-        switchUserRole(currentUserRole);
-        switchTab(currentTab);
-        
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
-          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-        });
-        
-        showToast('✅ Connected to database', 'success');
-      } catch (err) {
-        console.error('App initialization error:', err);
-        showToast('Failed to initialize app', 'error');
       }
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+      });
     }
 
-    // Initialize Supabase and check auth when page loads
-    async function initializePage() {
-      try {
-        const supabaseReady = await initSupabase();
-        if (!supabaseReady) {
-          showToast('Database connection failed', 'error');
-          return;
-        }
-        await checkAuth();
-      } catch (err) {
-        console.error('Page initialization error:', err);
-      }
-    }
-
-    // Initialize when page loads
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializePage);
-    } else {
-      initializePage();
-    }
-
-    // Utility functions
-    function debounce(func, delay) {
-      let timeoutId;
-      return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(this, args), delay);
-      };
-    }
-
-    // Validation functions
-    function isValidEmail(email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
-    }
-
-    function isValidDate(dateString) {
-      const date = new Date(dateString);
-      return !isNaN(date.getTime());
-    }
-
-    function checkEmailDuplicate(email, excludeId = null) {
-      return window.allData.some(r => r.employee_email === email && r.id !== excludeId && r.record_type === 'employee');
-    }
-    
-    // Debounced organization name update
-    const debouncedUpdateOrgName = debounce(function(name) {
-      configManager.setConfig({ organization_name: name });
-      showToast('✅ Organization name updated!');
-    }, 1000);
+    initApp();
 
     // Helper functions
     function getRecordsByType(type) {
-      return (window.allData || []).filter(r => r.record_type === type);
+      return allData.filter(r => r.record_type === type);
     }
 
     function getEmployees() {
@@ -1442,32 +795,9 @@
       return getRecordsByType('notification');
     }
 
-    // LocalStorage persistence for UI state
-    function saveUIState() {
-      const state = {
-        currentUserRole,
-        currentTab: currentTab || 'dashboard'
-      };
-      localStorage.setItem('complianceDashboardState', JSON.stringify(state));
-    }
-
-    function loadUIState() {
-      try {
-        const saved = localStorage.getItem('complianceDashboardState');
-        if (saved) {
-          const state = JSON.parse(saved);
-          return state;
-        }
-      } catch (err) {
-        console.warn('Failed to load UI state:', err);
-      }
-      return { currentUserRole: 'admin', currentTab: 'dashboard' };
-    }
-
     // Role switching
     function switchUserRole(role) {
       currentUserRole = role;
-      saveUIState();
      
       // Toggle visibility of admin/employee specific content
       const adminTabs = document.querySelectorAll('.admin-tab');
@@ -1569,9 +899,6 @@
 
     // Tab switching
     function switchTab(tabName) {
-      currentTab = tabName;
-      saveUIState();
-      
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
         el.classList.remove('tab-active');
@@ -1596,17 +923,16 @@
     }
 
     // Toast notification
-     function showToast(message, type = 'success') {
-       const toast = document.getElementById('toast');
-       const toastMessage = document.getElementById('toast-message');
-       toastMessage.textContent = message;
-       console.log(`Toast [${type}]:`, message); // Log to console for visibility
-       toast.className = `fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl z-50 animate-fade-in font-semibold ${
-         type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
-       }`;
-       toast.classList.remove('hidden');
-       setTimeout(() => toast.classList.add('hidden'), 4000);
-     }
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      toastMessage.textContent = message;
+      toast.className = `fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl z-50 animate-fade-in font-semibold ${
+        type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+      }`;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
 
     // Notification functions
     function toggleNotifications() {
@@ -1635,7 +961,7 @@
       container.innerHTML = sorted.map(notif => {
         const isUnread = notif.notification_read !== 'true';
         return `
-          <div onclick="markNotificationRead('${notif.id}')" class="bg-slate-800/70 rounded-xl p-4 cursor-pointer hover:bg-slate-700/70 transition-all ${isUnread ? 'border-l-4 border-purple-500' : ''}">
+          <div onclick="markNotificationRead('${notif.__backendId}')" class="bg-slate-800/70 rounded-xl p-4 cursor-pointer hover:bg-slate-700/70 transition-all ${isUnread ? 'border-l-4 border-purple-500' : ''}">
             <p class="text-sm ${isUnread ? 'font-bold text-white' : 'text-gray-300'}">${notif.notification_message}</p>
             <p class="text-xs text-gray-500 mt-1">${new Date(notif.notification_date).toLocaleString()}</p>
           </div>
@@ -1644,21 +970,22 @@
     }
 
     async function markNotificationRead(notifId) {
-      const notif = (window.allData || []).find(r => r.id === notifId);
+      const notif = allData.find(r => r.__backendId === notifId);
       if (notif && notif.notification_read !== 'true') {
-        await storageManager.update({ ...notif, notification_read: 'true' });
+        await window.dataSdk.update({ ...notif, notification_read: 'true' });
       }
     }
 
     async function sendNotification(type, message, recipient) {
-      if ((window.allData || []).length >= 999) return;
-      await storageManager.create({
+      if (allData.length >= 999) return;
+      await window.dataSdk.create({
         record_type: 'notification',
         notification_type: type,
         notification_message: message,
         notification_recipient: recipient,
         notification_date: new Date().toISOString(),
-        notification_read: 'false'
+        notification_read: 'false',
+        created_at: new Date().toISOString()
       });
     }
 
@@ -1677,9 +1004,7 @@
       const trainingPct = trainings.length > 0 ? Math.round((completed / trainings.length) * 100) : 0;
       document.getElementById('stat-training').textContent = trainingPct + '%';
      
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const overdue = trainings.filter(t => t.status !== 'Completed' && t.due_date && new Date(t.due_date) < today).length;
+      const overdue = trainings.filter(t => t.status !== 'Completed' && new Date(t.due_date) < new Date()).length;
       document.getElementById('stat-overdue').textContent = overdue;
      
       const compliant = controls.filter(c => c.control_status === 'Compliant').length;
@@ -1691,16 +1016,12 @@
      
       const highRisk = vendors.filter(v => v.risk_score >= 70).length;
       document.getElementById('stat-vendor-risk').textContent = highRisk;
-      
+     
+      const today = new Date();
       const expiring = vendors.filter(v => {
-        try {
-          const exp = new Date(v.expiry_date);
-          if (isNaN(exp.getTime())) return false;
-          const days = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
-          return days > 0 && days <= 30;
-        } catch {
-          return false;
-        }
+        const exp = new Date(v.expiry_date);
+        const days = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+        return days > 0 && days <= 30;
       }).length;
       document.getElementById('stat-expiring').textContent = expiring;
      
@@ -1721,7 +1042,7 @@
         document.getElementById(`${ids[i]}-progress`).style.width = pct + '%';
        
         const statusEl = document.getElementById(`${ids[i]}-status`);
-        if (pct >= 90) statusEl.textContent = '🟢';
+        if (pct >= 90) statusEl.textContent = '����';
         else if (pct >= 70) statusEl.textContent = '🟡';
         else statusEl.textContent = '🔴';
       });
@@ -1730,38 +1051,19 @@
     // Employee functions
     async function handleAddEmployee(e) {
       e.preventDefault();
-      
-      if (window.allData.length >= 999) {
+      if (allData.length >= 999) {
         showToast('Maximum limit of 999 records reached', 'error');
         return;
       }
      
       const btn = document.getElementById('add-emp-btn');
-      const name = document.getElementById('emp-name').value.trim();
-      const email = document.getElementById('emp-email').value.trim();
-      let dept = document.getElementById('emp-dept').value;
-      
-      // Validate inputs
-      if (!name || !email || !dept) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-      }
-      
-      // Validate email format
-      if (!isValidEmail(email)) {
-        showToast('Please enter a valid email address', 'error');
-        return;
-      }
-      
-      // Check for duplicate email
-      if (checkEmailDuplicate(email)) {
-        showToast('This email is already in use', 'error');
-        return;
-      }
-      
       btn.disabled = true;
       btn.textContent = 'Adding...';
-      
+     
+      const name = document.getElementById('emp-name').value;
+      const email = document.getElementById('emp-email').value;
+      let dept = document.getElementById('emp-dept').value;
+     
       // Handle new department
       if (dept === '__ADD_NEW__') {
         const newDeptName = document.getElementById('new-dept-name').value.trim();
@@ -1781,24 +1083,24 @@
         dept = newDeptName;
       }
      
-      const result = await storageManager.create({
+      const result = await window.dataSdk.create({
         record_type: 'employee',
         employee_name: name,
         employee_email: email,
-        department: dept
+        department: dept,
+        created_at: new Date().toISOString()
       });
-      
+     
       btn.disabled = false;
       btn.textContent = 'Add Employee';
-      
+     
       if (result.isOk) {
         showToast('✅ Employee added successfully!');
+        hideModal('add-employee-modal');
         document.getElementById('add-employee-form').reset();
         document.getElementById('new-dept-section').classList.add('hidden');
-        hideModal('add-employee-modal');
        
-        // Send notification asynchronously
-        sendNotification('welcome', `Welcome ${name}! You've been added to the compliance system.`, email);
+        await sendNotification('welcome', `Welcome ${name}! You've been added to the compliance system.`, email);
       } else {
         showToast('Failed to add employee', 'error');
       }
@@ -1806,7 +1108,6 @@
 
     function renderEmployees() {
       const container = document.getElementById('employee-list');
-      if (!container) return;
       const employees = getEmployees();
      
       if (employees.length === 0) {
@@ -1814,19 +1115,16 @@
         return;
       }
 
-      // Cache trainings once instead of fetching for each employee
-      const allTrainings = getTrainings();
       container.innerHTML = employees.map(emp => {
-        const trainings = allTrainings.filter(t => t.employee_email === emp.employee_email);
+        const trainings = getTrainings().filter(t => t.employee_email === emp.employee_email);
         const completed = trainings.filter(t => t.status === 'Completed').length;
-        const empName = emp.employee_name || 'Unknown';
        
         return `
           <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 shadow hover:shadow-lg transition-all">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                  ${empName.charAt(0).toUpperCase()}
+                  ${emp.employee_name.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <h4 class="font-bold text-gray-900 text-lg">${emp.employee_name}</h4>
@@ -1840,10 +1138,10 @@
                   <p class="text-xs text-gray-600">Completed</p>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <button onclick="editEmployee('${emp.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  <button onclick="editEmployee('${emp.__backendId}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                     ✏️ Edit
                   </button>
-                  <button onclick="confirmDeleteEmployee('${emp.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                  <button onclick="confirmDeleteEmployee('${emp.__backendId}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                     🗑️ Delete
                   </button>
                 </div>
@@ -1857,7 +1155,7 @@
     // Training functions
     async function handleAssignTraining(e) {
       e.preventDefault();
-      if (window.allData.length >= 999) {
+      if (allData.length >= 999) {
         showToast('Maximum limit reached', 'error');
         return;
       }
@@ -1868,34 +1166,12 @@
      
       const employeeEmail = document.getElementById('training-employee').value;
       const employee = getEmployees().find(e => e.employee_email === employeeEmail);
-      const trainingName = document.getElementById('training-name').value.trim();
+      const trainingName = document.getElementById('training-name').value;
       let framework = document.getElementById('training-framework').value;
       const contentType = document.getElementById('training-content-type').value;
-      const contentUrl = document.getElementById('training-content-url').value.trim();
+      const contentUrl = document.getElementById('training-content-url').value;
       const dueDate = document.getElementById('training-due').value;
-      const supervisorEmail = document.getElementById('training-supervisor').value || '';
-      
-      // Validate inputs
-      if (!employeeEmail || !employee) {
-        showToast('Please select a valid employee', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Assign Training';
-        return;
-      }
-      
-      if (!trainingName || !framework || !contentType || !contentUrl || !dueDate) {
-        showToast('Please fill in all required fields', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Assign Training';
-        return;
-      }
-      
-      if (!isValidDate(dueDate)) {
-        showToast('Please enter a valid due date', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Assign Training';
-        return;
-      }
+      const supervisorEmail = document.getElementById('training-supervisor').value;
      
       // Handle new framework
       if (framework === '__ADD_NEW__') {
@@ -1916,20 +1192,21 @@
         framework = newFwName;
       }
      
-      const result = await storageManager.create({
-         record_type: 'training',
-         training_id: 'TR-' + Date.now(),
-         training_name: trainingName,
-         framework: framework,
-         employee_name: employee.employee_name,
-         employee_email: employee.employee_email,
-         supervisor_email: supervisorEmail || '',
-         content_type: contentType,
-         content_url: contentUrl,
-         due_date: dueDate,
-         status: 'Pending',
-         score: 0
-       });
+      const result = await window.dataSdk.create({
+        record_type: 'training',
+        training_id: 'TR-' + Date.now(),
+        training_name: trainingName,
+        framework: framework,
+        employee_name: employee.employee_name,
+        employee_email: employee.employee_email,
+        supervisor_email: supervisorEmail || '',
+        content_type: contentType,
+        content_url: contentUrl,
+        due_date: dueDate,
+        status: 'Pending',
+        score: 0,
+        created_at: new Date().toISOString()
+      });
      
       btn.disabled = false;
       btn.textContent = 'Assign Training';
@@ -1969,13 +1246,6 @@
           'Pending': 'bg-gray-400'
         };
         const isOverdue = new Date(tr.due_date) < new Date() && tr.status !== 'Completed';
-        
-        // Get employee name from training record or look it up
-        let employeeName = tr.employee_name;
-        if (!employeeName && tr.employee_email) {
-          const emp = getEmployees().find(e => e.employee_email === tr.employee_email);
-          employeeName = emp ? emp.employee_name : tr.employee_email;
-        }
        
         return `
           <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 shadow hover:shadow-lg transition-all">
@@ -1986,7 +1256,7 @@
                   <span class="text-xs px-3 py-1 rounded-full ${statusColors[tr.status]} text-white font-medium">${tr.status}</span>
                   ${isOverdue ? '<span class="text-xs px-3 py-1 rounded-full bg-red-500 text-white font-medium">⚠️ Overdue</span>' : ''}
                 </div>
-                <p class="text-sm text-gray-600 mb-1">👤 ${employeeName || 'Unknown'}</p>
+                <p class="text-sm text-gray-600 mb-1">👤 ${tr.employee_name}</p>
                 <p class="text-sm text-gray-600">📅 Due: ${new Date(tr.due_date).toLocaleDateString()}</p>
                 <div class="flex gap-2 mt-2">
                   <span class="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">${tr.framework}</span>
@@ -1995,10 +1265,10 @@
                 </div>
               </div>
               <div class="flex gap-2">
-                <button onclick="editTraining('${tr.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                <button onclick="editTraining('${tr.__backendId}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                   ✏️ Edit
                 </button>
-                <button onclick="confirmDeleteTraining('${tr.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                <button onclick="confirmDeleteTraining('${tr.__backendId}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                   🗑️ Delete
                 </button>
               </div>
@@ -2045,11 +1315,11 @@
               </div>
               <div>
                 ${tr.status !== 'Completed' ? `
-                  <button onclick="openTrainingContent('${tr.id}')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                  <button onclick="openTrainingContent('${tr.__backendId}')" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
                     ${tr.status === 'Pending' ? 'Start Training' : 'Continue'} →
                   </button>
                 ` : `
-                  <button onclick="viewCertificate('${tr.id}')" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                  <button onclick="viewCertificate('${tr.__backendId}')" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
                     🏆 View Certificate
                   </button>
                 `}
@@ -2082,13 +1352,6 @@
         };
         const isOverdue = new Date(tr.due_date) < new Date() && tr.status !== 'Completed';
         const daysUntilDue = Math.ceil((new Date(tr.due_date) - new Date()) / (1000 * 60 * 60 * 24));
-        
-        // Get employee name from training record or look it up
-        let employeeName = tr.employee_name;
-        if (!employeeName && tr.employee_email) {
-          const emp = getEmployees().find(e => e.employee_email === tr.employee_email);
-          employeeName = emp ? emp.employee_name : tr.employee_email;
-        }
        
         return `
           <div class="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all border-2 ${isOverdue ? 'border-red-400' : 'border-orange-200'}">
@@ -2099,7 +1362,7 @@
                     <h4 class="font-bold text-gray-900 text-xl">${contentIcons[tr.content_type]} ${tr.training_name}</h4>
                     <span class="text-xs px-3 py-1 rounded-full ${statusColors[tr.status]} text-white font-medium">${tr.status}</span>
                   </div>
-                  <p class="text-gray-700 mb-2">👤 <span class="font-semibold">${employeeName || 'Unknown'}</span></p>
+                  <p class="text-gray-700 mb-2">👤 <span class="font-semibold">${tr.employee_name}</span></p>
                   <p class="text-sm text-gray-600 mb-1">${tr.framework} Compliance Training</p>
                 </div>
               </div>
@@ -2135,85 +1398,37 @@
     }
 
     // Training content viewer
-     async function openTrainingContent(trainingId) {
-       // Try to find in window.allData first
-       currentTrainingRecord = (window.allData || []).find(r => r.id === trainingId || String(r.id) === String(trainingId));
-       
-       // If not found, load from database
-       if (!currentTrainingRecord) {
-         try {
-           const { data, error } = await supabaseClient
-             .from('trainings')
-             .select('*')
-             .eq('id', trainingId)
-             .single();
-           
-           if (error || !data) {
-             console.error('Failed to load training:', error);
-             showToast('Failed to load training', 'error');
-             return;
-           }
-           currentTrainingRecord = data;
-           currentTrainingRecord._source_table = 'trainings';
-           currentTrainingRecord.record_type = 'training';
-         } catch (err) {
-           console.error('Error loading training:', err);
-           showToast('Error loading training', 'error');
-           return;
-         }
-       }
-      
-       // Ensure metadata is set
-       if (!currentTrainingRecord._source_table) {
-         currentTrainingRecord._source_table = 'trainings';
-       }
-       if (!currentTrainingRecord.record_type) {
-         currentTrainingRecord.record_type = 'training';
-       }
-      
-       if (!currentTrainingRecord) return;
-      
-       document.getElementById('training-modal-title').textContent = currentTrainingRecord.training_name;
+    function openTrainingContent(trainingId) {
+      currentTrainingRecord = allData.find(r => r.__backendId === trainingId);
+      if (!currentTrainingRecord) return;
+     
+      document.getElementById('training-modal-title').textContent = currentTrainingRecord.training_name;
       const contentArea = document.getElementById('training-content-area');
      
       // Load content based on type
-       if (currentTrainingRecord.content_type === 'video') {
-         // Extract video ID and embed with better error handling
-         let embedUrl = currentTrainingRecord.content_url;
-         let videoId = null;
-         
-         try {
-           // Try YouTube formats
-           if (embedUrl.includes('youtube.com/watch')) {
-             const url = new URL(embedUrl);
-             videoId = url.searchParams.get('v');
-           } else if (embedUrl.includes('youtu.be/')) {
-             videoId = embedUrl.split('youtu.be/')[1].split('?')[0].split('&')[0];
-           } else if (embedUrl.includes('vimeo.com/')) {
-             videoId = embedUrl.split('vimeo.com/')[1].split('?')[0].split('&')[0];
-             embedUrl = `https://player.vimeo.com/video/${videoId}`;
-           } else if (embedUrl.includes('youtube.com/embed/')) {
-             // Already an embed URL
-             embedUrl = embedUrl;
-           }
-           
-           // Convert YouTube video ID to embed URL
-           if (videoId && embedUrl.includes('youtu')) {
-             embedUrl = `https://www.youtube.com/embed/${videoId}`;
-           }
-         } catch (err) {
-           console.error('Error parsing video URL:', err);
-         }
-        
-         contentArea.innerHTML = `
-           <div class="mb-4">
-             <h4 class="text-xl font-bold text-gray-900 mb-4">📹 Video Training</h4>
-             <div class="video-container rounded-xl overflow-hidden shadow-lg">
-               <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-             </div>
-             <p class="text-gray-700 mt-4">Watch the complete video before proceeding to the assessment.</p>
-           </div>
-         `;
+      if (currentTrainingRecord.content_type === 'video') {
+        // Extract video ID and embed
+        let embedUrl = currentTrainingRecord.content_url;
+        if (embedUrl.includes('youtube.com/watch?v=')) {
+          const videoId = embedUrl.split('v=')[1].split('&')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        } else if (embedUrl.includes('youtu.be/')) {
+          const videoId = embedUrl.split('youtu.be/')[1].split('?')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        } else if (embedUrl.includes('vimeo.com/')) {
+          const videoId = embedUrl.split('vimeo.com/')[1];
+          embedUrl = `https://player.vimeo.com/video/${videoId}`;
+        }
+       
+        contentArea.innerHTML = `
+          <div class="mb-4">
+            <h4 class="text-xl font-bold text-gray-900 mb-4">📹 Video Training</h4>
+            <div class="video-container rounded-xl overflow-hidden shadow-lg">
+              <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="text-gray-700 mt-4">Watch the complete video before proceeding to the assessment.</p>
+          </div>
+        `;
       } else if (currentTrainingRecord.content_type === 'pdf') {
         contentArea.innerHTML = `
           <div class="mb-4">
@@ -2304,17 +1519,12 @@
      
       if (passed) {
         // Update training record as completed
-        const updateData = {
+        const result = await window.dataSdk.update({
           ...currentTrainingRecord,
           status: 'Completed',
           score: score,
-          completion_date: new Date().toISOString(),
-          record_type: currentTrainingRecord.record_type || 'training',
-          _source_table: currentTrainingRecord._source_table || 'trainings'
-        };
-        
-        console.log('Submitting assessment for training:', currentTrainingRecord.id, 'with data:', updateData);
-        const result = await storageManager.update(updateData);
+          completion_date: new Date().toISOString()
+        });
        
         if (result.isOk) {
           hideModal('assessment-modal');
@@ -2322,8 +1532,6 @@
           createConfetti();
          
           await sendNotification('completed', `Congratulations! You completed "${currentTrainingRecord.training_name}" with ${score}%!`, currentTrainingRecord.employee_email);
-        } else {
-          showToast('Failed to save assessment: ' + (result.error || 'Unknown error'), 'error');
         }
       } else {
         hideModal('assessment-modal');
@@ -2349,22 +1557,15 @@
     }
 
     function showCertificate(training, score) {
-       // Get employee name from training record or look it up
-       let employeeName = training.employee_name;
-       if (!employeeName && training.employee_email) {
-         const emp = getEmployees().find(e => e.employee_email === training.employee_email);
-         employeeName = emp ? emp.employee_name : training.employee_email;
-       }
-       
-       document.getElementById('cert-name').textContent = employeeName || 'Certificate Holder';
-       document.getElementById('cert-training').textContent = training.training_name;
-       document.getElementById('cert-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-       document.getElementById('cert-score').textContent = score + '%';
-       showModal('certificate-modal');
-     }
+      document.getElementById('cert-name').textContent = training.employee_name;
+      document.getElementById('cert-training').textContent = training.training_name;
+      document.getElementById('cert-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('cert-score').textContent = score + '%';
+      showModal('certificate-modal');
+    }
 
     function viewCertificate(trainingId) {
-      const training = (window.allData || []).find(r => r.id === trainingId);
+      const training = allData.find(r => r.__backendId === trainingId);
       if (training && training.status === 'Completed') {
         showCertificate(training, training.score);
       }
@@ -2464,12 +1665,12 @@
     }
 
     // Control functions
-     async function handleAddControl(e) {
-       e.preventDefault();
-       if ((window.allData || []).length >= 999) {
-         showToast('Maximum limit reached', 'error');
-         return;
-       }
+    async function handleAddControl(e) {
+      e.preventDefault();
+      if (allData.length >= 999) {
+        showToast('Maximum limit reached', 'error');
+        return;
+      }
      
       const btn = document.getElementById('add-control-btn');
       btn.disabled = true;
@@ -2496,13 +1697,14 @@
         framework = newFwName;
       }
      
-      const result = await storageManager.create({
-         record_type: 'control',
-         control_id: document.getElementById('control-id').value,
-         control_name: document.getElementById('control-name').value,
-         framework: framework,
-         control_status: document.getElementById('control-status').value
-       });
+      const result = await window.dataSdk.create({
+        record_type: 'control',
+        control_id: document.getElementById('control-id').value,
+        control_name: document.getElementById('control-name').value,
+        framework: framework,
+        control_status: document.getElementById('control-status').value,
+        created_at: new Date().toISOString()
+      });
      
       btn.disabled = false;
       btn.textContent = 'Add Control';
@@ -2588,10 +1790,10 @@
                 <span class="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">${ctrl.framework}</span>
               </div>
               <div class="flex gap-2">
-                <button onclick="editControl('${ctrl.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                <button onclick="editControl('${ctrl.__backendId}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                   ✏️ Edit
                 </button>
-                <button onclick="confirmDeleteControl('${ctrl.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                <button onclick="confirmDeleteControl('${ctrl.__backendId}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                   🗑️ Delete
                 </button>
               </div>
@@ -2611,7 +1813,7 @@
     // Vendor functions
     async function handleAddVendor(e) {
       e.preventDefault();
-      if ((window.allData || []).length >= 999) {
+      if (allData.length >= 999) {
         showToast('Maximum limit reached', 'error');
         return;
       }
@@ -2636,18 +1838,19 @@
           certFileName = certFile.name;
         }
        
-        const result = await storageManager.create({
-           record_type: 'vendor',
-           vendor_name: document.getElementById('vendor-name').value,
-           vendor_email: document.getElementById('vendor-email').value,
-           vendor_service: document.getElementById('vendor-service').value,
-           risk_score: parseInt(document.getElementById('vendor-risk').value),
-           certificate_name: document.getElementById('vendor-cert-name').value,
-           expiry_date: document.getElementById('vendor-expiry').value,
-           certificate_file_name: certFileName,
-           vendor_poc: document.getElementById('vendor-poc').value,
-           internal_owner: document.getElementById('vendor-internal-owner').value
-         });
+        const result = await window.dataSdk.create({
+          record_type: 'vendor',
+          vendor_name: document.getElementById('vendor-name').value,
+          vendor_email: document.getElementById('vendor-email').value,
+          vendor_service: document.getElementById('vendor-service').value,
+          risk_score: parseInt(document.getElementById('vendor-risk').value),
+          certificate_name: document.getElementById('vendor-cert-name').value,
+          expiry_date: document.getElementById('vendor-expiry').value,
+          certificate_file_name: certFileName,
+          vendor_poc: document.getElementById('vendor-poc').value,
+          internal_owner: document.getElementById('vendor-internal-owner').value,
+          created_at: new Date().toISOString()
+        });
        
         btn.disabled = false;
         btn.textContent = 'Add Vendor';
@@ -2687,19 +1890,10 @@
       container.innerHTML = vendors.map(vendor => {
         const riskColor = vendor.risk_score >= 70 ? 'text-red-600' : vendor.risk_score >= 40 ? 'text-orange-600' : 'text-green-600';
         const riskBg = vendor.risk_score >= 70 ? 'bg-red-100' : vendor.risk_score >= 40 ? 'bg-orange-100' : 'bg-green-100';
-        let expiryDate, daysUntilExpiry, isExpiringSoon, isExpired;
-        try {
-          expiryDate = new Date(vendor.expiry_date);
-          if (isNaN(expiryDate.getTime())) throw new Error('Invalid date');
-          daysUntilExpiry = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
-          isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
-          isExpired = daysUntilExpiry <= 0;
-        } catch (e) {
-          expiryDate = new Date();
-          daysUntilExpiry = -1;
-          isExpiringSoon = false;
-          isExpired = true;
-        }
+        const expiryDate = new Date(vendor.expiry_date);
+        const daysUntilExpiry = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+        const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
+        const isExpired = daysUntilExpiry <= 0;
        
         return `
           <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-6 shadow hover:shadow-lg transition-all border-2 ${isExpired ? 'border-red-400' : isExpiringSoon ? 'border-orange-400' : 'border-green-200'}">
@@ -2738,15 +1932,15 @@
                 </div>
                 <div>
                   <p class="text-xs text-gray-600 mb-1">👨‍💼 Our Owner</p>
-                  <p class="text-sm font-semibold text-gray-900">${vendor.internal_owner ? (getEmployees().find(e => e.employee_email === vendor.internal_owner) || {}).employee_name || vendor.internal_owner : 'N/A'}</p>
+                  <p class="text-sm font-semibold text-gray-900">${vendor.internal_owner ? getEmployees().find(e => e.employee_email === vendor.internal_owner)?.employee_name || vendor.internal_owner : 'N/A'}</p>
                 </div>
               </div>
              
               <div class="flex items-center gap-2">
-                <button onclick="editVendor('${vendor.id}')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                <button onclick="editVendor('${vendor.__backendId}')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                   ✏️ Edit
                 </button>
-                <button onclick="confirmDeleteVendor('${vendor.id}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                <button onclick="confirmDeleteVendor('${vendor.__backendId}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all">
                   🗑️ Delete
                 </button>
               </div>
@@ -2765,32 +1959,27 @@
     }
 
     function updateDepartmentDropdowns() {
-      try {
-        const departments = getDepartments();
-        const selects = ['emp-dept', 'edit-emp-dept'];
-       
-        selects.forEach(id => {
-          const select = document.getElementById(id);
-          if (select) {
-            const currentValue = select.value;
-            let html = '<option value="">Select Department</option>';
-            departments.forEach(dept => {
-              html += `<option value="${dept}">${dept}</option>`;
-            });
-            html += '<option value="__ADD_NEW__">➕ Add New Department</option>';
-            select.innerHTML = html;
-            if (currentValue && departments.includes(currentValue)) {
-              select.value = currentValue;
-            }
-            console.log('Updated select:', id, 'with', departments.length, 'departments');
+      const departments = getDepartments();
+      const selects = ['emp-dept', 'edit-emp-dept'];
+     
+      selects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+          const currentValue = select.value;
+          select.innerHTML = '<option value="">Select Department</option>';
+          departments.forEach(dept => {
+            select.innerHTML += `<option value="${dept}">${dept}</option>`;
+          });
+          select.innerHTML += '<option value="__ADD_NEW__">➕ Add New Department</option>';
+          if (currentValue && departments.includes(currentValue)) {
+            select.value = currentValue;
           }
-        });
-      } catch (err) {
-        console.error('Error updating department dropdowns:', err);
-      }
+        }
+      });
     }
    
-    // Will be called during initApp()
+    // Call this on page load and data changes
+    updateDepartmentDropdowns();
 
     function handleDepartmentChange(select) {
       const newDeptSection = document.getElementById('new-dept-section');
@@ -2804,22 +1993,17 @@
     }
 
     async function addNewDepartment(name) {
-      // Validate input
-      if (!name || name.trim() === '') {
-        showToast('Department name cannot be empty', 'error');
-        return false;
-      }
-      
-      if (window.allData.length >= 999) {
+      if (allData.length >= 999) {
         showToast('Maximum limit reached', 'error');
         return false;
       }
      
-      const result = await storageManager.create({
+      const result = await window.dataSdk.create({
         record_type: 'department',
-        department_name: name.trim()
+        department_name: name,
+        created_at: new Date().toISOString()
       });
-      
+     
       if (result.isOk) {
         showToast('✅ Department added!');
         return true;
@@ -2838,30 +2022,24 @@
     }
 
     function updateFrameworkDropdowns() {
-      try {
-        const frameworks = getFrameworks();
-        const selects = [
-          'control-framework', 'edit-control-framework',
-          'training-framework', 'edit-training-framework'
-        ];
-       
-        selects.forEach(id => {
-          const select = document.getElementById(id);
-          if (select) {
-            const currentValue = select.value;
-            let html = '<option value="">Select framework...</option>';
-            frameworks.forEach(fw => {
-              html += `<option value="${fw}">${fw}</option>`;
-            });
-            html += '<option value="__ADD_NEW__">➕ Add New Framework</option>';
-            select.innerHTML = html;
-            if (currentValue) select.value = currentValue;
-            console.log('Updated select:', id, 'with', frameworks.length, 'frameworks');
-          }
-        });
-      } catch (err) {
-        console.error('Error updating framework dropdowns:', err);
-      }
+      const frameworks = getFrameworks();
+      const selects = [
+        'control-framework', 'edit-control-framework',
+        'training-framework', 'edit-training-framework'
+      ];
+     
+      selects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+          const currentValue = select.value;
+          select.innerHTML = '<option value="">Select framework...</option>';
+          frameworks.forEach(fw => {
+            select.innerHTML += `<option value="${fw}">${fw}</option>`;
+          });
+          select.innerHTML += '<option value="__ADD_NEW__">➕ Add New Framework</option>';
+          if (currentValue) select.value = currentValue;
+        }
+      });
     }
 
     function handleFrameworkChange(select, context) {
@@ -2876,16 +2054,17 @@
     }
 
     async function addNewFramework(name) {
-       if ((window.allData || []).length >= 999) {
-         showToast('Maximum limit reached', 'error');
-         return false;
-       }
+      if (allData.length >= 999) {
+        showToast('Maximum limit reached', 'error');
+        return false;
+      }
      
-      const result = await storageManager.create({
+      const result = await window.dataSdk.create({
         record_type: 'framework',
-        framework_name: name
+        framework_name: name,
+        created_at: new Date().toISOString()
       });
-      
+     
       if (result.isOk) {
         showToast('✅ Framework added!');
         return true;
@@ -2897,32 +2076,26 @@
 
     // Update employee dropdowns
     function updateEmployeeDropdowns() {
-      try {
-        const employees = getEmployees();
-        const selects = ['training-employee', 'training-supervisor', 'vendor-internal-owner', 'edit-vendor-internal-owner'];
-       
-        selects.forEach(id => {
-          const select = document.getElementById(id);
-          if (select) {
-            const isSuper = id === 'training-supervisor';
-            const isVendor = id.includes('vendor');
-            let html = isSuper ? '<option value="">No supervisor</option>' :
-                                 isVendor ? '<option value="">Select employee...</option>' :
-                                 '<option value="">Choose employee...</option>';
-            employees.forEach(emp => {
-              html += `<option value="${emp.employee_email}">${emp.employee_name} (${emp.department})</option>`;
-            });
-            select.innerHTML = html;
-            console.log('Updated select:', id, 'with', employees.length, 'employees');
-          }
-        });
-       
-        updateDepartmentDropdowns();
-        updateFrameworkDropdowns();
-        updateEmployeeViewSelector();
-      } catch (err) {
-        console.error('Error updating employee dropdowns:', err);
-      }
+      const employees = getEmployees();
+      const selects = ['training-employee', 'training-supervisor', 'vendor-internal-owner', 'edit-vendor-internal-owner'];
+     
+      selects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+          const isSuper = id === 'training-supervisor';
+          const isVendor = id.includes('vendor');
+          select.innerHTML = isSuper ? '<option value="">No supervisor</option>' :
+                             isVendor ? '<option value="">Select employee...</option>' :
+                             '<option value="">Choose employee...</option>';
+          employees.forEach(emp => {
+            select.innerHTML += `<option value="${emp.employee_email}">${emp.employee_name} (${emp.department})</option>`;
+          });
+        }
+      });
+     
+      updateDepartmentDropdowns();
+      updateFrameworkDropdowns();
+      updateEmployeeViewSelector();
     }
 
     // Export reports
@@ -3058,96 +2231,35 @@
       URL.revokeObjectURL(link.href);
     }
 
-    // Delete confirmation functions
+    // Delete confirmation
+    let pendingDeleteAction = null;
+
     function confirmDeleteEmployee(id) {
-      console.log('Delete employee ID:', id);
-      console.log('AllData:', window.allData);
-      const emp = window.allData.find(r => String(r.id) === String(id));
-      if (!emp) {
-        alert('Employee record not found. ID: ' + id);
-        console.log('Available IDs:', window.allData.map(r => r.id));
-        return;
-      }
+      const emp = allData.find(r => r.__backendId === id);
       document.getElementById('delete-message').textContent = `Are you sure you want to delete employee "${emp.employee_name}"? This action cannot be undone.`;
-      pendingDeleteRecord = emp; // Store the full record with _source_table
       pendingDeleteAction = () => deleteEmployee(id);
       showModal('delete-confirmation-modal');
     }
 
     function confirmDeleteTraining(id) {
-      const training = window.allData.find(r => String(r.id) === String(id));
-      if (!training) {
-        alert('Training record not found');
-        return;
-      }
+      const training = allData.find(r => r.__backendId === id);
       document.getElementById('delete-message').textContent = `Are you sure you want to delete training "${training.training_name}"? This action cannot be undone.`;
-      pendingDeleteRecord = training; // Store the full record with _source_table
       pendingDeleteAction = () => deleteTraining(id);
       showModal('delete-confirmation-modal');
     }
 
-    async function confirmDeleteControl(id) {
-      try {
-        // Load the control record directly from the database
-        const { data, error } = await supabaseClient
-          .from('controls')
-          .select('*')
-          .eq('id', id)
-          .single();
-        
-        if (error || !data) {
-          console.error('Failed to load control for deletion:', error);
-          showToast('Failed to load control data', 'error');
-          return;
-        }
-        
-        const ctrl = data;
-        console.log('Loaded control for deletion:', ctrl);
-        
-        // Store the complete record with database metadata
-        pendingDeleteRecord = ctrl;
-        pendingDeleteRecord._source_table = 'controls';
-        pendingDeleteRecord.record_type = 'control';
-        
-        document.getElementById('delete-message').textContent = `Are you sure you want to delete control "${ctrl.control_name}"? This action cannot be undone.`;
-        pendingDeleteAction = () => deleteControl(id);
-        showModal('delete-confirmation-modal');
-      } catch (err) {
-        console.error('Error in confirmDeleteControl:', err);
-        showToast('Error loading control data', 'error');
-      }
+    function confirmDeleteControl(id) {
+      const ctrl = allData.find(r => r.__backendId === id);
+      document.getElementById('delete-message').textContent = `Are you sure you want to delete control "${ctrl.control_name}"? This action cannot be undone.`;
+      pendingDeleteAction = () => deleteControl(id);
+      showModal('delete-confirmation-modal');
     }
 
-    async function confirmDeleteVendor(id) {
-      try {
-        // Load the vendor record directly from the database
-        const { data, error } = await supabaseClient
-          .from('vendors')
-          .select('*')
-          .eq('id', id)
-          .single();
-        
-        if (error || !data) {
-          console.error('Failed to load vendor for deletion:', error);
-          showToast('Failed to load vendor data', 'error');
-          return;
-        }
-        
-        const vendor = data;
-        console.log('Loaded vendor for deletion:', vendor);
-        
-        // Store the complete record with database metadata
-        pendingDeleteRecord = vendor;
-        pendingDeleteRecord._source_table = 'vendors';
-        pendingDeleteRecord.record_type = 'vendor';
-        
-        document.getElementById('delete-message').textContent = `Are you sure you want to delete vendor "${vendor.vendor_name}"? This action cannot be undone.`;
-        pendingDeleteAction = () => deleteVendor(id);
-        showModal('delete-confirmation-modal');
-      } catch (err) {
-        console.error('Error in confirmDeleteVendor:', err);
-        showToast('Error loading vendor data', 'error');
-      }
+    function confirmDeleteVendor(id) {
+      const vendor = allData.find(r => r.__backendId === id);
+      document.getElementById('delete-message').textContent = `Are you sure you want to delete vendor "${vendor.vendor_name}"? This action cannot be undone.`;
+      pendingDeleteAction = () => deleteVendor(id);
+      showModal('delete-confirmation-modal');
     }
 
     async function confirmDelete() {
@@ -3167,71 +2279,59 @@
 
     // Delete functions
     async function deleteEmployee(id) {
-      // Use stored record from confirmation dialog if available
-      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
       if (record) {
-        const result = await storageManager.delete(id, record);
+        const result = await window.dataSdk.delete(record);
         if (result.isOk) {
           showToast('✅ Employee deleted successfully!');
         } else {
-          showToast('Failed to delete employee: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to delete employee', 'error');
         }
       }
     }
 
     async function deleteTraining(id) {
-      // Use stored record from confirmation dialog if available
-      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
       if (record) {
-        console.log('Deleting training:', id, 'record:', record);
-        const result = await storageManager.delete(id, record);
-        console.log('Delete result:', result);
+        const result = await window.dataSdk.delete(record);
         if (result.isOk) {
           showToast('✅ Training deleted successfully!');
         } else {
-          showToast('Failed to delete training: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to delete training', 'error');
         }
-      } else {
-        console.error('Training record not found:', id);
-        showToast('Training record not found', 'error');
       }
     }
 
     async function deleteControl(id) {
-      // Use stored record from confirmation dialog if available
-      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
       if (record) {
-        const result = await storageManager.delete(id, record);
+        const result = await window.dataSdk.delete(record);
         if (result.isOk) {
           showToast('✅ Control deleted successfully!');
         } else {
-          showToast('Failed to delete control: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to delete control', 'error');
         }
       }
     }
 
     async function deleteVendor(id) {
-      // Use stored record from confirmation dialog if available
-      const record = pendingDeleteRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
       if (record) {
-        const result = await storageManager.delete(id, record);
+        const result = await window.dataSdk.delete(record);
         if (result.isOk) {
           showToast('✅ Vendor deleted successfully!');
         } else {
-          showToast('Failed to delete vendor: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to delete vendor', 'error');
         }
       }
     }
 
     // Edit functions
     function editEmployee(id) {
-      const emp = window.allData.find(r => String(r.id) === String(id));
+      const emp = allData.find(r => r.__backendId === id);
       if (!emp) return;
      
-      // Store the complete record including _source_table
-      window.currentEditRecord = emp;
-     
-      document.getElementById('edit-emp-id').value = emp.id;
+      document.getElementById('edit-emp-id').value = emp.__backendId;
       document.getElementById('edit-emp-name').value = emp.employee_name;
       document.getElementById('edit-emp-email').value = emp.employee_email;
       document.getElementById('edit-emp-dept').value = emp.department;
@@ -3246,13 +2346,11 @@
       btn.textContent = 'Saving...';
      
       const id = document.getElementById('edit-emp-id').value;
-      // Use stored complete record if available
-      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
      
       if (record) {
-        const result = await storageManager.update({
+        const result = await window.dataSdk.update({
           ...record,
-          record_type: 'employee',
           employee_name: document.getElementById('edit-emp-name').value,
           employee_email: document.getElementById('edit-emp-email').value,
           department: document.getElementById('edit-emp-dept').value
@@ -3260,25 +2358,21 @@
        
         btn.disabled = false;
         btn.textContent = 'Save Changes';
-        window.currentEditRecord = null;
        
         if (result.isOk) {
           showToast('✅ Employee updated successfully!');
           hideModal('edit-employee-modal');
         } else {
-          showToast('Failed to update employee: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to update employee', 'error');
         }
       }
     }
 
     function editTraining(id) {
-      const training = window.allData.find(r => String(r.id) === String(id));
+      const training = allData.find(r => r.__backendId === id);
       if (!training) return;
-      
-      // Store the complete record including _source_table
-      window.currentEditRecord = training;
      
-      document.getElementById('edit-training-id').value = training.id;
+      document.getElementById('edit-training-id').value = training.__backendId;
       document.getElementById('edit-training-name').value = training.training_name;
       document.getElementById('edit-training-framework').value = training.framework;
       document.getElementById('edit-training-content-type').value = training.content_type;
@@ -3295,93 +2389,41 @@
       btn.textContent = 'Saving...';
      
       const id = document.getElementById('edit-training-id').value;
-      // Use stored complete record if available
-      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
      
       if (record) {
-        const updateData = {
+        const result = await window.dataSdk.update({
           ...record,
-          record_type: 'training',
           training_name: document.getElementById('edit-training-name').value,
           framework: document.getElementById('edit-training-framework').value,
           content_type: document.getElementById('edit-training-content-type').value,
           content_url: document.getElementById('edit-training-content-url').value,
           due_date: document.getElementById('edit-training-due').value
-        };
-        console.log('Updating training:', id, 'with data:', updateData);
-        const result = await storageManager.update(updateData);
-        console.log('Update result:', result);
+        });
        
         btn.disabled = false;
         btn.textContent = 'Save Changes';
-        window.currentEditRecord = null;
        
         if (result.isOk) {
           showToast('✅ Training updated successfully!');
           hideModal('edit-training-modal');
         } else {
-          showToast('Failed to update training: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to update training', 'error');
         }
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Save Changes';
-        window.currentEditRecord = null;
-        console.error('Training record not found:', id);
-        showToast('Training record not found', 'error');
       }
     }
 
-    async function editControl(id) {
-      try {
-        // Load the control record directly from the database
-        const { data, error } = await supabaseClient
-          .from('controls')
-          .select('*')
-          .eq('id', id)
-          .single();
-        
-        if (error || !data) {
-          console.error('Failed to load control:', error);
-          showToast('Failed to load control data', 'error');
-          return;
-        }
-        
-        const ctrl = data;
-        console.log('Loaded control from DB:', ctrl);
-        
-        // Store the complete record with database metadata
-        window.currentEditRecord = ctrl;
-        window.currentEditRecord._source_table = 'controls';
-        window.currentEditRecord.record_type = 'control';
-       
-        document.getElementById('edit-control-backend-id').value = ctrl.id;
-        document.getElementById('edit-control-id').value = ctrl.control_id || '';
-        document.getElementById('edit-control-name').value = ctrl.control_name || '';
-        const frameworkSelect = document.getElementById('edit-control-framework');
-        if (frameworkSelect) {
-          const currentFramework = ctrl.framework || '';
-          let hasOption = false;
-          for (let i = 0; i < frameworkSelect.options.length; i++) {
-            if (frameworkSelect.options[i].value === currentFramework) {
-              hasOption = true;
-              break;
-            }
-          }
-          if (currentFramework && !hasOption) {
-            const opt = document.createElement('option');
-            opt.value = currentFramework;
-            opt.textContent = currentFramework;
-            frameworkSelect.appendChild(opt);
-          }
-          frameworkSelect.value = currentFramework;
-        }
-        document.getElementById('edit-control-status').value = ctrl.control_status || '';
-       
-        showModal('edit-control-modal');
-      } catch (err) {
-        console.error('Error in editControl:', err);
-        showToast('Error loading control data', 'error');
-      }
+    function editControl(id) {
+      const ctrl = allData.find(r => r.__backendId === id);
+      if (!ctrl) return;
+     
+      document.getElementById('edit-control-backend-id').value = ctrl.__backendId;
+      document.getElementById('edit-control-id').value = ctrl.control_id;
+      document.getElementById('edit-control-name').value = ctrl.control_name;
+      document.getElementById('edit-control-framework').value = ctrl.framework;
+      document.getElementById('edit-control-status').value = ctrl.control_status;
+     
+      showModal('edit-control-modal');
     }
 
     async function handleEditControl(e) {
@@ -3391,13 +2433,11 @@
       btn.textContent = 'Saving...';
      
       const id = document.getElementById('edit-control-backend-id').value;
-      // Use stored complete record if available
-      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
      
       if (record) {
-        const result = await storageManager.update({
+        const result = await window.dataSdk.update({
           ...record,
-          record_type: 'control',
           control_id: document.getElementById('edit-control-id').value,
           control_name: document.getElementById('edit-control-name').value,
           framework: document.getElementById('edit-control-framework').value,
@@ -3406,92 +2446,41 @@
        
         btn.disabled = false;
         btn.textContent = 'Save Changes';
-        window.currentEditRecord = null;
        
         if (result.isOk) {
           showToast('✅ Control updated successfully!');
           hideModal('edit-control-modal');
         } else {
-          showToast('Failed to update control: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to update control', 'error');
         }
       }
     }
 
-    async function editVendor(id) {
-      try {
-        // Load the vendor record directly from the database
-        const { data, error } = await supabaseClient
-          .from('vendors')
-          .select('*')
-          .eq('id', id)
-          .single();
-        
-        if (error || !data) {
-          console.error('Failed to load vendor:', error);
-          showToast('Failed to load vendor data', 'error');
-          return;
-        }
-        
-        const vendor = data;
-        console.log('Loaded vendor from DB:', vendor);
-        
-        // Store the complete record with database metadata
-        window.currentEditRecord = vendor;
-        window.currentEditRecord._source_table = 'vendors';
-        window.currentEditRecord.record_type = 'vendor';
-       
-        document.getElementById('edit-vendor-backend-id').value = vendor.id || '';
-        document.getElementById('edit-vendor-name').value = vendor.vendor_name || '';
-        document.getElementById('edit-vendor-email').value = vendor.vendor_email || '';
-        document.getElementById('edit-vendor-service').value = vendor.vendor_service || '';
-        document.getElementById('edit-vendor-risk').value = vendor.risk_score != null ? vendor.risk_score : '';
-        document.getElementById('edit-vendor-cert-name').value = vendor.certificate_name || '';
-        let expiryValue = '';
-        if (vendor.expiry_date) {
-          const d = new Date(vendor.expiry_date);
-          if (!isNaN(d.getTime())) {
-            expiryValue = d.toISOString().slice(0, 10);
-          } else {
-            expiryValue = vendor.expiry_date;
-          }
-        }
-        document.getElementById('edit-vendor-expiry').value = expiryValue;
-        document.getElementById('edit-vendor-poc').value = vendor.vendor_poc || '';
-        const ownerSelect = document.getElementById('edit-vendor-internal-owner');
-        const ownerValue = vendor.internal_owner || '';
-        if (ownerSelect) {
-          let hasOwner = false;
-          for (let i = 0; i < ownerSelect.options.length; i++) {
-            if (ownerSelect.options[i].value === ownerValue) {
-              hasOwner = true;
-              break;
-            }
-          }
-          if (ownerValue && !hasOwner) {
-            const opt = document.createElement('option');
-            opt.value = ownerValue;
-            opt.textContent = ownerValue;
-            ownerSelect.appendChild(opt);
-          }
-          ownerSelect.value = ownerValue;
-        }
-       
-        const certInfo = document.getElementById('edit-vendor-current-cert');
-        if (certInfo) {
-          if (vendor.certificate_file_name) {
-            certInfo.textContent = `Current: ${vendor.certificate_file_name}`;
-            certInfo.className = 'mb-2 text-sm text-green-600 font-medium';
-          } else {
-            certInfo.textContent = 'No certificate uploaded';
-            certInfo.className = 'mb-2 text-sm text-gray-500';
-          }
-        }
-       
-        showModal('edit-vendor-modal');
-      } catch (err) {
-        console.error('Error in editVendor:', err);
-        showToast('Error loading vendor data', 'error');
+    function editVendor(id) {
+      const vendor = allData.find(r => r.__backendId === id);
+      if (!vendor) return;
+     
+      document.getElementById('edit-vendor-backend-id').value = vendor.__backendId;
+      document.getElementById('edit-vendor-name').value = vendor.vendor_name;
+      document.getElementById('edit-vendor-email').value = vendor.vendor_email;
+      document.getElementById('edit-vendor-service').value = vendor.vendor_service || '';
+      document.getElementById('edit-vendor-risk').value = vendor.risk_score;
+      document.getElementById('edit-vendor-cert-name').value = vendor.certificate_name || '';
+      document.getElementById('edit-vendor-expiry').value = vendor.expiry_date;
+      document.getElementById('edit-vendor-poc').value = vendor.vendor_poc || '';
+      document.getElementById('edit-vendor-internal-owner').value = vendor.internal_owner || '';
+     
+      // Show current certificate info
+      const certInfo = document.getElementById('edit-vendor-current-cert');
+      if (vendor.certificate_file_name) {
+        certInfo.textContent = `Current: ${vendor.certificate_file_name}`;
+        certInfo.className = 'mb-2 text-sm text-green-600 font-medium';
+      } else {
+        certInfo.textContent = 'No certificate uploaded';
+        certInfo.className = 'mb-2 text-sm text-gray-500';
       }
+     
+      showModal('edit-vendor-modal');
     }
 
     async function handleEditVendor(e) {
@@ -3501,8 +2490,7 @@
       btn.textContent = 'Saving...';
      
       const id = document.getElementById('edit-vendor-backend-id').value;
-      // Use stored complete record if available
-      const record = window.currentEditRecord || window.allData.find(r => String(r.id) === String(id));
+      const record = allData.find(r => r.__backendId === id);
      
       if (record) {
         // Handle certificate file upload if new file selected
@@ -3514,16 +2502,14 @@
             showToast('Certificate file must be less than 10MB', 'error');
             btn.disabled = false;
             btn.textContent = 'Save Changes';
-            window.currentEditRecord = null;
             return;
           }
          
           certFileName = certFile.name;
         }
        
-        const result = await storageManager.update({
+        const result = await window.dataSdk.update({
           ...record,
-          record_type: 'vendor',
           vendor_name: document.getElementById('edit-vendor-name').value,
           vendor_email: document.getElementById('edit-vendor-email').value,
           vendor_service: document.getElementById('edit-vendor-service').value,
@@ -3537,13 +2523,12 @@
        
         btn.disabled = false;
         btn.textContent = 'Save Changes';
-        window.currentEditRecord = null;
        
         if (result.isOk) {
           showToast('✅ Vendor updated successfully!');
           hideModal('edit-vendor-modal');
         } else {
-          showToast('Failed to update vendor: ' + (result.error || 'Unknown error'), 'error');
+          showToast('Failed to update vendor', 'error');
         }
       }
     }
