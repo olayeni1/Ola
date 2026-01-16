@@ -777,22 +777,23 @@
         
         .project-card:first-child,
         .projects-grid:nth-of-type(2) .project-card:first-child {
-            grid-column: span 2;
+            grid-column: span 3;
             display: flex;
         }
         
         .project-card:first-child .project-image,
         .projects-grid:nth-of-type(2) .project-card:first-child .project-image {
-            flex: 0 0 45%;
+            flex: 0 0 50%;
             height: auto;
-            min-height: 300px;
+            min-height: 400px;
         }
         
         .project-card:first-child .project-content,
         .projects-grid:nth-of-type(2) .project-card:first-child .project-content {
-            flex: 0 0 55%;
+            flex: 0 0 50%;
             display: flex;
             flex-direction: column;
+            padding: 2.5rem;
         }
         
         /* .project-card::after {
@@ -1437,7 +1438,7 @@
         <!-- Projects Handled Section -->
         <section>
             <h2>Featured Projects</h2>
-            <p style="color: #64748b; margin-bottom: 2rem;">Showcasing hands-on implementations of GRC frameworks, automation solutions, and security initiatives</p>
+            <p style="color: #64748b; margin-bottom: 2rem; font-size: 1rem;">I <b>built a compliance control center in under 6 hours.</b></p>
             
             <div class="projects-grid">
                 <div class="project-card">
@@ -1452,11 +1453,14 @@
                             </p>
                             <div class="project-tags">
                                 <span class="project-tag">Control Panel</span>
-                                <span class="project-tag">JavaScript</span>
+                                <span class="project-tag">Compliance Center</span>
                             </div>
-                            <button class="compliance-btn" onclick="openComplianceModal()">Learn More</button>
-                        </div>
-                    </div>
+                            <div style="display: flex; gap: 1rem; margin-top: auto;">
+                                <button class="compliance-btn" onclick="openComplianceModal()">Learn More</button>
+                                <a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">View Project →</a>
+                            </div>
+                            </div>
+                            </div>
                     <div class="project-card">
                     <div class="project-image">🔢</div>
                     <div class="project-content">
@@ -1498,7 +1502,7 @@
             <div class="projects-grid">
                 <div class="project-card">
                     <div class="project-image">
-                        <img src="it-audit4.png" alt="IT AUDIT Sanitized">
+                        <img src="it-audit2.png" alt="IT AUDIT Sanitized">
                     </div>
                     <div class="project-content">
                         <div class="project-category">IT Audit</div>
