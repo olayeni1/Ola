@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +10,15 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
         
         @keyframes fadeInDown {
@@ -765,6 +775,26 @@
             position: relative;
         }
         
+        .project-card:first-child,
+        .projects-grid:nth-of-type(2) .project-card:first-child {
+            grid-column: span 2;
+            display: flex;
+        }
+        
+        .project-card:first-child .project-image,
+        .projects-grid:nth-of-type(2) .project-card:first-child .project-image {
+            flex: 0 0 45%;
+            height: auto;
+            min-height: 300px;
+        }
+        
+        .project-card:first-child .project-content,
+        .projects-grid:nth-of-type(2) .project-card:first-child .project-content {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+        }
+        
         /* .project-card::after {
             content: '✓ Verified';
             position: absolute;
@@ -888,6 +918,101 @@
         .project-link:hover {
             gap: 0.8rem;
             color: #2563eb;
+        }
+        
+        .compliance-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: auto;
+            align-self: flex-start;
+        }
+        
+        .compliance-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .modal-close {
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #64748b;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: -1rem 0 1rem 0;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: #0f172a;
+        }
+        
+        .modal-text {
+            color: #1f2937;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+        
+        .modal-text p {
+            margin-bottom: 1rem;
+        }
+        
+        .modal-text ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0;
+        }
+        
+        .modal-text li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .modal-text li::before {
+            content: '✔';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
         }
         
         @media (max-width: 1024px) {
@@ -1316,17 +1441,20 @@
             
             <div class="projects-grid">
                 <div class="project-card">
-                        <div class="project-image">🖥️</div>
-                            <div class="project-content">
-                                <div class="project-category">Command Panel</div>
-                                <h3 class="project-title">Compliance Command Center</h3>
-                                <p class="project-description">
-                                    A control panel for managing and assessing frameworks.</p>
-                                <div class="project-tags">
-                                    <span class="project-tag">Control Panel</span>
-                                    <span class="project-tag">JavaScript</span>
-                                </div>
-                            <a href="./compliance-control-center" class="project-link">View Details →</a>
+                        <div class="project-image">
+                            <img src="Compliance Command Center.png" alt="Compliance Command Center">
+                        </div>
+                        <div class="project-content">
+                            <div class="project-category">Command Panel</div>
+                            <h3 class="project-title">I built a Compliance Control Center in under 6 hours</h3>
+                            <p class="project-description">
+                                A comprehensive compliance management solution built to prove that skills should make work easier, not harder.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Control Panel</span>
+                                <span class="project-tag">JavaScript</span>
+                            </div>
+                            <button class="compliance-btn" onclick="openComplianceModal()">Learn More</button>
                         </div>
                     </div>
                     <div class="project-card">
@@ -1369,7 +1497,9 @@
             
             <div class="projects-grid">
                 <div class="project-card">
-                    <div class="project-image">📄</div>
+                    <div class="project-image">
+                        <img src="it-audit4.png" alt="IT AUDIT Sanitized">
+                    </div>
                     <div class="project-content">
                         <div class="project-category">IT Audit</div>
                         <h3 class="project-title">IT Audit Sample Report (Summary – Sanitized Version)</h3>
@@ -1438,6 +1568,48 @@
             </section>
         </div>
     </div> -->
+    
+    <!-- Compliance Modal -->
+    <div id="complianceModal" class="modal" onclick="closeComplianceModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeComplianceModal()">&times;</button>
+            <h2 style="color: #0f172a; margin-bottom: 1.5rem;">I built a Compliance Control Center in under 6 hours</h2>
+            <div class="modal-text">
+                <p>Not because I'm a great coder (my coding skills are basic),
+                but because I deeply understand compliance problems and take initiative without waiting to be told.</p>
+                
+                <p>This was about proving one thing:</p>
+                
+                <p><strong>Skills should make work easier — not harder.
+                That's what automation is for.</strong></p>
+                
+                <p>The solution tackles one of the biggest compliance pain points organizations face:</p>
+                
+                <ul>
+                    <li><strong>Employee training & tracking</strong> - Assign training, notify employees and supervisors, track completion, run assessments, and auto-generate certificates — all in one flow.</li>
+                    <li><strong>Third-party / vendor risk management</strong> - Register vendors, assign risk ratings, upload certifications (e.g., SOC 2), track expiry dates, assign accountability, and get automatic alerts.</li>
+                    <li><strong>Control monitoring & RACI</strong> - Know who owns what. See compliance status at a glance.</li>
+                    <li><strong>Reporting</strong> - Generate audit-ready reports in minutes.</li>
+                </ul>
+                
+                <p><strong>All built in less than 6 hours.</strong></p>
+                
+                <p>Because this isn't about knowing how to code.
+                It's about knowing the problem and designing the right solution.</p>
+                
+                <p style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                    <strong>See it live:</strong><br>
+                    <a href="https://olayeni1.github.io/Ola/compliance-control-center" style="color: #3b82f6; text-decoration: none;" target="_blank">🔗 https://olayeni1.github.io/Ola/compliance-control-center</a>
+                </p>
+                
+                <p style="margin-top: 1.5rem; padding: 1.5rem; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 10px; border-left: 4px solid #3b82f6;">
+                    If you're an SME, startup, or growing organization looking to automate compliance without expensive tools, <strong>we should talk.</strong>
+                </p>
+                
+                <p style="color: #10b981; font-weight: 600; margin-top: 1.5rem;">Compliance doesn't have to be painful. It just needs to be smart.</p>
+            </div>
+        </div>
+    </div>
     
     <footer>
         <div style="max-width: 1200px; margin: 0 auto;">
@@ -1637,6 +1809,33 @@
                 }
             }
         });
-    </script>
-</body>
-</html>
+        
+        // Compliance Modal Functions
+        function openComplianceModal() {
+            const modal = document.getElementById('complianceModal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+        
+        function closeComplianceModal(event) {
+            const modal = document.getElementById('complianceModal');
+            if (modal) {
+                if (!event || event.target.id === 'complianceModal') {
+                    modal.classList.remove('active');
+                }
+            }
+        }
+        
+        // Close compliance modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('complianceModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
+        });
+        </script>
+        </body>
+        </html>
