@@ -208,16 +208,16 @@
   </div>
   <script>
     const defaultConfig = {
-      background_color: '#f0f4ff',
-      card_color: '#ffffff',
-      text_color: '#1e293b',
-      primary_action_color: '#3b82f6',
-      secondary_surface_color: '#e0e7ff',
-      font_family: 'Inter',
-      font_size: 16,
-      title_text: 'Random Integer Generator',
-      button_text: 'Generate'
-    };
+       background_color: '#0f172a',
+       card_color: '#1e3a8a',
+       text_color: '#f1f5f9',
+       primary_action_color: '#3b82f6',
+       secondary_surface_color: '#1e40af',
+       font_family: 'Inter',
+       font_size: 16,
+       title_text: 'Random Integer Generator',
+       button_text: 'Generate'
+     };
 
     let config = { ...defaultConfig };
 
@@ -365,10 +365,13 @@
       errorMsg.style.fontSize = `${baseFontSize * 0.875}px`;
     }
 
+    // Apply default config on page load
+    onConfigChange(defaultConfig);
+
     if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
+       window.elementSdk.init({
+         defaultConfig,
+         onConfigChange,
         mapToCapabilities: (config) => ({
           recolorables: [
             {
