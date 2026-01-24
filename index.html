@@ -731,6 +731,14 @@
             font-weight: 500;
         }
         
+        .timeline-item .location {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        
         .timeline-item .highlight {
             background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
             padding: 1.2rem;
@@ -1168,6 +1176,35 @@
             font-size: 0.85rem;
             color: #64748b;
         }
+
+        .linki:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .linki {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.2rem;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            font-size: 1rem;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -1179,11 +1216,14 @@
             <div class="hero-text">
                 <h1>Ola Ayeni</h1>
                 <div class="title">Ola Ayeni - CISM, CISA, AAISM, CRISC, <span onclick="openFortinelModal()">Fortinet Certified</span>, ISC² CC</div>
-                <div class="tagline">Results-driven GRC Analyst with a Network Infrastructure and Computer Engineering background, leveraging 16 years’ experience implementing NIST, ISO 27001, COBIT, SOC 2, and GDPR frameworks to align technical controls with business risk and ensure audit readiness and compliance.</div>
+                <div class="tagline">Multidisciplinary professional with 16+ years spanning enterprise infrastructure engineering, award-winning environmental sustainability, and technology risk & governance, combining Cisco-based system design, circular economy innovation, and IT risk, compliance, and audit expertise across frameworks like ISO 27001, NIST, SOC 2, HIPAA, SOX, and GDPR.</div>
                 <div class="contact-links">
                     <a href="mailto:olaiiayeni@gmail.com">✉️ Email</a>
                     <a href="#">📍 DMV, USA</a>
                     <a href="https://linkedin.com/in/olamideiayeni">LinkedIn</a>
+                    <button class="linki" onclick="switchTab('projects', this)">
+                        Projects
+                    </button>
                 </div>
             </div>
         </div>
@@ -1263,6 +1303,9 @@
             <h2>Executive Summary</h2>
             <div class="summary-box">
                 <p>Technology Risk, IT Governance & Compliance Professional | CISA, CISM, CRISC, AAISM
+                    <br/>
+                    <br/>
+                    Multidisciplinary professional with 16+ years spanning enterprise infrastructure engineering, award-winning environmental sustainability, and technology risk & governance, combining Cisco-based system design, circular economy innovation, and IT risk, compliance, and audit expertise across frameworks like ISO 27001, NIST, SOC 2, HIPAA, SOX, and GDPR.
                     <br/>
                     <br/>
                     My career spans three complementary domains: enterprise infrastructure engineering, sustainability entrepreneurship, and technology risk and governance.
@@ -1453,47 +1496,61 @@
         </section>
         
         <section id="experience">
-            <h2>Professional Journey</h2>
-            <div class="experience-timeline">
-                <div class="timeline-item">
-                    <h3>Fellow, Policy & Reporting Specialist</h3>
-                    <div class="company">NOAA: National Oceanic & Atmospheric Administration</div>
-                    <div class="date">Feb 2026 - Present · 11 mos</div>
-                    <div class="highlight">
-                        Translate complex federal policy requirements into board-level guidance for the National Sea Grant Advisory Board and senior leadership, ensuring regulatory understanding and organizational compliance.
-                    </div>
-                    <div class="highlight" style="font-style:italic; color:#2563eb; margin-top:0.5rem;">Policy Analysis, Compliance Reporting and +3 skills</div>
-                </div>
+             <h2>Professional Journey</h2>
+             <div class="experience-timeline">
+                 <div class="timeline-item">
+                     <h3>Policy & Reporting Specialist</h3>
+                     <div class="company">NOAA: National Oceanic & Atmospheric Administration · Full-time</div>
+                     <div class="date">Feb 2025 - Present · 1 yr</div>
+                     <div class="location">United States · On-site</div>
+                     <div class="highlight">
+                         Translate complex federal policy requirements into board-level guidance for the National Sea Grant Advisory Board and senior leadership, ensuring regulatory understanding and organizational compliance.....
+                     </div>
+                     <div class="highlight" style="font-style:italic; color:#2563eb; margin-top:0.5rem;"> Policy Analysis, Compliance Reporting and +3 skills</div>
+                 </div>
 
-                <div class="timeline-item">
-                    <h3>Governance | Policy | Risk Management</h3>
-                    <div class="company">HOPCYKU</div>
-                    <div class="date">Jan 2018 - Jul 2023 · 5 yrs 7 mos</div>
-                    <div class="highlight">
-                        Led governance activities across a growing startup, establishing foundational policies, control procedures, and operational documentation.
-                    </div>
-                </div>
+                 <div class="timeline-item">
+                     <h3>Governance | Policy | IT Risk Management</h3>
+                     <div class="company">Aion Tech LLC · Full-time</div>
+                     <div class="date">Jan 2022 - Present · 4 yrs 1 mo</div>
+                     <div class="location">Remote</div>
+                     <div class="highlight">
+                         Advised diverse clients across multiple sectors on governance frameworks, resulting in 30% faster compliance onboarding and standardized policies adopted across the organization....
+                     </div>
+                 </div>
 
-                <div class="timeline-item">
-                    <h3>Intern, Techwomen</h3>
-                    <div class="company">Symantec</div>
-                    <div class="date">Sep 2017 - Oct 2017 · 2 mos</div>
-                    <div class="highlight">
-                        - Collaborated with cross-functional teams including IT operations, application teams, and business units to capture risk information and implement security controls
-                    </div>
-                    <div class="highlight" style="font-style:italic; color:#2563eb; margin-top:0.5rem;">Cybersecurity, Cloud Security and +1 skill</div>
-                </div>
+                 <div class="timeline-item">
+                     <h3>Founder, Governance and Direction</h3>
+                     <div class="company">HOPCYKU · Full-time</div>
+                     <div class="date">Aug 2016 - Aug 2023 · 7 yrs 1 mo</div>
+                     <div class="location">Lagos State, Nigeria · On-site</div>
+                     <div class="highlight">
+                         Founded and scaled Hopcyku into a trusted circular-economy and sustainability consultancy, driving transformation of waste systems, creating inclusive value chains, and enabling clients to adopt sustain...
+                     </div>
+                 </div>
 
-                <div class="timeline-item">
-                    <h3>Network Engineering | Infrastructure | Security Controls</h3>
-                    <div class="company">MITSUMI Distribution</div>
-                    <div class="date">Jan 2015 - Jul 2017 · 2 yrs 7 mos</div>
-                    <div class="highlight">
-                        Supported day-to-day network engineering and infrastructure operations across enterprise environments.
-                    </div>
-                </div>
-            </div>
-        </section>
+                 <div class="timeline-item">
+                     <h3>Intern, Techwomen</h3>
+                     <div class="company">Symantec · Internship</div>
+                     <div class="date">Sep 2017 - Oct 2017 · 2 mos</div>
+                     <div class="location">San Francisco Bay Area · On-site</div>
+                     <div class="highlight">
+                         - Collaborated with cross-functional teams including IT operations, application teams, and business units to capture risk information and implement security controls...
+                     </div>
+                     <div class="highlight" style="font-style:italic; color:#2563eb; margin-top:0.5rem;"> Cybersecurity, Cloud Security and +1 skill</div>
+                 </div>
+
+                 <div class="timeline-item">
+                     <h3>Network Engineering | Infrastructure</h3>
+                     <div class="company">MITSUMI Distribution · Full-time</div>
+                     <div class="date">Mar 2013 - Dec 2015 · 2 yrs 10 mos</div>
+                     <div class="location">Lagos State, Nigeria · On-site</div>
+                     <div class="highlight">
+                         Led technical sales and solution delivery for Audio-Visual systems across West Africa, managing multiple enterprise clients and ensuring high-value solutions met operational and strategic needs....
+                     </div>
+                 </div>
+             </div>
+         </section>
         
         <section id="education">
             <h2>Education</h2>
