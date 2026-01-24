@@ -1623,6 +1623,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="project-card">
+                    <div class="project-image">🖥️</div>
+                    <div class="project-content">
+                        <div class="project-category">Command Center</div>
+                        <h3 class="project-title">Compliance Control Center</h3>
+                        <p class="project-description">
+                             A comprehensive compliance management solution built to prove that skills should make work easier, not harder.</p>
+                        <div class="project-tags">
+                            <span class="project-tag">Control Panel</span>
+                            <span class="project-tag">Compliance Center</span>
+                        </div>
+                        <a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">See Demo Live →</a>
+                    </div>
+                </div>
                     <div class="project-card">
                     <div class="project-image">🔢</div>
                     <div class="project-content">
@@ -1890,6 +1904,14 @@
 
             document.getElementById(tabName).classList.add('active');
             button.classList.add('active');
+            
+            // Scroll to the tab section
+            setTimeout(() => {
+                const tabElement = document.getElementById(tabName);
+                if (tabElement) {
+                    tabElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 0);
         }
         
         // Image upload handler
