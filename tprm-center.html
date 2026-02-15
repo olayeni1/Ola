@@ -1,0 +1,2086 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Third-Party Risk Management System</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #1e293b; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    .risk-critical { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+    .risk-high { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); }
+    .risk-medium { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+    .risk-low { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
+    .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(71, 85, 105, 0.5); }
+    .nav-item { transition: all 0.2s ease; cursor: pointer; }
+    .nav-item:hover:not(.disabled) { background: rgba(59, 130, 246, 0.1); }
+    .nav-item.active { background: rgba(59, 130, 246, 0.2); border-left: 3px solid #3b82f6; }
+    .nav-item.disabled { opacity: 0.5; cursor: not-allowed; }
+    .nav-item.disabled:hover { background: transparent; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full bg-slate-900 text-slate-100 overflow-auto">
+  <div id="app" class="h-full w-full flex"><!-- Sidebar Navigation -->
+   <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0">
+    <div class="p-4 border-b border-slate-700">
+     <h1 id="app-title" class="text-xl font-bold text-blue-400">TPRM System</h1>
+     <p id="org-name" class="text-xs text-slate-400 mt-1">Risk Management Portal</p>
+    </div><!-- Current User Info -->
+    <div class="p-3 border-b border-slate-700">
+     <div class="text-xs text-slate-400 mb-2">
+      Logged in as
+     </div>
+     <div class="bg-slate-700 rounded-lg p-2 mb-2">
+      <p id="current-user-name" class="text-sm font-medium">Admin User</p>
+      <p id="current-user-email" class="text-xs text-slate-400">admin@company.com</p>
+      <p id="current-user-roles" class="text-xs text-blue-300 mt-1">SCRM Lead, Analyst</p>
+     </div><button onclick="switchUser()" class="w-full text-xs bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 rounded px-2 py-1 transition">Switch User</button>
+    </div>
+    <nav class="flex-1 py-2 overflow-y-auto scrollbar-thin"><button id="nav-dashboard" class="nav-item active w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="dashboard">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      </svg> Dashboard </button> <button id="nav-users" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="users">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg> User Management </button> <button id="nav-vendors" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="vendors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg> Vendor Management </button> <button id="nav-assessments" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="assessments">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012 2h2a2 2 0 012-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg> Security Assessments </button> <button id="nav-software" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="software">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      </svg> Software Supply Chain </button> <button id="nav-policies" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="policies">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg> Policy Management </button> <button id="nav-contracts" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="contracts">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg> Contracting </button> <button id="nav-reports" class="nav-item w-full text-left px-4 py-2.5 flex items-center gap-3" data-section="reports">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg> Reports </button>
+    </nav>
+    <div class="p-3 border-t border-slate-700 text-xs text-slate-500">
+     <p>Data records: <span id="record-count">0</span>/999</p>
+    </div>
+   </aside><!-- Main Content -->
+   <main class="flex-1 overflow-y-auto scrollbar-thin"><!-- Dashboard Section -->
+    <section id="section-dashboard" class="p-6 animate-fade-in">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Dashboard</h2>
+      <div class="text-sm text-slate-400">
+       Q<span id="current-quarter">4</span> <span id="current-year">2024</span>
+      </div>
+     </div><!-- Stats Grid -->
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="stat-card glass-card rounded-xl p-4">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-slate-400 text-sm">Total Vendors</p>
+         <p id="stat-vendors" class="text-3xl font-bold text-blue-400">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+         </svg>
+        </div>
+       </div>
+       <p class="text-xs text-slate-500 mt-2">Active third parties</p>
+      </div>
+      <div class="stat-card glass-card rounded-xl p-4">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-slate-400 text-sm">Assessments Completed</p>
+         <p id="stat-assessments" class="text-3xl font-bold text-emerald-400">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+         <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+        </div>
+       </div>
+       <p class="text-xs text-slate-500 mt-2">This year</p>
+      </div>
+      <div class="stat-card glass-card rounded-xl p-4">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-slate-400 text-sm">Active Users</p>
+         <p id="stat-users" class="text-3xl font-bold text-purple-400">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+         <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+        </div>
+       </div>
+       <p class="text-xs text-slate-500 mt-2">Team members</p>
+      </div>
+      <div class="stat-card glass-card rounded-xl p-4">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-slate-400 text-sm">Active Policies</p>
+         <p id="stat-policies" class="text-3xl font-bold text-amber-400">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center">
+         <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+         </svg>
+        </div>
+       </div>
+       <p class="text-xs text-slate-500 mt-2">Governance documents</p>
+      </div>
+     </div><!-- Risk Distribution & Alerts -->
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="glass-card rounded-xl p-5">
+       <h3 class="text-lg font-semibold mb-4">Risk Distribution</h3>
+       <div class="space-y-3">
+        <div class="flex items-center gap-3">
+         <div class="w-20 text-sm text-slate-400">
+          Critical
+         </div>
+         <div class="flex-1 h-6 bg-slate-700 rounded-full overflow-hidden">
+          <div id="risk-critical-bar" class="h-full risk-critical transition-all duration-500" style="width: 0%"></div>
+         </div><span id="risk-critical-count" class="w-8 text-right text-sm font-medium">0</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-20 text-sm text-slate-400">
+          High
+         </div>
+         <div class="flex-1 h-6 bg-slate-700 rounded-full overflow-hidden">
+          <div id="risk-high-bar" class="h-full risk-high transition-all duration-500" style="width: 0%"></div>
+         </div><span id="risk-high-count" class="w-8 text-right text-sm font-medium">0</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-20 text-sm text-slate-400">
+          Medium
+         </div>
+         <div class="flex-1 h-6 bg-slate-700 rounded-full overflow-hidden">
+          <div id="risk-medium-bar" class="h-full risk-medium transition-all duration-500" style="width: 0%"></div>
+         </div><span id="risk-medium-count" class="w-8 text-right text-sm font-medium">0</span>
+        </div>
+        <div class="flex items-center gap-3">
+         <div class="w-20 text-sm text-slate-400">
+          Low
+         </div>
+         <div class="flex-1 h-6 bg-slate-700 rounded-full overflow-hidden">
+          <div id="risk-low-bar" class="h-full risk-low transition-all duration-500" style="width: 0%"></div>
+         </div><span id="risk-low-count" class="w-8 text-right text-sm font-medium">0</span>
+        </div>
+       </div>
+      </div>
+      <div class="glass-card rounded-xl p-5">
+       <h3 class="text-lg font-semibold mb-4">⚠️ High Risk Vendors</h3>
+       <div id="assessment-alerts" class="space-y-2 max-h-48 overflow-y-auto scrollbar-thin">
+        <p class="text-slate-400 text-sm">No critical alerts</p>
+       </div>
+      </div>
+     </div><!-- Recent Activity -->
+     <div class="glass-card rounded-xl p-5">
+      <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+      <div id="recent-activity" class="space-y-2">
+       <p class="text-slate-400 text-sm">No recent activity</p>
+      </div>
+     </div>
+    </section><!-- User Management Section -->
+    <section id="section-users" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">User Management</h2><button onclick="showUserModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg> Add User </button>
+     </div><!-- Users Table -->
+     <div class="glass-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="bg-slate-700/50">
+         <tr>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Name</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Email</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Department</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Assigned Roles</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Status</th>
+          <th class="text-right px-4 py-3 text-sm font-medium text-slate-300">Actions</th>
+         </tr>
+        </thead>
+        <tbody id="users-table-body" class="divide-y divide-slate-700">
+         <tr>
+          <td colspan="6" class="px-4 py-8 text-center text-slate-400">No users added yet</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div><!-- Available Roles Info -->
+     <div class="glass-card rounded-xl p-4 mt-6">
+      <h4 class="font-semibold mb-3">Available Roles &amp; Permissions</h4>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+       <div class="bg-slate-700/30 rounded-lg p-3">
+        <p class="text-sm font-medium text-blue-400 mb-2">🔐 SCRM Lead</p>
+        <p class="text-xs text-slate-400">Full access to all sections. Can manage all vendors, assessments, policies, and generate reports.</p>
+       </div>
+       <div class="bg-slate-700/30 rounded-lg p-3">
+        <p class="text-sm font-medium text-emerald-400 mb-2">📊 Analyst</p>
+        <p class="text-xs text-slate-400">Can view vendors, create/edit assessments, and manage software supply chain. Cannot access policy management.</p>
+       </div>
+       <div class="bg-slate-700/30 rounded-lg p-3">
+        <p class="text-sm font-medium text-amber-400 mb-2">📝 Contracting Officer</p>
+        <p class="text-xs text-slate-400">Limited access. Can only access contracting section for contract reviews and security requirements.</p>
+       </div>
+      </div>
+     </div>
+    </section><!-- Vendor Management Section -->
+    <section id="section-vendors" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Vendor Management</h2><button onclick="showVendorModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg> Add Vendor </button>
+     </div><!-- Filter Bar -->
+     <div class="glass-card rounded-xl p-4 mb-6 flex flex-wrap gap-4"><input type="text" id="vendor-search" placeholder="Search vendors..." class="flex-1 min-w-[200px] bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" oninput="filterVendors()"> <select id="vendor-risk-filter" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" onchange="filterVendors()"> <option value="">All Risk Levels</option> <option value="Critical">Critical</option> <option value="High">High</option> <option value="Medium">Medium</option> <option value="Low">Low</option> </select> <select id="vendor-status-filter" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" onchange="filterVendors()"> <option value="">All Statuses</option> <option value="Active">Active</option> <option value="Under Review">Under Review</option> <option value="Inactive">Inactive</option> </select>
+     </div><!-- Vendors Table -->
+     <div class="glass-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="bg-slate-700/50">
+         <tr>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Vendor Name</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Category</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Risk Level</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Status</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Incidents</th>
+          <th class="text-right px-4 py-3 text-sm font-medium text-slate-300">Actions</th>
+         </tr>
+        </thead>
+        <tbody id="vendors-table-body" class="divide-y divide-slate-700">
+         <tr>
+          <td colspan="6" class="px-4 py-8 text-center text-slate-400">No vendors added yet</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </section><!-- Security Assessments Section -->
+    <section id="section-assessments" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Security Assessments</h2><button onclick="showAssessmentModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg> New Assessment </button>
+     </div><!-- Assessment Stats -->
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">Total Assessments</p>
+       <p id="pending-assessments" class="text-2xl font-bold text-amber-400">0</p>
+      </div>
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">Avg. Score</p>
+       <p id="avg-risk-score" class="text-2xl font-bold text-blue-400">0</p>
+      </div>
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">High Risk Assessments</p>
+       <p id="open-findings" class="text-2xl font-bold text-red-400">0</p>
+      </div>
+     </div><!-- Assessments List -->
+     <div class="glass-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="bg-slate-700/50">
+         <tr>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Vendor</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Date</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Score</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Risk Level</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Residual Risk</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Findings</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Due Date</th>
+          <th class="text-right px-4 py-3 text-sm font-medium text-slate-300">Actions</th>
+         </tr>
+        </thead>
+        <tbody id="assessments-table-body" class="divide-y divide-slate-700">
+         <tr>
+          <td colspan="8" class="px-4 py-8 text-center text-slate-400">No assessments recorded</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </section><!-- Software Supply Chain Section -->
+    <section id="section-software" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Software Supply Chain</h2><button onclick="showSoftwareModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg> Add Software </button>
+     </div><!-- SBOM Stats -->
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">Total Components</p>
+       <p id="total-components" class="text-2xl font-bold text-purple-400">0</p>
+      </div>
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">High Risk</p>
+       <p id="high-risk-software" class="text-2xl font-bold text-red-400">0</p>
+      </div>
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">Total Vulnerabilities</p>
+       <p id="total-vulnerabilities" class="text-2xl font-bold text-amber-400">0</p>
+      </div>
+      <div class="glass-card rounded-xl p-4">
+       <p class="text-slate-400 text-sm">External Exposure</p>
+       <p id="external-exposed" class="text-2xl font-bold text-orange-400">0</p>
+      </div>
+     </div><!-- Software Table -->
+     <div class="glass-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="bg-slate-700/50">
+         <tr>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Software</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Vendor</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Dependencies</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Vulnerabilities</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">External</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Risk Score</th>
+          <th class="text-right px-4 py-3 text-sm font-medium text-slate-300">Actions</th>
+         </tr>
+        </thead>
+        <tbody id="software-table-body" class="divide-y divide-slate-700">
+         <tr>
+          <td colspan="7" class="px-4 py-8 text-center text-slate-400">No software tracked</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </section><!-- Policy Management Section -->
+    <section id="section-policies" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Policy Management</h2><button onclick="showPolicyModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg> Create Policy </button>
+     </div><!-- Policies Grid -->
+     <div id="policies-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="glass-card rounded-xl p-6 text-center text-slate-400">
+       <p>No policies created yet</p>
+      </div>
+     </div>
+    </section><!-- Contracting Section -->
+    <section id="section-contracts" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Contracting Interface</h2><button onclick="showContractModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg> New Contract Review </button>
+     </div><!-- Security Requirements Checklist -->
+     <div class="glass-card rounded-xl p-5 mb-6">
+      <h3 class="text-lg font-semibold mb-4">Standard Security Requirements</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3"><label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Data encryption at rest and in transit</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">SOC 2 Type II certification</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Annual penetration testing</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Incident notification within 24 hours</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Right to audit clause</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Data deletion upon termination</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Subcontractor security requirements</span> </label> <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer"> <input type="checkbox" class="w-4 h-4 rounded border-slate-500 text-blue-600 focus:ring-blue-500"> <span class="text-sm">Business continuity plan</span> </label>
+      </div>
+     </div><!-- Contract Reviews Table -->
+     <div class="glass-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="bg-slate-700/50">
+         <tr>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Vendor</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Contract Date</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Requirements Met</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Security Clauses</th>
+          <th class="text-left px-4 py-3 text-sm font-medium text-slate-300">Status</th>
+          <th class="text-right px-4 py-3 text-sm font-medium text-slate-300">Actions</th>
+         </tr>
+        </thead>
+        <tbody id="contracts-table-body" class="divide-y divide-slate-700">
+         <tr>
+          <td colspan="6" class="px-4 py-8 text-center text-slate-400">No contract reviews</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </section><!-- Reports Section -->
+    <section id="section-reports" class="p-6 hidden">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Reports &amp; Analytics</h2><button onclick="generateQuarterlyReport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+       </svg> Generate Quarterly Report </button>
+     </div><!-- Report Preview -->
+     <div id="report-preview" class="glass-card rounded-xl p-6">
+      <div class="text-center py-12">
+       <svg class="w-16 h-16 mx-auto text-slate-500 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+       </svg>
+       <p class="text-slate-400">Click "Generate Quarterly Report" to create a comprehensive SCRM report</p>
+      </div>
+     </div>
+    </section>
+   </main><!-- Modal Overlay -->
+   <div id="modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div id="modal-content" class="bg-slate-800 rounded-xl border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-thin"><!-- Modal content injected here -->
+    </div>
+   </div><!-- Toast Container -->
+   <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+  </div>
+  <script>
+    // Available roles
+    const AVAILABLE_ROLES = {
+      'scrm_lead': { label: 'SCRM Lead', icon: '🔐', color: 'text-blue-400' },
+      'analyst': { label: 'Analyst', icon: '📊', color: 'text-emerald-400' },
+      'contracting': { label: 'Contracting Officer', icon: '📝', color: 'text-amber-400' }
+    };
+   
+    // Sample users for switching
+    const SAMPLE_USERS = [
+      { id: 'user1', name: 'Admin User', email: 'admin@company.com', department: 'Management', roles: ['scrm_lead', 'analyst'] },
+      { id: 'user2', name: 'John Analyst', email: 'john.analyst@company.com', department: 'Security', roles: ['analyst'] },
+      { id: 'user3', name: 'Sarah Contracting', email: 'sarah.contracting@company.com', department: 'Procurement', roles: ['contracting'] },
+      { id: 'user4', name: 'Mike SCRM', email: 'mike.scrm@company.com', department: 'Risk', roles: ['scrm_lead'] }
+    ];
+   
+    // Application State
+    let appData = {
+      vendors: [],
+      assessments: [],
+      software: [],
+      policies: [],
+      contracts: [],
+      users: []
+    };
+   
+    let currentUser = SAMPLE_USERS[0];
+    let recordCount = 0;
+   
+    const defaultConfig = {
+      app_title: 'TPRM System',
+      organization_name: 'Risk Management Portal'
+    };
+   
+    // Initialize SDKs
+    async function initApp() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+            document.getElementById('org-name').textContent = config.organization_name || defaultConfig.organization_name;
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['app_title', config.app_title || defaultConfig.app_title],
+            ['organization_name', config.organization_name || defaultConfig.organization_name]
+          ])
+        });
+      }
+     
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init({
+          onDataChanged: (data) => {
+            processData(data);
+            updateUI();
+          }
+        });
+       
+        if (!result.isOk) {
+          showToast('Failed to initialize data storage', 'error');
+        }
+      }
+     
+      const now = new Date();
+      document.getElementById('current-quarter').textContent = Math.ceil((now.getMonth() + 1) / 3);
+      document.getElementById('current-year').textContent = now.getFullYear();
+     
+      updateCurrentUserDisplay();
+      updateNavigationAccess();
+      setupNavigationListeners();
+    }
+   
+    function setupNavigationListeners() {
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const section = item.dataset.section;
+          if (item.classList.contains('disabled')) {
+            e.preventDefault();
+            e.stopPropagation();
+            showToast('You do not have access to this section', 'error');
+          } else {
+            showSection(section);
+          }
+        });
+      });
+    }
+   
+    function processData(data) {
+      recordCount = data.length;
+      document.getElementById('record-count').textContent = recordCount;
+     
+      appData.vendors = data.filter(d => d.type === 'vendor');
+      appData.assessments = data.filter(d => d.type === 'assessment');
+      appData.software = data.filter(d => d.type === 'software');
+      appData.policies = data.filter(d => d.type === 'policy');
+      appData.contracts = data.filter(d => d.type === 'contract');
+      appData.users = data.filter(d => d.type === 'user');
+    }
+   
+    function updateCurrentUserDisplay() {
+      document.getElementById('current-user-name').textContent = currentUser.name;
+      document.getElementById('current-user-email').textContent = currentUser.email;
+      document.getElementById('current-user-roles').textContent = currentUser.roles
+        .map(r => AVAILABLE_ROLES[r]?.label || r)
+        .join(', ');
+    }
+   
+    function updateNavigationAccess() {
+      const sections = {
+        dashboard: true,
+        users: currentUser.roles.includes('scrm_lead'),
+        vendors: currentUser.roles.includes('scrm_lead') || currentUser.roles.includes('analyst'),
+        assessments: currentUser.roles.includes('scrm_lead') || currentUser.roles.includes('analyst'),
+        software: currentUser.roles.includes('scrm_lead') || currentUser.roles.includes('analyst'),
+        policies: currentUser.roles.includes('scrm_lead'),
+        contracts: currentUser.roles.includes('scrm_lead') || currentUser.roles.includes('contracting'),
+        reports: currentUser.roles.includes('scrm_lead')
+      };
+     
+      document.querySelectorAll('.nav-item').forEach(item => {
+        const section = item.dataset.section;
+        const hasAccess = sections[section];
+       
+        if (!hasAccess) {
+          item.classList.add('disabled');
+        } else {
+          item.classList.remove('disabled');
+        }
+      });
+    }
+   
+    function switchUser() {
+      showModal(`
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-4">Switch User</h3>
+          <div class="space-y-2">
+            ${SAMPLE_USERS.map(user => `
+              <button onclick="setCurrentUser('${user.id}'); hideModal();" class="w-full text-left p-4 rounded-lg border border-slate-600 hover:border-blue-500 hover:bg-slate-700/50 transition ${currentUser.id === user.id ? 'border-blue-500 bg-slate-700/50' : ''}">
+                <div class="font-medium">${user.name}</div>
+                <div class="text-xs text-slate-400">${user.email} • ${user.department}</div>
+                <div class="text-xs text-slate-400 mt-1">
+                  ${user.roles.map(r => `<span class="inline-block mr-2">${AVAILABLE_ROLES[r].icon} ${AVAILABLE_ROLES[r].label}</span>`).join('')}
+                </div>
+              </button>
+            `).join('')}
+          </div>
+          <div class="mt-4 p-3 bg-slate-700/30 rounded-lg text-xs text-slate-400">
+            <strong>Testing role-based access:</strong><br/>
+            • SCRM Lead: Full access<br/>
+            • Analyst: Can't access policies<br/>
+            • Contracting Officer: Only contracts
+          </div>
+        </div>
+      `);
+    }
+   
+    function setCurrentUser(userId) {
+      const user = SAMPLE_USERS.find(u => u.id === userId);
+      if (user) {
+        currentUser = user;
+        updateCurrentUserDisplay();
+        updateNavigationAccess();
+        showToast(`Switched to ${user.name}`, 'success');
+      }
+    }
+   
+    function updateUI() {
+      updateDashboard();
+      updateVendorsTable();
+      updateAssessmentsTable();
+      updateSoftwareTable();
+      updatePoliciesGrid();
+      updateContractsTable();
+      updateUsersTable();
+    }
+   
+    function updateDashboard() {
+      document.getElementById('stat-vendors').textContent = appData.vendors.length;
+      document.getElementById('stat-assessments').textContent = appData.assessments.length;
+      document.getElementById('stat-users').textContent = SAMPLE_USERS.length;
+      document.getElementById('stat-policies').textContent = appData.policies.length;
+     
+      const riskCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+      appData.vendors.forEach(v => {
+        if (riskCounts.hasOwnProperty(v.risk_level)) {
+          riskCounts[v.risk_level]++;
+        }
+      });
+     
+      const total = appData.vendors.length || 1;
+      document.getElementById('risk-critical-bar').style.width = `${(riskCounts.Critical / total) * 100}%`;
+      document.getElementById('risk-critical-count').textContent = riskCounts.Critical;
+      document.getElementById('risk-high-bar').style.width = `${(riskCounts.High / total) * 100}%`;
+      document.getElementById('risk-high-count').textContent = riskCounts.High;
+      document.getElementById('risk-medium-bar').style.width = `${(riskCounts.Medium / total) * 100}%`;
+      document.getElementById('risk-medium-count').textContent = riskCounts.Medium;
+      document.getElementById('risk-low-bar').style.width = `${(riskCounts.Low / total) * 100}%`;
+      document.getElementById('risk-low-count').textContent = riskCounts.Low;
+     
+      const alertsContainer = document.getElementById('assessment-alerts');
+      const criticalVendors = appData.vendors.filter(v => v.risk_level === 'Critical' || v.risk_level === 'High');
+     
+      if (criticalVendors.length > 0) {
+        alertsContainer.innerHTML = criticalVendors.slice(0, 5).map(v => `
+          <div class="flex items-center gap-2 p-2 bg-red-500/10 rounded-lg border border-red-500/30">
+            <span class="text-red-400">⚠️</span>
+            <span class="text-sm">${v.name} - ${v.risk_level} risk vendor</span>
+          </div>
+        `).join('');
+      } else {
+        alertsContainer.innerHTML = '<p class="text-slate-400 text-sm">No critical alerts</p>';
+      }
+     
+      const activityContainer = document.getElementById('recent-activity');
+      const allRecords = [...appData.vendors, ...appData.assessments, ...appData.software, ...appData.policies, ...appData.contracts]
+        .filter(r => r.created_at)
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5);
+     
+      if (allRecords.length > 0) {
+        activityContainer.innerHTML = allRecords.map(r => `
+          <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30">
+            <span class="text-xs text-slate-500">${formatDate(r.created_at)}</span>
+            <span class="text-sm">${getActivityDescription(r)}</span>
+          </div>
+        `).join('');
+      } else {
+        activityContainer.innerHTML = '<p class="text-slate-400 text-sm">No recent activity</p>';
+      }
+    }
+   
+    function getActivityDescription(record) {
+      const typeLabels = {
+        vendor: '🏢 Vendor added',
+        assessment: '📋 Assessment completed',
+        software: '💻 Software tracked',
+        policy: '📄 Policy created',
+        contract: '📝 Contract reviewed'
+      };
+      return `${typeLabels[record.type] || 'Record'}: ${record.name || record.vendor_id || 'Unknown'}`;
+    }
+   
+    function updateUsersTable() {
+      const tbody = document.getElementById('users-table-body');
+     
+      if (SAMPLE_USERS.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No users added yet</td></tr>';
+        return;
+      }
+     
+      tbody.innerHTML = SAMPLE_USERS.map(u => `
+        <tr class="hover:bg-slate-700/30">
+          <td class="px-4 py-3 font-medium">${u.name}</td>
+          <td class="px-4 py-3 text-sm text-slate-400">${u.email}</td>
+          <td class="px-4 py-3 text-sm">${u.department}</td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-1">
+              ${u.roles.map(r => `
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
+                  ${AVAILABLE_ROLES[r].icon} ${AVAILABLE_ROLES[r].label}
+                </span>
+              `).join('')}
+            </div>
+          </td>
+          <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-400">Active</span></td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="editUserRoles('${u.id}')" class="text-blue-400 hover:text-blue-300 text-sm mr-2">Edit Roles</button>
+            <button onclick="showToast('User deletion not available in demo', 'info')" class="text-slate-400 hover:text-slate-300 text-sm">Remove</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+   
+    function editUserRoles(userId) {
+      const user = SAMPLE_USERS.find(u => u.id === userId);
+      if (!user) return;
+     
+      const allRoles = Object.keys(AVAILABLE_ROLES);
+     
+      showModal(`
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-2">${user.name}</h3>
+          <p class="text-sm text-slate-400 mb-4">${user.email} • ${user.department}</p>
+         
+          <div class="bg-slate-700/30 rounded-lg p-4 mb-4">
+            <p class="text-sm font-medium mb-3">Assign Roles:</p>
+            <div class="space-y-2">
+              ${allRoles.map(roleKey => `
+                <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer">
+                  <input type="checkbox" class="user-role-checkbox w-4 h-4" value="${roleKey}" ${user.roles.includes(roleKey) ? 'checked' : ''}>
+                  <span class="text-sm">${AVAILABLE_ROLES[roleKey].icon} ${AVAILABLE_ROLES[roleKey].label}</span>
+                  <span class="text-xs text-slate-500 ml-auto">${getRoleDescription(roleKey)}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+         
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-xs text-amber-300">
+            <p class="font-medium mb-1">⚠️ Important:</p>
+            <p>Ensure at least one role is assigned. Users with only Contracting Officer role cannot access other sections.</p>
+          </div>
+         
+          <div class="flex gap-3 pt-4">
+            <button onclick="saveUserRoles('${userId}')" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">Save Changes</button>
+            <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+          </div>
+        </div>
+      `);
+    }
+   
+    function getRoleDescription(roleKey) {
+      const descriptions = {
+        scrm_lead: 'Full access to all sections',
+        analyst: 'Assessments & Vendors (no policies)',
+        contracting: 'Contracting section only'
+      };
+      return descriptions[roleKey] || '';
+    }
+   
+    function saveUserRoles(userId) {
+      const user = SAMPLE_USERS.find(u => u.id === userId);
+      if (!user) return;
+     
+      const selectedRoles = Array.from(document.querySelectorAll('.user-role-checkbox:checked'))
+        .map(cb => cb.value);
+     
+      if (selectedRoles.length === 0) {
+        showToast('Please select at least one role', 'error');
+        return;
+      }
+     
+      user.roles = selectedRoles;
+     
+      if (user.id === currentUser.id) {
+        updateCurrentUserDisplay();
+        updateNavigationAccess();
+      }
+     
+      updateUsersTable();
+      hideModal();
+      showToast(`Roles updated for ${user.name}`, 'success');
+    }
+   
+    function showUserModal() {
+      showModal(`
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-4">Add New User</h3>
+          <form id="user-form" class="space-y-4">
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Full Name *</label>
+              <input type="text" id="user-name" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Email *</label>
+              <input type="email" id="user-email" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Department</label>
+              <input type="text" id="user-department" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-2">Assign Roles *</label>
+              <div class="space-y-2">
+                ${Object.entries(AVAILABLE_ROLES).map(([key, role]) => `
+                  <label class="flex items-center gap-3 p-2 rounded hover:bg-slate-700/50 cursor-pointer">
+                    <input type="checkbox" class="new-user-role-checkbox w-4 h-4" value="${key}">
+                    <span class="text-sm">${role.icon} ${role.label}</span>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">Add User</button>
+              <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `);
+     
+      document.getElementById('user-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+       
+        const roles = Array.from(document.querySelectorAll('.new-user-role-checkbox:checked'))
+          .map(cb => cb.value);
+       
+        if (roles.length === 0) {
+          showToast('Please select at least one role', 'error');
+          return;
+        }
+       
+        const newUser = {
+          id: 'user' + (SAMPLE_USERS.length + 1),
+          name: document.getElementById('user-name').value,
+          email: document.getElementById('user-email').value,
+          department: document.getElementById('user-department').value,
+          roles: roles
+        };
+       
+        SAMPLE_USERS.push(newUser);
+        updateUsersTable();
+        hideModal();
+        showToast('User added successfully', 'success');
+      });
+    }
+   
+    function updateVendorsTable() {
+      const tbody = document.getElementById('vendors-table-body');
+     
+      if (appData.vendors.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No vendors added yet</td></tr>';
+        return;
+      }
+     
+      tbody.innerHTML = appData.vendors.map(v => `
+        <tr class="hover:bg-slate-700/30">
+          <td class="px-4 py-3">
+            <div class="font-medium">${v.name}</div>
+            <div class="text-xs text-slate-400">${v.contact_email || ''}</div>
+          </td>
+          <td class="px-4 py-3 text-sm">${v.category || '-'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${getRiskClass(v.risk_level)}">${v.risk_level}</span>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs ${getStatusClass(v.status)}">${v.status || 'Active'}</span>
+          </td>
+          <td class="px-4 py-3 text-sm">${v.incidents || 0}</td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="editVendor('${v.__backendId}')" class="text-blue-400 hover:text-blue-300 text-sm mr-2">Edit</button>
+            <button onclick="confirmDelete('${v.__backendId}', 'vendor')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+   
+    function filterVendors() {
+      const search = document.getElementById('vendor-search').value.toLowerCase();
+      const risk = document.getElementById('vendor-risk-filter').value;
+      const status = document.getElementById('vendor-status-filter').value;
+     
+      const filtered = appData.vendors.filter(v => {
+        const matchesSearch = !search || v.name.toLowerCase().includes(search);
+        const matchesRisk = !risk || v.risk_level === risk;
+        const matchesStatus = !status || v.status === status;
+        return matchesSearch && matchesRisk && matchesStatus;
+      });
+     
+      const tbody = document.getElementById('vendors-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No matching vendors</td></tr>';
+        return;
+      }
+     
+      tbody.innerHTML = filtered.map(v => `
+        <tr class="hover:bg-slate-700/30">
+          <td class="px-4 py-3">
+            <div class="font-medium">${v.name}</div>
+            <div class="text-xs text-slate-400">${v.contact_email || ''}</div>
+          </td>
+          <td class="px-4 py-3 text-sm">${v.category || '-'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${getRiskClass(v.risk_level)}">${v.risk_level}</span>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs ${getStatusClass(v.status)}">${v.status || 'Active'}</span>
+          </td>
+          <td class="px-4 py-3 text-sm">${v.incidents || 0}</td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="editVendor('${v.__backendId}')" class="text-blue-400 hover:text-blue-300 text-sm mr-2">Edit</button>
+            <button onclick="confirmDelete('${v.__backendId}', 'vendor')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+   
+    function updateAssessmentsTable() {
+      const tbody = document.getElementById('assessments-table-body');
+     
+      document.getElementById('pending-assessments').textContent = appData.assessments.length;
+     
+      const avgScore = appData.assessments.length > 0
+        ? Math.round(appData.assessments.reduce((sum, a) => sum + (a.score || 0), 0) / appData.assessments.length)
+        : 0;
+      document.getElementById('avg-risk-score').textContent = avgScore;
+     
+      const highRisk = appData.assessments.filter(a => a.risk_level === 'High' || a.risk_level === 'Critical').length;
+      document.getElementById('open-findings').textContent = highRisk;
+     
+      if (appData.assessments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">No assessments recorded</td></tr>';
+        return;
+      }
+     
+      tbody.innerHTML = appData.assessments.map(a => `
+        <tr class="hover:bg-slate-700/30">
+          <td class="px-4 py-3 font-medium">${a.name || a.vendor_id}</td>
+          <td class="px-4 py-3 text-sm">${formatDate(a.created_at)}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <div class="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full ${getScoreColor(a.score)}" style="width: ${a.score}%"></div>
+              </div>
+              <span class="text-sm">${a.score || 0}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${getRiskClass(a.risk_level)}">${a.risk_level || 'N/A'}</span>
+          </td>
+          <td class="px-4 py-3 text-sm">${a.residual_risk || 0}%</td>
+          <td class="px-4 py-3 text-sm">${a.findings ? a.findings.split(',').length : 0}</td>
+          <td class="px-4 py-3">
+            ${a.due_date ? `<span class="${getDueDateStatus(a.due_date).class}">${getDueDateStatus(a.due_date).label}</span>` : '<span class="text-slate-500 text-xs">No due date</span>'}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="editAssessment('${a.__backendId}')" class="text-blue-400 hover:text-blue-300 text-sm mr-2">Edit</button>
+            <button onclick="confirmDelete('${a.__backendId}', 'assessment')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+   
+    function updateSoftwareTable() {
+      const tbody = document.getElementById('software-table-body');
+     
+      document.getElementById('total-components').textContent = appData.software.length;
+      document.getElementById('high-risk-software').textContent = appData.software.filter(s => (s.score || 0) >= 70).length;
+      document.getElementById('total-vulnerabilities').textContent = appData.software.reduce((sum, s) => sum + (s.vulnerabilities || 0), 0);
+      document.getElementById('external-exposed').textContent = appData.software.filter(s => s.external_exposure).length;
+     
+      if (appData.software.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No software tracked</td></tr>';
+        return;
+      }
+     
+      tbody.innerHTML = appData.software.map(s => `
+        <tr class="hover:bg-slate-700/30">
+          <td class="px-4 py-3 font-medium">${s.name}</td>
+          <td class="px-4 py-3 text-sm">${s.vendor_id || '-'}</td>
+          <td class="px-4 py-3 text-sm">${s.dependencies || '-'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs ${(s.vulnerabilities || 0) > 0 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">${s.vulnerabilities || 0}</span>
+          </td>
+          <td class="px-4 py-3">
+            ${s.external_exposure ? '<span class="text-amber-400">⚠️ Yes</span>' : '<span class="text-slate-400">No</span>'}
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${getRiskScoreClass(s.score)}">${s.score || 0}</span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="editSoftware('${s.__backendId}')" class="text-blue-400 hover:text-blue-300 text-sm mr-2">Edit</button>
+            <button onclick="confirmDelete('${s.__backendId}', 'software')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+   
+    function updatePoliciesGrid() {
+      const grid = document.getElementById('policies-grid');
+     
+      if (appData.policies.length === 0) {
+        grid.innerHTML = '<div class="glass-card rounded-xl p-6 text-center text-slate-400"><p>No policies created yet</p></div>';
+        return;
+      }
+     
+      grid.innerHTML = appData.policies.map(p => `
+        <div class="glass-card rounded-xl p-5 hover:border-blue-500/50 transition-all">
+          <div class="flex justify-between items-start mb-3">
+            <h4 class="font-semibold text-blue-400">${p.name}</h4>
+            <span class="text-xs bg-slate-700 px-2 py-1 rounded">v${p.version || '1.0'}</span>
+          </div>
+          <p class="text-sm text-slate-400 mb-2 line-clamp-2">${p.content ? p.content.substring(0, 100) + '...' : 'No description'}</p>
+          ${p.attachment ? '<div class="text-xs text-green-400 mb-2">✓ Attachment included</div>' : ''}
+          <div class="flex justify-between items-center text-xs text-slate-500">
+            <span>Owner: ${p.owner || 'Unassigned'}</span>
+            <span>${p.last_updated ? formatDate(p.last_updated) : 'Never updated'}</span>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-700 flex gap-2">
+            <button onclick="editPolicy('${p.__backendId}')" class="flex-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded text-sm transition">Edit</button>
+            <button onclick="confirmDelete('${p.__backendId}', 'policy')" class="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded text-sm transition">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+   
+    function updateContractsTable() {
+      const tbody = document.getElementById('contracts-table-body');
+     
+      if (appData.contracts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No contract reviews</td></tr>';
+        return;
+      }
+     
+      tbody.innerHTML = appData.contracts.map(c => `
+        <tr class="hover:bg-slate-700/30">
+          <td class="px-4 py-3 font-medium">${c.name}</td>
+          <td class="px-4 py-3 text-sm">${formatDate(c.created_at)}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <div class="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500" style="width: ${((c.requirements_met || 0) / (c.total_requirements || 8)) * 100}%"></div>
+              </div>
+              <span class="text-sm">${c.requirements_met || 0}/${c.total_requirements || 8}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-sm">${c.clauses || '-'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs ${getStatusClass(c.status)}">${c.status || 'Pending'}</span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="editContract('${c.__backendId}')" class="text-blue-400 hover:text-blue-300 text-sm mr-2">Edit</button>
+            <button onclick="confirmDelete('${c.__backendId}', 'contract')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+   
+    function showSection(sectionId) {
+      document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+      document.getElementById(`section-${sectionId}`).classList.add('animate-fade-in');
+     
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.section === sectionId) {
+          item.classList.add('active');
+        }
+      });
+    }
+   
+    function showModal(content) {
+      document.getElementById('modal-content').innerHTML = content;
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+   
+    function hideModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+    }
+   
+    function showVendorModal(vendor = null) {
+      const isEdit = vendor !== null;
+      showModal(`
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-4">${isEdit ? 'Edit' : 'Add'} Vendor</h3>
+          <form id="vendor-form" class="space-y-4">
+            <input type="hidden" id="vendor-id" value="${isEdit ? vendor.__backendId : ''}">
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Vendor Name *</label>
+              <input type="text" id="vendor-name" value="${isEdit ? vendor.name : ''}" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Category</label>
+                <select id="vendor-category" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                  <option value="Technology" ${isEdit && vendor.category === 'Technology' ? 'selected' : ''}>Technology</option>
+                  <option value="Cloud Services" ${isEdit && vendor.category === 'Cloud Services' ? 'selected' : ''}>Cloud Services</option>
+                  <option value="Financial" ${isEdit && vendor.category === 'Financial' ? 'selected' : ''}>Financial</option>
+                  <option value="Healthcare" ${isEdit && vendor.category === 'Healthcare' ? 'selected' : ''}>Healthcare</option>
+                  <option value="Manufacturing" ${isEdit && vendor.category === 'Manufacturing' ? 'selected' : ''}>Manufacturing</option>
+                  <option value="Professional Services" ${isEdit && vendor.category === 'Professional Services' ? 'selected' : ''}>Professional Services</option>
+                  <option value="Other" ${isEdit && vendor.category === 'Other' ? 'selected' : ''}>Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Risk Level *</label>
+                <select id="vendor-risk" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                  <option value="Low" ${isEdit && vendor.risk_level === 'Low' ? 'selected' : ''}>Low</option>
+                  <option value="Medium" ${isEdit && vendor.risk_level === 'Medium' ? 'selected' : ''}>Medium</option>
+                  <option value="High" ${isEdit && vendor.risk_level === 'High' ? 'selected' : ''}>High</option>
+                  <option value="Critical" ${isEdit && vendor.risk_level === 'Critical' ? 'selected' : ''}>Critical</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Contact Name</label>
+                <input type="text" id="vendor-contact" value="${isEdit ? vendor.contact_name || '' : ''}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Contact Email</label>
+                <input type="email" id="vendor-email" value="${isEdit ? vendor.contact_email || '' : ''}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Status</label>
+                <select id="vendor-status" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                  <option value="Active" ${isEdit && vendor.status === 'Active' ? 'selected' : ''}>Active</option>
+                  <option value="Under Review" ${isEdit && vendor.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
+                  <option value="Inactive" ${isEdit && vendor.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Incidents</label>
+                <input type="number" id="vendor-incidents" value="${isEdit ? vendor.incidents || 0 : 0}" min="0" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Notes</label>
+              <textarea id="vendor-notes" rows="3" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">${isEdit ? vendor.notes || '' : ''}</textarea>
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">${isEdit ? 'Update' : 'Add'} Vendor</button>
+              <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `);
+     
+      document.getElementById('vendor-form').addEventListener('submit', saveVendor);
+    }
+   
+    async function saveVendor(e) {
+      e.preventDefault();
+     
+      if (recordCount >= 999) {
+        showToast('Maximum record limit (999) reached', 'error');
+        return;
+      }
+     
+      const vendorId = document.getElementById('vendor-id').value;
+      const vendorData = {
+        type: 'vendor',
+        name: document.getElementById('vendor-name').value,
+        category: document.getElementById('vendor-category').value,
+        risk_level: document.getElementById('vendor-risk').value,
+        contact_name: document.getElementById('vendor-contact').value,
+        contact_email: document.getElementById('vendor-email').value,
+        status: document.getElementById('vendor-status').value,
+        incidents: parseInt(document.getElementById('vendor-incidents').value) || 0,
+        notes: document.getElementById('vendor-notes').value,
+        created_at: new Date().toISOString()
+      };
+     
+      let result;
+      if (vendorId) {
+        const existing = appData.vendors.find(v => v.__backendId === vendorId);
+        if (existing) {
+          result = await window.dataSdk.update({ ...existing, ...vendorData });
+        }
+      } else {
+        result = await window.dataSdk.create(vendorData);
+      }
+     
+      if (result && result.isOk) {
+        showToast(vendorId ? 'Vendor updated successfully' : 'Vendor added successfully', 'success');
+        hideModal();
+      } else {
+        showToast('Failed to save vendor', 'error');
+      }
+    }
+   
+    function editVendor(id) {
+      const vendor = appData.vendors.find(v => v.__backendId === id);
+      if (vendor) showVendorModal(vendor);
+    }
+   
+    function showAssessmentModal(assessment = null) {
+      const isEdit = assessment !== null;
+      showModal(`
+        <div class="p-6 max-h-[90vh] overflow-y-auto scrollbar-thin">
+          <h3 class="text-xl font-bold mb-4 sticky top-0 bg-slate-800 py-2">${isEdit ? 'Edit' : 'New'} Security Assessment</h3>
+          <form id="assessment-form" class="space-y-4">
+            <input type="hidden" id="assessment-id" value="${isEdit ? assessment.__backendId : ''}">
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Vendor *</label>
+              <select id="assessment-vendor" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                <option value="">Select a vendor</option>
+                ${appData.vendors.map(v => `<option value="${v.name}" ${isEdit && assessment.name === v.name ? 'selected' : ''}>${v.name}</option>`).join('')}
+              </select>
+            </div>
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Assessment Score (0-100) *</label>
+              <input type="number" id="assessment-score" min="0" max="100" value="${isEdit ? assessment.score || '' : ''}" required placeholder="Enter your assessment score" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              <p class="text-xs text-slate-500 mt-1">Based on security questionnaire responses and evaluation</p>
+            </div>
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Risk Level *</label>
+              <select id="assessment-risk-level" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                <option value="">Select risk level</option>
+                <option value="Low" ${isEdit && assessment.risk_level === 'Low' ? 'selected' : ''}>Low</option>
+                <option value="Medium" ${isEdit && assessment.risk_level === 'Medium' ? 'selected' : ''}>Medium</option>
+                <option value="High" ${isEdit && assessment.risk_level === 'High' ? 'selected' : ''}>High</option>
+                <option value="Critical" ${isEdit && assessment.risk_level === 'Critical' ? 'selected' : ''}>Critical</option>
+              </select>
+            </div>
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Key Findings (comma-separated)</label>
+              <textarea id="assessment-findings" rows="3" placeholder="e.g., Missing MFA, Outdated encryption, No incident plan" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-vertical max-h-32">${isEdit ? assessment.findings || '' : ''}</textarea>
+            </div>
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Residual Risk Score (0-100)</label>
+              <input type="number" id="assessment-residual" min="0" max="100" value="${isEdit ? assessment.residual_risk || 30 : 30}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              <p class="text-xs text-slate-500 mt-1">Risk that remains after mitigation controls</p>
+            </div>
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Due Date (Next Assessment)</label>
+              <input type="date" id="assessment-due-date" value="${isEdit && assessment.due_date ? assessment.due_date.split('T')[0] : ''}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              <p class="text-xs text-slate-500 mt-1">When the next assessment is due</p>
+            </div>
+           
+            <div class="flex gap-3 pt-4 sticky bottom-0 bg-slate-800 py-2">
+              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">${isEdit ? 'Update' : 'Save'} Assessment</button>
+              <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `);
+     
+      document.getElementById('assessment-form').addEventListener('submit', saveAssessment);
+    }
+   
+    async function saveAssessment(e) {
+      e.preventDefault();
+     
+      if (!window.dataSdk) return;
+     
+      const assessmentId = document.getElementById('assessment-id').value;
+      if (!assessmentId && recordCount >= 999) {
+        showToast('Maximum record limit (999) reached', 'error');
+        return;
+      }
+     
+      const dueDate = document.getElementById('assessment-due-date').value;
+      const assessmentData = {
+        type: 'assessment',
+        name: document.getElementById('assessment-vendor').value,
+        vendor_id: document.getElementById('assessment-vendor').value,
+        score: parseInt(document.getElementById('assessment-score').value),
+        risk_level: document.getElementById('assessment-risk-level').value,
+        findings: document.getElementById('assessment-findings').value,
+        residual_risk: parseInt(document.getElementById('assessment-residual').value) || 0,
+        due_date: dueDate ? new Date(dueDate).toISOString() : '',
+        created_at: new Date().toISOString()
+      };
+     
+      let result;
+      if (assessmentId) {
+        const existing = appData.assessments.find(a => a.__backendId === assessmentId);
+        if (existing) {
+          result = await window.dataSdk.update({ ...existing, ...assessmentData });
+        }
+      } else {
+        result = await window.dataSdk.create(assessmentData);
+      }
+     
+      if (result && result.isOk) {
+        showToast(assessmentId ? 'Assessment updated successfully' : 'Assessment saved successfully', 'success');
+        hideModal();
+      } else {
+        showToast('Failed to save assessment', 'error');
+      }
+    }
+   
+    function editAssessment(id) {
+      const assessment = appData.assessments.find(a => a.__backendId === id);
+      if (assessment) showAssessmentModal(assessment);
+    }
+   
+    function showSoftwareModal(software = null) {
+      const isEdit = software !== null;
+      showModal(`
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-4">${isEdit ? 'Edit' : 'Add'} Software Component</h3>
+          <form id="software-form" class="space-y-4">
+            <input type="hidden" id="software-id" value="${isEdit ? software.__backendId : ''}">
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Software Name *</label>
+              <input type="text" id="software-name" value="${isEdit ? software.name : ''}" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Vendor</label>
+              <input type="text" id="software-vendor" value="${isEdit ? software.vendor_id || '' : ''}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Dependencies (SBOM) - comma separated</label>
+              <textarea id="software-dependencies" rows="2" placeholder="e.g., log4j, openssl, nodejs" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">${isEdit ? software.dependencies || '' : ''}</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Known Vulnerabilities *</label>
+                <input type="number" id="software-vulns" min="0" required value="${isEdit ? software.vulnerabilities || 0 : 0}" placeholder="Number of known vulnerabilities" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                <p class="text-xs text-slate-500 mt-1">Total vulnerability count from scans</p>
+              </div>
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">External Exposure</label>
+                <select id="software-external" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                  <option value="false" ${isEdit && !software.external_exposure ? 'selected' : ''}>No</option>
+                  <option value="true" ${isEdit && software.external_exposure ? 'selected' : ''}>Yes</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">${isEdit ? 'Update' : 'Add'} Software</button>
+              <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `);
+     
+      document.getElementById('software-form').addEventListener('submit', saveSoftware);
+    }
+   
+    async function saveSoftware(e) {
+      e.preventDefault();
+     
+      if (recordCount >= 999) {
+        showToast('Maximum record limit (999) reached', 'error');
+        return;
+      }
+     
+      const softwareId = document.getElementById('software-id').value;
+      const dependencies = document.getElementById('software-dependencies').value;
+      const vulns = parseInt(document.getElementById('software-vulns').value) || 0;
+      const external = document.getElementById('software-external').value === 'true';
+     
+      let riskScore = 0;
+      const depCount = dependencies ? dependencies.split(',').length : 0;
+      riskScore += Math.min(depCount * 5, 30);
+      riskScore += Math.min(vulns * 15, 45);
+      riskScore += external ? 25 : 0;
+     
+      const softwareData = {
+        type: 'software',
+        name: document.getElementById('software-name').value,
+        vendor_id: document.getElementById('software-vendor').value,
+        dependencies: dependencies,
+        vulnerabilities: vulns,
+        external_exposure: external,
+        score: Math.min(riskScore, 100),
+        created_at: new Date().toISOString()
+      };
+     
+      let result;
+      if (softwareId) {
+        const existing = appData.software.find(s => s.__backendId === softwareId);
+        if (existing) {
+          result = await window.dataSdk.update({ ...existing, ...softwareData });
+        }
+      } else {
+        result = await window.dataSdk.create(softwareData);
+      }
+     
+      if (result && result.isOk) {
+        showToast(softwareId ? 'Software updated successfully' : 'Software added successfully', 'success');
+        hideModal();
+      } else {
+        showToast('Failed to save software', 'error');
+      }
+    }
+   
+    function editSoftware(id) {
+      const software = appData.software.find(s => s.__backendId === id);
+      if (software) showSoftwareModal(software);
+    }
+   
+    function showPolicyModal(policy = null) {
+      const isEdit = policy !== null;
+      const attachmentName = isEdit && policy.attachment ? 'Attached' : 'No file';
+     
+      showModal(`
+        <div class="p-6 max-h-[90vh] overflow-y-auto scrollbar-thin">
+          <h3 class="text-xl font-bold mb-4 sticky top-0 bg-slate-800 py-2">${isEdit ? 'Edit' : 'Create'} Policy</h3>
+          <form id="policy-form" class="space-y-4">
+            <input type="hidden" id="policy-id" value="${isEdit ? policy.__backendId : ''}">
+            <input type="hidden" id="policy-attachment-data" value="">
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Policy Name *</label>
+              <input type="text" id="policy-name" value="${isEdit ? policy.name : ''}" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+           
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Version</label>
+                <input type="text" id="policy-version" value="${isEdit ? policy.version || '1.0' : '1.0'}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Owner</label>
+                <input type="text" id="policy-owner" value="${isEdit ? policy.owner || '' : ''}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              </div>
+            </div>
+           
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Policy Content</label>
+              <textarea id="policy-content" rows="6" placeholder="Enter full policy text here..." class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-vertical max-h-96">${isEdit ? policy.content || '' : ''}</textarea>
+              <p class="text-xs text-slate-500 mt-1">📋 Supports long text content with full scrolling</p>
+            </div>
+           
+            <div class="bg-slate-700/50 rounded-lg p-4 border border-slate-600">
+              <label class="block text-sm text-slate-400 mb-3 font-medium">📎 Attach Document</label>
+              <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                  <input type="file" id="policy-file" accept=".pdf,.txt,.doc,.docx" class="hidden">
+                  <button type="button" onclick="document.getElementById('policy-file').click()" class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg border-2 border-dashed border-slate-500 text-sm transition cursor-pointer">
+                    Choose File
+                  </button>
+                </div>
+                <div id="file-info" class="text-xs text-slate-400">
+                  ${attachmentName}
+                </div>
+              </div>
+            </div>
+           
+            <div class="flex gap-3 pt-4 sticky bottom-0 bg-slate-800 py-2">
+              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">${isEdit ? 'Update' : 'Create'} Policy</button>
+              <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `);
+     
+      document.getElementById('policy-file').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const validTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+          if (!validTypes.includes(file.type)) {
+            showToast('Only PDF, TXT, DOC, DOCX files allowed', 'error');
+            return;
+          }
+         
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const base64 = event.target.result;
+            document.getElementById('policy-attachment-data').value = base64;
+            document.getElementById('file-info').innerHTML = `✓ Attached: ${file.name}`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+     
+      document.getElementById('policy-form').addEventListener('submit', savePolicy);
+    }
+   
+    async function savePolicy(e) {
+      e.preventDefault();
+     
+      if (recordCount >= 999) {
+        showToast('Maximum record limit (999) reached', 'error');
+        return;
+      }
+     
+      const policyId = document.getElementById('policy-id').value;
+      const attachmentData = document.getElementById('policy-attachment-data').value;
+     
+      const policyData = {
+        type: 'policy',
+        name: document.getElementById('policy-name').value,
+        version: document.getElementById('policy-version').value,
+        owner: document.getElementById('policy-owner').value,
+        content: document.getElementById('policy-content').value,
+        attachment: attachmentData ? 'attached' : '',
+        last_updated: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      };
+     
+      let result;
+      if (policyId) {
+        const existing = appData.policies.find(p => p.__backendId === policyId);
+        if (existing) {
+          result = await window.dataSdk.update({ ...existing, ...policyData });
+        }
+      } else {
+        result = await window.dataSdk.create(policyData);
+      }
+     
+      if (result && result.isOk) {
+        showToast(policyId ? 'Policy updated successfully' : 'Policy created successfully', 'success');
+        hideModal();
+      } else {
+        showToast('Failed to save policy', 'error');
+      }
+    }
+   
+    function editPolicy(id) {
+      const policy = appData.policies.find(p => p.__backendId === id);
+      if (policy) showPolicyModal(policy);
+    }
+   
+    function showContractModal(contract = null) {
+      const isEdit = contract !== null;
+      showModal(`
+        <div class="p-6">
+          <h3 class="text-xl font-bold mb-4">${isEdit ? 'Edit' : 'New'} Contract Review</h3>
+          <form id="contract-form" class="space-y-4">
+            <input type="hidden" id="contract-id" value="${isEdit ? contract.__backendId : ''}">
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Vendor Name *</label>
+              <input type="text" id="contract-vendor" value="${isEdit ? contract.name : ''}" required class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Security Clauses Included</label>
+              <textarea id="contract-clauses" rows="2" placeholder="e.g., Data protection, Audit rights, Incident notification" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">${isEdit ? contract.clauses || '' : ''}</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Requirements Met</label>
+                <input type="number" id="contract-met" min="0" max="8" value="${isEdit ? contract.requirements_met || 0 : 0}" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-sm text-slate-400 mb-1">Status</label>
+                <select id="contract-status" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                  <option value="Pending" ${isEdit && contract.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                  <option value="Approved" ${isEdit && contract.status === 'Approved' ? 'selected' : ''}>Approved</option>
+                  <option value="Rejected" ${isEdit && contract.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex gap-3 pt-4">
+              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">${isEdit ? 'Update' : 'Save'} Review</button>
+              <button type="button" onclick="hideModal()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `);
+     
+      document.getElementById('contract-form').addEventListener('submit', saveContract);
+    }
+   
+    async function saveContract(e) {
+      e.preventDefault();
+     
+      if (recordCount >= 999) {
+        showToast('Maximum record limit (999) reached', 'error');
+        return;
+      }
+     
+      const contractId = document.getElementById('contract-id').value;
+      const contractData = {
+        type: 'contract',
+        name: document.getElementById('contract-vendor').value,
+        clauses: document.getElementById('contract-clauses').value,
+        requirements_met: parseInt(document.getElementById('contract-met').value) || 0,
+        total_requirements: 8,
+        status: document.getElementById('contract-status').value,
+        created_at: new Date().toISOString()
+      };
+     
+      let result;
+      if (contractId) {
+        const existing = appData.contracts.find(c => c.__backendId === contractId);
+        if (existing) {
+          result = await window.dataSdk.update({ ...existing, ...contractData });
+        }
+      } else {
+        result = await window.dataSdk.create(contractData);
+      }
+     
+      if (result && result.isOk) {
+        showToast(contractId ? 'Contract updated successfully' : 'Contract review saved', 'success');
+        hideModal();
+      } else {
+        showToast('Failed to save contract', 'error');
+      }
+    }
+   
+    function editContract(id) {
+      const contract = appData.contracts.find(c => c.__backendId === id);
+      if (contract) showContractModal(contract);
+    }
+   
+    let pendingDelete = null;
+   
+    function confirmDelete(id, type) {
+      pendingDelete = { id, type };
+      showModal(`
+        <div class="p-6 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Delete ${type}?</h3>
+          <p class="text-slate-400 mb-6">This action cannot be undone.</p>
+          <div class="flex gap-3">
+            <button onclick="executeDelete()" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition">Delete</button>
+            <button onclick="hideModal(); pendingDelete = null;" class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-medium transition">Cancel</button>
+          </div>
+        </div>
+      `);
+    }
+   
+    async function executeDelete() {
+      if (!pendingDelete) return;
+     
+      const { id, type } = pendingDelete;
+      const dataArrays = { vendor: 'vendors', assessment: 'assessments', software: 'software', policy: 'policies', contract: 'contracts' };
+      const record = appData[dataArrays[type]].find(r => r.__backendId === id);
+     
+      if (record) {
+        const result = await window.dataSdk.delete(record);
+        if (result && result.isOk) {
+          showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted`, 'success');
+        } else {
+          showToast('Delete failed', 'error');
+        }
+      }
+     
+      pendingDelete = null;
+      hideModal();
+    }
+   
+    function generateQuarterlyReport() {
+      const now = new Date();
+      const quarter = Math.ceil((now.getMonth() + 1) / 3);
+      const year = now.getFullYear();
+     
+      const riskCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+      appData.vendors.forEach(v => {
+        if (riskCounts.hasOwnProperty(v.risk_level)) riskCounts[v.risk_level]++;
+      });
+     
+      const avgScore = appData.assessments.length > 0
+        ? Math.round(appData.assessments.reduce((sum, a) => sum + (a.score || 0), 0) / appData.assessments.length)
+        : 0;
+     
+      const totalVulns = appData.software.reduce((sum, s) => sum + (s.vulnerabilities || 0), 0);
+     
+      const assessmentStatus = { overdue: 0, due_soon: 0, almost_due: 0, on_track: 0 };
+      appData.assessments.forEach(a => {
+        if (a.due_date) {
+          const due = new Date(a.due_date);
+          const today = new Date();
+          const daysUntil = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+          if (daysUntil < 0) assessmentStatus.overdue++;
+          else if (daysUntil <= 7) assessmentStatus.due_soon++;
+          else if (daysUntil <= 30) assessmentStatus.almost_due++;
+          else assessmentStatus.on_track++;
+        }
+      });
+     
+      const preview = document.getElementById('report-preview');
+      preview.innerHTML = `
+        <div class="animate-fade-in">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h3 class="text-2xl font-bold">Q${quarter} ${year} SCRM Report</h3>
+              <p class="text-slate-400">Generated: ${formatDate(new Date().toISOString())}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="downloadReport('json', ${quarter}, ${year})" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-medium transition flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                JSON
+              </button>
+              <button onclick="downloadReport('csv', ${quarter}, ${year})" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                CSV
+              </button>
+              <button onclick="downloadReport('pdf', ${quarter}, ${year})" class="px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                PDF
+              </button>
+            </div>
+          </div>
+         
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-slate-700/50 rounded-lg p-4 text-center">
+              <p class="text-3xl font-bold text-blue-400">${appData.vendors.length}</p>
+              <p class="text-sm text-slate-400">Total Vendors</p>
+            </div>
+            <div class="bg-slate-700/50 rounded-lg p-4 text-center">
+              <p class="text-3xl font-bold text-emerald-400">${appData.assessments.length}</p>
+              <p class="text-sm text-slate-400">Assessments</p>
+            </div>
+            <div class="bg-slate-700/50 rounded-lg p-4 text-center">
+              <p class="text-3xl font-bold text-purple-400">${appData.software.length}</p>
+              <p class="text-sm text-slate-400">Software Components</p>
+            </div>
+            <div class="bg-slate-700/50 rounded-lg p-4 text-center">
+              <p class="text-3xl font-bold text-amber-400">${appData.policies.length}</p>
+              <p class="text-sm text-slate-400">Active Policies</p>
+            </div>
+          </div>
+         
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-slate-700/30 rounded-lg p-4">
+              <h4 class="font-semibold mb-3">Risk Distribution</h4>
+              <div class="space-y-2">
+                <div class="flex justify-between"><span class="text-red-400">Critical:</span><span>${riskCounts.Critical}</span></div>
+                <div class="flex justify-between"><span class="text-orange-400">High:</span><span>${riskCounts.High}</span></div>
+                <div class="flex justify-between"><span class="text-amber-400">Medium:</span><span>${riskCounts.Medium}</span></div>
+                <div class="flex justify-between"><span class="text-green-400">Low:</span><span>${riskCounts.Low}</span></div>
+              </div>
+            </div>
+            <div class="bg-slate-700/30 rounded-lg p-4">
+              <h4 class="font-semibold mb-3">Key Metrics</h4>
+              <div class="space-y-2">
+                <div class="flex justify-between"><span>Avg Assessment Score:</span><span class="text-blue-400">${avgScore}</span></div>
+                <div class="flex justify-between"><span>Total Vulnerabilities:</span><span class="text-red-400">${totalVulns}</span></div>
+                <div class="flex justify-between"><span>Contract Reviews:</span><span class="text-emerald-400">${appData.contracts.length}</span></div>
+                <div class="flex justify-between"><span>High-Risk Software:</span><span class="text-orange-400">${appData.software.filter(s => (s.score || 0) >= 70).length}</span></div>
+              </div>
+            </div>
+          </div>
+         
+          <div class="bg-slate-700/30 rounded-lg p-4 mb-6">
+            <h4 class="font-semibold mb-3">🗓️ Assessment Due Date Status</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="bg-red-500/20 rounded-lg p-3 border border-red-500/30">
+                <p class="text-2xl font-bold text-red-400">${assessmentStatus.overdue}</p>
+                <p class="text-xs text-red-400">⚠️ Overdue</p>
+              </div>
+              <div class="bg-amber-500/20 rounded-lg p-3 border border-amber-500/30">
+                <p class="text-2xl font-bold text-amber-400">${assessmentStatus.due_soon}</p>
+                <p class="text-xs text-amber-400">🔔 Due Soon (≤7 days)</p>
+              </div>
+              <div class="bg-yellow-500/20 rounded-lg p-3 border border-yellow-500/30">
+                <p class="text-2xl font-bold text-yellow-400">${assessmentStatus.almost_due}</p>
+                <p class="text-xs text-yellow-400">📅 Almost Due (8-30 days)</p>
+              </div>
+              <div class="bg-green-500/20 rounded-lg p-3 border border-green-500/30">
+                <p class="text-2xl font-bold text-green-400">${assessmentStatus.on_track}</p>
+                <p class="text-xs text-green-400">✓ On Track (&gt;30 days)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+   
+    function downloadReport(format, quarter, year) {
+      const riskCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+      appData.vendors.forEach(v => {
+        if (riskCounts.hasOwnProperty(v.risk_level)) riskCounts[v.risk_level]++;
+      });
+     
+      const avgScore = appData.assessments.length > 0
+        ? Math.round(appData.assessments.reduce((sum, a) => sum + (a.score || 0), 0) / appData.assessments.length)
+        : 0;
+     
+      const totalVulns = appData.software.reduce((sum, s) => sum + (s.vulnerabilities || 0), 0);
+     
+      const assessmentStatus = { overdue: 0, due_soon: 0, almost_due: 0, on_track: 0 };
+      appData.assessments.forEach(a => {
+        if (a.due_date) {
+          const due = new Date(a.due_date);
+          const today = new Date();
+          const daysUntil = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+          if (daysUntil < 0) assessmentStatus.overdue++;
+          else if (daysUntil <= 7) assessmentStatus.due_soon++;
+          else if (daysUntil <= 30) assessmentStatus.almost_due++;
+          else assessmentStatus.on_track++;
+        }
+      });
+     
+      let content, filename, mimeType;
+     
+      if (format === 'json') {
+        const reportData = {
+          title: `Q${quarter} ${year} SCRM Report`,
+          generated: new Date().toISOString(),
+          metrics: {
+            totalVendors: appData.vendors.length,
+            assessments: appData.assessments.length,
+            softwareComponents: appData.software.length,
+            policies: appData.policies.length,
+            contracts: appData.contracts.length
+          },
+          riskDistribution: riskCounts,
+          assessmentMetrics: {
+            averageScore: avgScore,
+            totalVulnerabilities: totalVulns
+          },
+          assessmentDueStatus: {
+            overdue: assessmentStatus.overdue,
+            due_soon_7days: assessmentStatus.due_soon,
+            almost_due_8to30days: assessmentStatus.almost_due,
+            on_track_over30days: assessmentStatus.on_track
+          },
+          vendors: appData.vendors.map(v => ({ name: v.name, risk: v.risk_level, status: v.status })),
+          assessments: appData.assessments.map(a => {
+            const due = a.due_date ? new Date(a.due_date) : null;
+            const today = new Date();
+            let dueStatus = 'No due date';
+            if (due) {
+              const daysUntil = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+              if (daysUntil < 0) dueStatus = 'Overdue';
+              else if (daysUntil <= 7) dueStatus = 'Due Soon';
+              else if (daysUntil <= 30) dueStatus = 'Almost Due';
+              else dueStatus = 'On Track';
+            }
+            return {
+              vendor: a.name,
+              score: a.score,
+              risk: a.risk_level,
+              residualRisk: a.residual_risk,
+              dueDate: a.due_date ? formatDate(a.due_date) : 'N/A',
+              dueStatus: dueStatus
+            };
+          }),
+          software: appData.software.map(s => ({ name: s.name, vendor: s.vendor_id, vulnerabilities: s.vulnerabilities, riskScore: s.score }))
+        };
+        content = JSON.stringify(reportData, null, 2);
+        filename = `SCRM_Report_Q${quarter}_${year}.json`;
+        mimeType = 'application/json';
+      } else if (format === 'csv') {
+        let csv = `Third-Party Risk Management Report - Q${quarter} ${year}\n\n`;
+        csv += `Generated,${new Date().toISOString()}\n\n`;
+       
+        csv += `SUMMARY METRICS\n`;
+        csv += `Total Vendors,${appData.vendors.length}\n`;
+        csv += `Assessments Completed,${appData.assessments.length}\n`;
+        csv += `Software Components,${appData.software.length}\n`;
+        csv += `Active Policies,${appData.policies.length}\n`;
+        csv += `Contract Reviews,${appData.contracts.length}\n\n`;
+       
+        csv += `RISK DISTRIBUTION\n`;
+        csv += `Critical,${riskCounts.Critical}\n`;
+        csv += `High,${riskCounts.High}\n`;
+        csv += `Medium,${riskCounts.Medium}\n`;
+        csv += `Low,${riskCounts.Low}\n\n`;
+       
+        csv += `ASSESSMENT METRICS\n`;
+        csv += `Average Score,${avgScore}\n`;
+        csv += `Total Vulnerabilities,${totalVulns}\n\n`;
+       
+        csv += `ASSESSMENT DUE DATE STATUS\n`;
+        csv += `Overdue,${assessmentStatus.overdue}\n`;
+        csv += `Due Soon (≤7 days),${assessmentStatus.due_soon}\n`;
+        csv += `Almost Due (8-30 days),${assessmentStatus.almost_due}\n`;
+        csv += `On Track (>30 days),${assessmentStatus.on_track}\n\n`;
+       
+        csv += `VENDORS\n`;
+        csv += `Name,Risk Level,Status\n`;
+        appData.vendors.forEach(v => {
+          csv += `"${v.name}","${v.risk_level}","${v.status}"\n`;
+        });
+       
+        csv += `\nASSESSMENTS\n`;
+        csv += `Vendor,Score,Risk Level,Residual Risk,Due Date,Due Status\n`;
+        appData.assessments.forEach(a => {
+          const due = a.due_date ? new Date(a.due_date) : null;
+          const today = new Date();
+          let dueStatus = 'No due date';
+          if (due) {
+            const daysUntil = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+            if (daysUntil < 0) dueStatus = 'Overdue';
+            else if (daysUntil <= 7) dueStatus = 'Due Soon';
+            else if (daysUntil <= 30) dueStatus = 'Almost Due';
+            else dueStatus = 'On Track';
+          }
+          csv += `"${a.name}","${a.score}","${a.risk_level}","${a.residual_risk}","${a.due_date ? formatDate(a.due_date) : 'N/A'}","${dueStatus}"\n`;
+        });
+       
+        filename = `SCRM_Report_Q${quarter}_${year}.csv`;
+        mimeType = 'text/csv';
+        content = csv;
+      } else if (format === 'pdf') {
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+              h1 { color: #1e40af; border-bottom: 3px solid #1e40af; padding-bottom: 10px; }
+              h2 { color: #1e40af; margin-top: 30px; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+              th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+              th { background-color: #f0f0f0; font-weight: bold; }
+              .metric { display: inline-block; width: 23%; margin: 1%; text-align: center; border: 1px solid #ddd; padding: 15px; }
+              .critical { color: #dc2626; } .high { color: #ea580c; } .medium { color: #d97706; } .low { color: #16a34a; }
+              .overdue { background-color: #fee2e2; color: #dc2626; }
+              .due-soon { background-color: #fef08a; color: #92400e; }
+              .almost-due { background-color: #fef3c7; color: #92400e; }
+              .on-track { background-color: #dcfce7; color: #166534; }
+            </style>
+          </head>
+          <body>
+            <h1>Third-Party Risk Management Report</h1>
+            <p><strong>Quarter:</strong> Q${quarter} ${year}</p>
+            <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+           
+            <h2>Summary Metrics</h2>
+            <div class="metric"><strong>${appData.vendors.length}</strong><br>Total Vendors</div>
+            <div class="metric"><strong>${appData.assessments.length}</strong><br>Assessments</div>
+            <div class="metric"><strong>${appData.software.length}</strong><br>Software Components</div>
+            <div class="metric"><strong>${appData.policies.length}</strong><br>Active Policies</div>
+           
+            <h2>Risk Distribution</h2>
+            <table>
+              <tr><th>Risk Level</th><th>Count</th></tr>
+              <tr><td class="critical">Critical</td><td>${riskCounts.Critical}</td></tr>
+              <tr><td class="high">High</td><td>${riskCounts.High}</td></tr>
+              <tr><td class="medium">Medium</td><td>${riskCounts.Medium}</td></tr>
+              <tr><td class="low">Low</td><td>${riskCounts.Low}</td></tr>
+            </table>
+           
+            <h2>Assessment Metrics</h2>
+            <p><strong>Average Score:</strong> ${avgScore} | <strong>Total Vulnerabilities:</strong> ${totalVulns}</p>
+           
+            <h2>Assessment Due Date Status</h2>
+            <table>
+              <tr><th>Status</th><th>Count</th></tr>
+              <tr class="overdue"><td>⚠️ Overdue</td><td>${assessmentStatus.overdue}</td></tr>
+              <tr class="due-soon"><td>🔔 Due Soon (≤7 days)</td><td>${assessmentStatus.due_soon}</td></tr>
+              <tr class="almost-due"><td>📅 Almost Due (8-30 days)</td><td>${assessmentStatus.almost_due}</td></tr>
+              <tr class="on-track"><td>✓ On Track (&gt;30 days)</td><td>${assessmentStatus.on_track}</td></tr>
+            </table>
+           
+            <h2>Top Vendors</h2>
+            <table>
+              <tr><th>Vendor</th><th>Risk Level</th><th>Status</th></tr>
+              ${appData.vendors.slice(0, 10).map(v => `<tr><td>${v.name}</td><td class="${v.risk_level.toLowerCase()}">${v.risk_level}</td><td>${v.status}</td></tr>`).join('')}
+            </table>
+           
+            <h2>Assessment Details</h2>
+            <table>
+              <tr><th>Vendor</th><th>Score</th><th>Risk</th><th>Due Date</th><th>Status</th></tr>
+              ${appData.assessments.slice(0, 15).map(a => {
+                const due = a.due_date ? new Date(a.due_date) : null;
+                const today = new Date();
+                let dueStatus = 'No due date';
+                let statusClass = '';
+                if (due) {
+                  const daysUntil = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+                  if (daysUntil < 0) { dueStatus = 'Overdue'; statusClass = 'overdue'; }
+                  else if (daysUntil <= 7) { dueStatus = 'Due Soon'; statusClass = 'due-soon'; }
+                  else if (daysUntil <= 30) { dueStatus = 'Almost Due'; statusClass = 'almost-due'; }
+                  else { dueStatus = 'On Track'; statusClass = 'on-track'; }
+                }
+                return `<tr><td>${a.name}</td><td>${a.score}</td><td class="${a.risk_level.toLowerCase()}">${a.risk_level}</td><td>${a.due_date ? formatDate(a.due_date) : 'N/A'}</td><td class="${statusClass}">${dueStatus}</td></tr>`;
+              }).join('')}
+            </table>
+           
+            <p style="margin-top: 40px; font-size: 12px; color: #666;">
+              This report is confidential and intended for authorized users only.
+            </p>
+          </body>
+          </html>
+        `;
+       
+        const newWindow = window.open('', '', 'width=900,height=600');
+        newWindow.document.write(htmlContent);
+        newWindow.document.close();
+        newWindow.print();
+        showToast('PDF report opened in new window. Use browser print function to save as PDF.', 'info');
+        return;
+      }
+     
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Report downloaded as ${format.toUpperCase()}`, 'success');
+    }
+   
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+   
+    function getRiskClass(level) {
+      const classes = {
+        Critical: 'bg-red-500/20 text-red-400',
+        High: 'bg-orange-500/20 text-orange-400',
+        Medium: 'bg-amber-500/20 text-amber-400',
+        Low: 'bg-green-500/20 text-green-400'
+      };
+      return classes[level] || 'bg-slate-500/20 text-slate-400';
+    }
+   
+    function getStatusClass(status) {
+      const classes = {
+        Active: 'bg-green-500/20 text-green-400',
+        'Under Review': 'bg-amber-500/20 text-amber-400',
+        Inactive: 'bg-slate-500/20 text-slate-400',
+        Pending: 'bg-blue-500/20 text-blue-400',
+        Approved: 'bg-green-500/20 text-green-400',
+        Rejected: 'bg-red-500/20 text-red-400'
+      };
+      return classes[status] || 'bg-slate-500/20 text-slate-400';
+    }
+   
+    function getScoreColor(score) {
+      if (score >= 80) return 'bg-green-500';
+      if (score >= 60) return 'bg-amber-500';
+      if (score >= 40) return 'bg-orange-500';
+      return 'bg-red-500';
+    }
+   
+    function getRiskScoreClass(score) {
+      if (score >= 70) return 'bg-red-500/20 text-red-400';
+      if (score >= 40) return 'bg-amber-500/20 text-amber-400';
+      return 'bg-green-500/20 text-green-400';
+    }
+   
+    function getDueDateStatus(dueDate) {
+      if (!dueDate) return { label: 'No due date', class: 'text-slate-500' };
+     
+      const due = new Date(dueDate);
+      const today = new Date();
+      const daysUntil = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+     
+      if (daysUntil < 0) {
+        return { label: '⚠️ Overdue', class: 'bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs' };
+      } else if (daysUntil <= 7) {
+        return { label: '🔔 Due Soon', class: 'bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full text-xs' };
+      } else if (daysUntil <= 30) {
+        return { label: '📅 Almost Due', class: 'bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs' };
+      } else {
+        return { label: `✓ Due in ${daysUntil}d`, class: 'bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs' };
+      }
+    }
+   
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+     
+      const colors = {
+        success: 'bg-emerald-600',
+        error: 'bg-red-600',
+        info: 'bg-blue-600'
+      };
+     
+      toast.className = `${colors[type]} px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in`;
+      toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="ml-2 text-white/70 hover:text-white">✕</button>
+      `;
+     
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+   
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) hideModal();
+    });
+   
+    initApp();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ce0bd2f4129d6fb',t:'MTc3MTExNTg3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
