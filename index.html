@@ -783,26 +783,64 @@
             position: relative;
         }
         
-        .project-card:first-child,
-        .projects-grid:nth-of-type(2) .project-card:first-child {
-            grid-column: span 3;
-            display: flex;
+        #featured-project .projects-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
         
-        .project-card:first-child .project-image,
-        .projects-grid:nth-of-type(2) .project-card:first-child .project-image {
-            flex: 0 0 50%;
-            height: auto;
-            min-height: 400px;
+        #featured-project .project-card {
+            grid-column: span 1;
         }
         
-        .project-card:first-child .project-content,
-        .projects-grid:nth-of-type(2) .project-card:first-child .project-content {
-            flex: 0 0 50%;
+        #featured-project .project-image {
+            width: 100%;
+            height: 250px;
+        }
+        
+        #projects .projects-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        #projects .projects-grid .project-card:nth-child(1),
+        #projects .projects-grid .project-card:nth-child(2) {
+            grid-column: span 1 !important;
+            display: block !important;
+        }
+        
+        #projects .projects-grid .project-card:nth-child(1) .project-image,
+        #projects .projects-grid .project-card:nth-child(2) .project-image {
+            width: 100%;
+            height: 250px;
+            flex: none !important;
+        }
+        
+        #projects .projects-grid .project-card:nth-child(1) .project-content,
+        #projects .projects-grid .project-card:nth-child(2) .project-content {
+            flex: none !important;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            padding: 2.5rem;
         }
+         
+          #projects section:not(:first-of-type) .project-card:first-child,
+          .projects-grid:nth-of-type(2) .project-card:first-child {
+              grid-column: span 3;
+              display: flex;
+          }
+          
+          #projects section:not(:first-of-type) .project-card:first-child .project-image,
+          .projects-grid:nth-of-type(2) .project-card:first-child .project-image {
+              flex: 0 0 50%;
+              height: auto;
+              min-height: 400px;
+          }
+          
+          #projects section:not(:first-of-type) .project-card:first-child .project-content,
+          .projects-grid:nth-of-type(2) .project-card:first-child .project-content {
+              flex: 0 0 50%;
+              display: flex;
+              flex-direction: column;
+              padding: 2.5rem;
+          }
         
         /* .project-card::after {
             content: '✓ Verified';
@@ -1274,31 +1312,51 @@
     <div id="overview" class="tab-content active">
          <div class="container">
          <section id="featured-project">
-            <h2>Featured Project</h2>
-            <p style="color: #000000; margin-bottom: 2rem; font-size: 2rem;"><b>I built a compliance control center in under 6 hours.</b></p>
-            
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-image">
-                        <img src="Compliance Command Center.png" alt="Compliance Command Center">
-                    </div>
-                    <div class="project-content">
-                        <div class="project-category"><a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">View Live Demo →</a></div>
-                        <h3 class="project-title">I built a Compliance Control Center in under 6 hours</h3>
-                        <p class="project-description">
-                            A comprehensive compliance management solution built to prove that skills should make work easier, not harder.
-                        </p>
-                        <div class="project-tags">
-                            <span class="project-tag">Control Panel</span>
-                            <span class="project-tag">Compliance Center</span>
-                        </div>
-                        <div style="display: flex; gap: 1rem; margin-top: auto;">
-                            <a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">See Demo Live →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+             <h2>Featured Projects</h2>
+             <p style="color: #000000; margin-bottom: 2rem; font-size: 2rem;"><b>Strategic solutions in governance, risk, and compliance.</b></p>
+             
+             <div class="projects-grid">
+                 <div class="project-card">
+                     <div class="project-image">
+                         <img src="tprm.png" alt="TPRM Compliance Framework Implementation">
+                     </div>
+                     <div class="project-content">
+                         <div class="project-category"><a href="./tprm-center.html" target="_blank" class="project-link" style="align-self: center;">View Project →</a></div>
+                         <h3 class="project-title">Enterprise Risk Framework Implementation</h3>
+                         <p class="project-description">
+                             Architected and deployed an enterprise-wide risk management framework supporting ISO 27001, NIST CSF 2.0, and SOC 2 compliance across multiple business units.
+                         </p>
+                         <div class="project-tags">
+                             <span class="project-tag">Risk Management</span>
+                             <span class="project-tag">Framework Design</span>
+                         </div>
+                         <div style="display: flex; gap: 1rem; margin-top: auto;">
+                             <a href="./tprm-center.html" target="_blank" class="project-link" style="align-self: center;">Learn More →</a>
+                         </div>
+                     </div>
+                 </div>
+                 
+                 <div class="project-card">
+                     <div class="project-image">
+                         <img src="Compliance Command Center.png" alt="Compliance Command Center">
+                     </div>
+                     <div class="project-content">
+                         <div class="project-category"><a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">View Live Demo →</a></div>
+                         <h3 class="project-title">Compliance Control Center</h3>
+                         <p class="project-description">
+                             A comprehensive compliance management solution built in under 6 hours to prove that skills should make work easier, not harder.
+                         </p>
+                         <div class="project-tags">
+                             <span class="project-tag">Control Panel</span>
+                             <span class="project-tag">Compliance Center</span>
+                         </div>
+                         <div style="display: flex; gap: 1rem; margin-top: auto;">
+                             <a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">See Demo Live →</a>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </section>
          <section id="summary">
             <h2>Executive Summary</h2>
             <div class="summary-box">
@@ -1610,18 +1668,38 @@
          <!-- Projects Handled Section -->
          <section>
              <h2>Featured Projects</h2>
-             <p style="color: #000000; margin-bottom: 2rem; font-size: 2rem;"><b>I built a compliance control center in under 6 hours.</b></p>
+             <p style="color: #000000; margin-bottom: 2rem; font-size: 2rem;"><b>Strategic solutions in governance, risk, and compliance.</b></p>
              
              <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="tprm.png" alt="Enterprise Risk Framework Implementation">
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category"><a href="tprm-center.html" target="_blank" class="project-link" style="align-self: center;">View Project →</a></div>
+                        <h3 class="project-title">Enterprise Risk Framework Implementation</h3>
+                        <p class="project-description">
+                            Architected and deployed an enterprise-wide risk management framework supporting ISO 27001, NIST CSF 2.0, and SOC 2 compliance across multiple business units.
+                        </p>
+                        <div class="project-tags">
+                            <span class="project-tag">Risk Management</span>
+                            <span class="project-tag">Framework Design</span>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: auto;">
+                            <a href="tprm-center.html" target="_blank" class="project-link" style="align-self: center;">Learn More →</a>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="project-card">
                     <div class="project-image">
                         <img src="Compliance Command Center.png" alt="Compliance Command Center">
                     </div>
                     <div class="project-content">
                         <div class="project-category"><a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">View Live Demo →</a></div>
-                        <h3 class="project-title">I built a Compliance Control Center in under 6 hours</h3>
+                        <h3 class="project-title">Compliance Control Center</h3>
                         <p class="project-description">
-                            A comprehensive compliance management solution built to prove that skills should make work easier, not harder.
+                            A comprehensive compliance management solution built in under 6 hours, demonstrating rapid deployment of enterprise-grade control systems.
                         </p>
                         <div class="project-tags">
                             <span class="project-tag">Control Panel</span>
@@ -1631,20 +1709,6 @@
                             <button class="compliance-btn" onclick="openComplianceModal()">Learn More</button>
                             <a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">See Demo Live →</a>
                         </div>
-                    </div>
-                </div>
-                <div class="project-card">
-                    <div class="project-image">🖥️</div>
-                    <div class="project-content">
-                        <div class="project-category">Command Center</div>
-                        <h3 class="project-title">Compliance Control Center</h3>
-                        <p class="project-description">
-                             A comprehensive compliance management solution built to prove that skills should make work easier, not harder.</p>
-                        <div class="project-tags">
-                            <span class="project-tag">Control Panel</span>
-                            <span class="project-tag">Compliance Center</span>
-                        </div>
-                        <a href="https://olayeni1.github.io/Ola/compliance-control-center" target="_blank" class="project-link" style="align-self: center;">See Demo Live →</a>
                     </div>
                 </div>
                     <div class="project-card">
