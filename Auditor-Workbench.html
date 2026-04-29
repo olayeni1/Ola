@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITGC Auditor Workbench v3</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F6F5F1;--surface:#FFFFFF;--s2:#EFEDE7;--s3:#E8E5DE;
+  --border:#D9D6CE;--border2:#C4C0B6;
+  --txt:#1C1B18;--txt2:#52504A;--txt3:#888480;
+  --accent:#0F2D4A;--accent2:#1A4A70;--accent-l:#E8F0F8;
+  --gold:#A67C00;--gold-l:#FBF5E0;
+  --red:#B83232;--red-l:#FDECEA;
+  --green:#1A5C36;--green-l:#E6F4ED;
+  --amber:#A04A00;--amber-l:#FEF0E6;
+  --purple:#3D2B80;--purple-l:#EEEBF8;
+  --blue:#1055A0;--blue-l:#E6EEFA;
+  --teal:#006060;--teal-l:#E0F4F4;
+  --shadow-xs:0 1px 2px rgba(0,0,0,0.06);
+  --shadow-sm:0 2px 6px rgba(0,0,0,0.08);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.13);
+  --r:6px;--r2:10px;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'Playfair Display',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);font-size:13.5px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+/* ── APP SHELL ── */
+.app-header{background:var(--accent);color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:300;box-shadow:var(--shadow-md);}
+.hbrand{display:flex;align-items:center;gap:11px;}
+.hlogo{width:32px;height:32px;background:rgba(255,255,255,0.13);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:-0.5px;}
+.htitle{font-family:var(--serif);font-size:16px;font-weight:700;}
+.hsub{font-size:9.5px;color:rgba(255,255,255,0.5);font-family:var(--mono);letter-spacing:0.5px;text-transform:uppercase;}
+.hactions{display:flex;align-items:center;gap:7px;}
+
+/* TABS */
+.tab-bar{background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:flex-end;gap:0;position:sticky;top:56px;z-index:200;height:40px;}
+.tab{padding:0 18px;height:40px;font-size:12.5px;font-weight:600;color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:6px;transition:all 0.15s;user-select:none;white-space:nowrap;}
+.tab svg{width:13px;height:13px;}
+.tab:hover{color:var(--txt2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+#tab-audit.active{display:flex;flex-direction:column;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap;text-decoration:none;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.btn-ghost{background:rgba(255,255,255,0.11);color:#fff;border:1px solid rgba(255,255,255,0.18);}
+.btn-ghost:hover{background:rgba(255,255,255,0.2);}
+.btn-primary{background:var(--gold);color:#fff;}
+.btn-primary:hover{filter:brightness(0.9);}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-accent:hover{background:var(--accent2);}
+.btn-secondary{background:var(--surface);color:var(--accent);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--s2);}
+.btn-danger{background:var(--red-l);color:var(--red);border:1px solid #EFB8B8;}
+.btn-danger:hover{background:#EFB8B8;}
+.btn-green{background:var(--green-l);color:var(--green);border:1px solid #A8D8BC;}
+.btn-green:hover{background:#A8D8BC;}
+.btn-sm{padding:4px 10px;font-size:11.5px;}
+.btn-xs{padding:2px 8px;font-size:11px;}
+
+/* ── AUDIT TAB ── */
+#tab-audit{flex-direction:column;height:calc(100vh - 96px);}
+.audit-inner{display:flex;flex:1;overflow:hidden;min-height:0;}
+.ctrl-sidebar{width:300px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-toolbar{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;background:var(--s2);}
+.search-box{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;}
+.search-box svg{color:var(--txt3);width:12px;height:12px;flex-shrink:0;}
+.search-box input{border:none;background:transparent;font-family:var(--sans);font-size:12.5px;color:var(--txt);outline:none;width:100%;}
+.search-box input::placeholder{color:var(--txt3);}
+.sidebar-filters{display:flex;gap:6px;}
+.fsel{flex:1;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);font-family:var(--sans);font-size:12px;color:var(--txt);cursor:pointer;outline:none;}
+.fsel:focus{border-color:var(--accent);}
+.sidebar-stats{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.spill{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid transparent;user-select:none;}
+.spill:hover{opacity:0.8;}
+.spill.active{border-color:currentColor;}
+.spill .n{font-family:var(--mono);font-size:12px;font-weight:700;}
+.sp-all{background:var(--s2);color:var(--txt2);}
+.sp-pass{background:var(--green-l);color:var(--green);}
+.sp-fail{background:var(--red-l);color:var(--red);}
+.sp-partial{background:var(--amber-l);color:var(--amber);}
+.sp-pending{background:var(--purple-l);color:var(--purple);}
+.sp-na{background:#F0F0F0;color:var(--txt3);}
+.detail-pane{flex:1;overflow-y:auto;background:var(--bg);min-height:0;}
+.ctrl-list-body{flex:1;overflow-y:auto;min-height:0;}
+.list-hdr{padding:7px 12px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt3);font-family:var(--mono);background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;}
+.ctrl-item{padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;display:flex;gap:9px;align-items:flex-start;}
+.ctrl-item:hover{background:var(--s2);}
+.ctrl-item.sel{background:var(--accent-l);border-left:3px solid var(--accent);padding-left:9px;}
+.ctrl-item.is-custom{border-left:2px solid var(--gold);}
+.ctrl-item.is-custom.sel{border-left:3px solid var(--accent);}
+.ci-num{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--txt3);min-width:18px;margin-top:2px;}
+.ci-body{flex:1;min-width:0;}
+.ci-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ci-sub{font-size:10.5px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.ci-chips{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;}
+.fw-chip{font-size:9px;padding:1px 5px;border-radius:3px;font-family:var(--mono);font-weight:700;letter-spacing:0.3px;}
+.fw-nist{background:#E6EEF8;color:#1055A0;}
+.fw-sox{background:#FBF5E0;color:#A67C00;}
+.fw-iso{background:#E6F4ED;color:#1A5C36;}
+.fw-pci{background:#FDECEA;color:#B83232;}
+.fw-cob{background:#EEEBF8;color:#3D2B80;}
+.fw-custom{background:#F0F0F0;color:#555;}
+.sdot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.dot-pass{background:var(--green);}
+.dot-fail{background:var(--red);}
+.dot-partial{background:var(--amber);}
+.dot-pending{background:var(--purple);}
+.dot-na{background:var(--txt3);}
+
+/* ── DETAIL PANE ── */
+.detail-pane{flex:1;overflow-y:auto;background:var(--bg);}
+.d-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--txt3);padding:40px;text-align:center;}
+.d-empty svg{width:42px;height:42px;opacity:0.2;}
+.d-empty h3{font-size:15px;font-weight:600;color:var(--txt2);}
+.d-empty p{font-size:12.5px;max-width:280px;}
+.dcontent{padding:22px 26px;max-width:900px;}
+.dhead{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;}
+.did{font-family:var(--mono);font-size:9.5px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.dtitle{font-family:var(--serif);font-size:21px;line-height:1.3;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-xs);}
+.card-hd{padding:9px 13px;background:var(--s2);border-bottom:1px solid var(--border);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);font-family:var(--mono);display:flex;align-items:center;justify-content:space-between;}
+.card-hl{display:flex;align-items:center;gap:6px;}
+.card-hd svg{width:11px;height:11px;}
+.card-bd{padding:13px;}
+
+/* COMPLIANCE MAP */
+.fw-map{display:flex;flex-wrap:wrap;gap:6px;}
+.fw-badge{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:4px;font-size:11.5px;font-weight:600;}
+.fw-badge .fw-code{font-family:var(--mono);font-size:10px;}
+.fw-badge .fw-ref{font-size:10px;color:inherit;opacity:0.75;}
+
+/* MITRE */
+.mitre-grid{display:flex;flex-direction:column;gap:6px;}
+.mitre-row{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:4px;background:var(--s2);border:1px solid var(--border);}
+.mitre-id{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);background:var(--red-l);border:1px solid #EFB8B8;border-radius:3px;padding:2px 6px;white-space:nowrap;flex-shrink:0;}
+.mitre-tactic{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;min-width:110px;flex-shrink:0;margin-top:1px;}
+.mitre-name{font-size:12px;font-weight:600;color:var(--txt);}
+.mitre-desc{font-size:11px;color:var(--txt2);margin-top:1px;}
+
+/* RISKS */
+.risk-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.rtag{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:4px;font-size:11.5px;font-weight:500;background:var(--red-l);color:var(--red);border:1px solid #EFB8B8;font-family:var(--mono);}
+.rtag .dx{cursor:pointer;font-size:13px;line-height:1;opacity:0.55;border:none;background:none;color:inherit;padding:0;}
+.rtag .dx:hover{opacity:1;}
+
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:6px;}
+.cli{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:4px;background:var(--s2);border:1px solid var(--border);}
+.cli input[type=checkbox]{width:13px;height:13px;accent-color:var(--accent);cursor:pointer;margin-top:3px;flex-shrink:0;}
+.cli .clt{flex:1;font-size:12.5px;cursor:pointer;line-height:1.5;}
+.cli.checked .clt{text-decoration:line-through;color:var(--txt3);}
+.cli .dx{cursor:pointer;color:var(--txt3);border:none;background:none;font-size:15px;line-height:1;padding:0;opacity:0;transition:opacity 0.15s;flex-shrink:0;}
+.cli:hover .dx{opacity:0.55;}
+.cli .dx:hover{opacity:1!important;color:var(--red);}
+
+/* DOCS / ATTACHMENTS */
+.doc-list{display:flex;flex-direction:column;gap:7px;}
+.doc-item{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.doc-row{display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--gold-l);}
+.doc-icon{width:28px;height:28px;background:var(--gold);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;}
+.doc-icon svg{width:14px;height:14px;}
+.doc-text{flex:1;font-size:12px;line-height:1.4;font-weight:500;}
+.doc-actions{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.doc-link-zone{padding:9px 12px;background:var(--s2);border-top:1px dashed var(--border);display:flex;flex-direction:column;gap:6px;}
+.link-row{display:flex;align-items:center;gap:6px;}
+.link-row a{flex:1;font-size:11.5px;font-family:var(--mono);color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;}
+.link-row a:hover{text-decoration:underline;}
+.link-row .lx{border:none;background:none;cursor:pointer;color:var(--txt3);font-size:15px;line-height:1;padding:0;opacity:0.55;flex-shrink:0;}
+.link-row .lx:hover{opacity:1;color:var(--red);}
+.link-add-row{display:flex;gap:6px;align-items:center;}
+.link-add-row input{flex:1;padding:5px 9px;border:1px dashed var(--border2);border-radius:var(--r);font-family:var(--mono);font-size:11.5px;color:var(--txt);background:var(--surface);outline:none;transition:border-color 0.15s;}
+.link-add-row input:focus{border-color:var(--blue);border-style:solid;background:var(--surface);}
+.link-add-row input::placeholder{color:var(--txt3);}
+.link-empty{font-size:10.5px;color:var(--txt3);font-family:var(--mono);}
+
+/* ADD ROW */
+.add-row{display:flex;gap:6px;margin-top:9px;align-items:center;}
+.add-row input{flex:1;padding:6px 9px;border:1px dashed var(--border2);border-radius:var(--r);font-family:var(--sans);font-size:12px;color:var(--txt);background:var(--s2);outline:none;}
+.add-row input:focus{border-color:var(--accent);border-style:solid;background:var(--surface);}
+.add-row input::placeholder{color:var(--txt3);}
+
+/* ASSESSMENT FIELDS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--txt3);font-family:var(--mono);}
+.fi,.fs,.fta{padding:7px 9px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:12.5px;color:var(--txt);background:var(--surface);outline:none;transition:border-color 0.15s;width:100%;}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-l);}
+.fta{resize:vertical;min-height:72px;}
+.dfooter{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:12px;border-top:1px solid var(--border);gap:10px;}
+.lu{font-size:10.5px;color:var(--txt3);font-family:var(--mono);}
+
+/* ── DASHBOARD TAB ── */
+#tab-dash{padding:24px;overflow-y:auto;height:calc(100vh - 96px);}
+.dash-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.dash-title{font-family:var(--serif);font-size:22px;color:var(--txt);}
+.dash-meta{font-size:11px;color:var(--txt3);font-family:var(--mono);}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;box-shadow:var(--shadow-xs);}
+.kpi-val{font-family:var(--mono);font-size:28px;font-weight:700;display:block;line-height:1;}
+.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--txt3);font-family:var(--mono);margin-top:4px;}
+.kpi-sub{font-size:10.5px;color:var(--txt3);margin-top:2px;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.dash-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.dcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-xs);overflow:hidden;}
+.dcard-hd{padding:10px 14px;background:var(--s2);border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);font-family:var(--mono);display:flex;align-items:center;justify-content:space-between;}
+.dcard-bd{padding:14px;}
+.chart-wrap{display:flex;align-items:center;justify-content:center;}
+/* SVG chart helpers */
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.bar-label{font-size:11px;color:var(--txt2);min-width:130px;font-family:var(--mono);}
+.bar-track{flex:1;height:14px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.5s;}
+.bar-pct{font-size:11px;font-family:var(--mono);color:var(--txt3);min-width:30px;text-align:right;}
+/* Heatmap */
+.heatmap-wrap{display:grid;gap:3px;}
+.hm-cell{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);font-weight:700;cursor:pointer;padding:4px 2px;text-align:center;line-height:1.2;}
+/* Risk table */
+.risk-table{width:100%;border-collapse:collapse;font-size:12px;}
+.risk-table th{text-align:left;padding:6px 10px;background:var(--s2);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--txt3);font-family:var(--mono);border-bottom:1px solid var(--border);}
+.risk-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+.risk-table tr:hover td{background:var(--s2);}
+/* Donut legend */
+.donut-legend{display:flex;flex-direction:column;gap:7px;}
+.dl-row{display:flex;align-items:center;gap:8px;}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dl-label{font-size:11.5px;flex:1;}
+.dl-val{font-family:var(--mono);font-size:12px;font-weight:700;}
+
+/* ── REPORTS TAB ── */
+#tab-reports{padding:24px;overflow-y:auto;height:calc(100vh - 96px);}
+.rep-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;}
+.rep-title{font-family:var(--serif);font-size:22px;}
+.rep-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+.rep-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;transition:all 0.15s;}
+.rep-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.rep-card.selected{border-color:var(--accent);background:var(--accent-l);}
+.rep-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.rep-icon svg{width:20px;height:20px;}
+.rep-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+.rep-desc{font-size:12px;color:var(--txt2);line-height:1.5;}
+.rep-config{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;}
+.rep-config-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--txt3);font-family:var(--mono);margin-bottom:12px;}
+.config-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.preview-btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* MODAL */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;align-items:center;justify-content:center;}
+.moverlay.open{display:flex;}
+.mbox{background:var(--surface);border-radius:var(--r2);box-shadow:var(--shadow-lg);width:660px;max-width:96vw;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;}
+.mhead{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2;}
+.mtitle{font-family:var(--serif);font-size:18px;}
+.mclose{cursor:pointer;color:var(--txt3);font-size:22px;border:none;background:none;line-height:1;}
+.mbody{padding:20px;}
+.mfoot{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--surface);}
+.fsec{margin-bottom:18px;}
+.fsec-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--accent);font-family:var(--mono);margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.frow{margin-bottom:11px;}
+.flabel{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--txt3);font-family:var(--mono);display:block;margin-bottom:4px;}
+.finput,.fsel,.ftarea{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:12.5px;color:var(--txt);background:var(--surface);outline:none;transition:border-color 0.15s;}
+.finput:focus,.fsel:focus,.ftarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-l);}
+.ftarea{resize:vertical;min-height:65px;}
+.dynlist{display:flex;flex-direction:column;gap:5px;margin-bottom:7px;}
+.dynitem{display:flex;align-items:center;gap:6px;}
+.dynitem input{flex:1;padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:12.5px;outline:none;background:var(--surface);}
+.dynitem input:focus{border-color:var(--accent);}
+.dynitem .ddel{border:none;background:none;cursor:pointer;color:var(--txt3);font-size:17px;line-height:1;padding:0;}
+.dynitem .ddel:hover{color:var(--red);}
+.dyn-add{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--accent);cursor:pointer;padding:4px 0;border:none;background:none;font-family:var(--sans);font-weight:600;}
+.dyn-add:hover{text-decoration:underline;}
+.dyn-add svg{width:11px;height:11px;}
+
+/* TOOLBAR AUDIT */
+.audit-topbar{padding:7px 12px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.audit-meta-row{display:flex;gap:8px;align-items:center;}
+.amf{display:flex;align-items:center;gap:4px;}
+.amf label{font-size:9.5px;font-weight:700;color:var(--txt3);font-family:var(--mono);text-transform:uppercase;}
+.amf input{border:1px solid var(--border);border-radius:4px;padding:3px 7px;font-size:11.5px;font-family:var(--sans);color:var(--txt);background:var(--surface);outline:none;width:105px;}
+.amf input:focus{border-color:var(--accent);}
+.progress-wrap{display:flex;align-items:center;gap:8px;}
+.progress-label{font-size:11px;font-family:var(--mono);color:var(--txt2);}
+.progress-track{width:140px;height:7px;background:var(--border);border-radius:4px;overflow:hidden;display:flex;}
+.pf-pass{background:var(--green);height:100%;transition:width 0.3s;}
+.pf-partial{background:var(--amber);height:100%;transition:width 0.3s;}
+.pf-fail{background:var(--red);height:100%;transition:width 0.3s;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:8px 16px;border-radius:var(--r);font-size:12.5px;font-weight:600;box-shadow:var(--shadow-lg);z-index:1000;opacity:0;transform:translateY(6px);transition:all 0.2s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* PRINT (for PDF export) */
+@media print{
+  .app-header,.tab-bar,.ctrl-sidebar,.audit-topbar{display:none!important;}
+  #tab-dash{height:auto;overflow:visible;padding:16px;}
+  #tab-audit,#tab-reports{display:none!important;}
+  #tab-dash{display:block!important;}
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
+  .dash-grid{grid-template-columns:1fr;}
+  .dcard{break-inside:avoid;}
+}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.no-results{padding:32px;text-align:center;color:var(--txt3);font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="hbrand">
+    <div class="hlogo">ITGC</div>
+    <div>
+      <div class="htitle">ITGC Auditor Workbench</div>
+      <div class="hsub">IT General Controls · Audit Assessment Tool · v3</div>
+    </div>
+  </div>
+  <div class="hactions">
+    <button class="btn btn-ghost btn-sm" onclick="openAddModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Control
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="switchTab('dash')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+    </button>
+    <button class="btn btn-primary btn-sm" onclick="saveAll()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save
+    </button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active" id="tabt-audit" onclick="switchTab('audit')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h4"/></svg>
+    Audit Workbench
+  </div>
+  <div class="tab" id="tabt-dash" onclick="switchTab('dash')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Dashboard
+  </div>
+  <div class="tab" id="tabt-reports" onclick="switchTab('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Reports &amp; Export
+  </div>
+</div>
+
+<!-- ══ AUDIT TAB ══ -->
+<div class="tab-panel active" id="tab-audit">
+  <div class="audit-topbar">
+    <div class="audit-meta-row">
+      <div class="amf"><label>Entity</label><input type="text" id="entityName" placeholder="Client / Entity"></div>
+      <div class="amf"><label>Period</label><input type="text" id="auditPeriod" placeholder="FY2025 Q3"></div>
+      <div class="amf"><label>Auditor</label><input type="text" id="auditorName" placeholder="Lead Auditor"></div>
+    </div>
+    <div class="progress-wrap">
+      <span class="progress-label" id="progressLabel">0% Complete</span>
+      <div class="progress-track">
+        <div class="pf-pass" id="progressPass" style="width:0%"></div>
+        <div class="pf-partial" id="progressPartial" style="width:0%"></div>
+        <div class="pf-fail" id="progressFail" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="audit-inner">
+    <!-- SIDEBAR -->
+    <div class="ctrl-sidebar">
+      <div class="sidebar-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Search controls, risks, frameworks…" oninput="renderList()">
+        </div>
+        <div class="sidebar-filters">
+          <select class="fsel" id="statusFilter" onchange="renderList()">
+            <option value="">All Statuses</option><option value="pass">Pass</option><option value="fail">Fail</option>
+            <option value="partial">Partial</option><option value="pending">Pending</option><option value="na">N/A</option>
+          </select>
+          <select class="fsel" id="fwFilter" onchange="renderList()">
+            <option value="">All Frameworks</option>
+            <option value="NIST CSF">NIST CSF</option>
+            <option value="NIST 800-53">NIST 800-53</option>
+            <option value="SOX ITGC">SOX ITGC</option>
+            <option value="ISO 27001">ISO 27001</option>
+            <option value="PCI-DSS">PCI-DSS</option>
+            <option value="COBIT">COBIT</option>
+          </select>
+        </div>
+      </div>
+      <div class="sidebar-stats" id="sidebarStats"></div>
+      <div class="ctrl-list-body" id="controlList"></div>
+    </div>
+    <!-- DETAIL -->
+    <div class="detail-pane" id="detailPane">
+      <div class="d-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h4"/></svg>
+        <h3>Select a Control</h3>
+        <p>Pick a control from the list to begin assessment, or click Add Control to create a custom one.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD TAB ══ -->
+<div class="tab-panel" id="tab-dash">
+  <div id="dashContent"></div>
+</div>
+
+<!-- ══ REPORTS TAB ══ -->
+<div class="tab-panel" id="tab-reports">
+  <div class="rep-header">
+    <div>
+      <div class="rep-title">Reports &amp; Export</div>
+      <div style="font-size:12px;color:var(--txt3);margin-top:3px;">Generate management-ready reports from your audit data.</div>
+    </div>
+  </div>
+
+  <div class="rep-options">
+    <div class="rep-card selected" id="rcard-pdf" onclick="selectReport('pdf')">
+      <div class="rep-icon" style="background:var(--red-l);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+      </div>
+      <div class="rep-name">PDF Report</div>
+      <div class="rep-desc">Full audit report with dashboard charts and findings. Print-to-PDF from browser — no plugins required.</div>
+    </div>
+    <div class="rep-card" id="rcard-xls" onclick="selectReport('xls')">
+      <div class="rep-icon" style="background:var(--blue-l);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+      </div>
+      <div class="rep-name">Excel / CSV</div>
+      <div class="rep-desc">Detailed control-by-control spreadsheet with all assessment data, framework mappings, and findings.</div>
+    </div>
+    <div class="rep-card" id="rcard-doc" onclick="selectReport('doc')">
+      <div class="rep-icon" style="background:var(--purple-l);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div class="rep-name">Word Document</div>
+      <div class="rep-desc">Formatted management report (HTML download, opens in Word/Google Docs). Includes executive summary and findings table.</div>
+    </div>
+  </div>
+
+  <div class="rep-config">
+    <div class="rep-config-title">Report Configuration</div>
+    <div class="config-grid">
+      <div class="fg"><div class="fl">Entity / Client Name</div><input class="fi" type="text" id="rep_entity" placeholder="Auto-filled from audit tab"></div>
+      <div class="fg"><div class="fl">Audit Period</div><input class="fi" type="text" id="rep_period" placeholder="e.g. FY2025 Q3"></div>
+      <div class="fg"><div class="fl">Prepared By</div><input class="fi" type="text" id="rep_auditor" placeholder="Lead Auditor Name"></div>
+      <div class="fg"><div class="fl">Report Date</div><input class="fi" type="date" id="rep_date"></div>
+      <div class="fg"><div class="fl">Classification</div>
+        <select class="fs" id="rep_class">
+          <option value="CONFIDENTIAL">Confidential</option>
+          <option value="INTERNAL USE ONLY">Internal Use Only</option>
+          <option value="RESTRICTED">Restricted</option>
+          <option value="FOR MANAGEMENT REVIEW">For Management Review</option>
+        </select>
+      </div>
+      <div class="fg"><div class="fl">Include Sections</div>
+        <select class="fs" id="rep_scope">
+          <option value="full">Full Report (All Sections)</option>
+          <option value="exec">Executive Summary Only</option>
+          <option value="findings">Findings & Recommendations Only</option>
+          <option value="failed">Failed / Partial Controls Only</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-btn-row">
+    <button class="btn btn-accent" onclick="generateReport()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Generate &amp; Download
+    </button>
+    <button class="btn btn-secondary" onclick="switchTab('dash');setTimeout(()=>{window.print()},200)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print Dashboard (PDF)
+    </button>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="moverlay" id="controlModal">
+  <div class="mbox">
+    <div class="mhead">
+      <div class="mtitle" id="modalTitle">Add Custom Control</div>
+      <button class="mclose" onclick="closeModal()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="fsec">
+        <div class="fsec-t">Control Identity</div>
+        <div class="frow"><label class="flabel">Control Name <span style="color:var(--red)">*</span></label><input type="text" class="finput" id="mc_name" placeholder="e.g. API Security Controls"></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-t">Associated Risks <span style="font-weight:400;color:var(--txt3)">(min 1)</span></div>
+        <div class="dynlist" id="mc_risks"></div>
+        <button class="dyn-add" onclick="addDyn('mc_risks','Enter a risk…')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Risk</button>
+      </div>
+      <div class="fsec">
+        <div class="fsec-t">Audit Checklist Items</div>
+        <div class="dynlist" id="mc_checks"></div>
+        <button class="dyn-add" onclick="addDyn('mc_checks','Checklist step…')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Checklist Item</button>
+      </div>
+      <div class="fsec">
+        <div class="fsec-t">Documentation References</div>
+        <div class="dynlist" id="mc_docs"></div>
+        <button class="dyn-add" onclick="addDyn('mc_docs','Policy / procedure / tool reference…')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Documentation</button>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFromModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Control</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// COMPLIANCE FRAMEWORK MAPPINGS
+// ══════════════════════════════════════════════════════════════
+const FW_META = {
+  'NIST CSF': {cls:'fw-nist', codes:{'Access Control':'PR.AC','Change Management':'PR.IP-3','Segregation of Duties':'PR.AC-4','Data Encryption':'PR.DS','Incident Response':'RS.RP','Backup & Recovery':'PR.IP-4','System Monitoring':'DE.CM','Physical Security':'PR.AC-2','Patch Management':'PR.IP-12','Data Retention':'PR.IP-6','Network Security':'PR.AC-5','Vendor Management':'ID.SC','Configuration Management':'PR.IP-1','Remote Access Controls':'PR.AC-3','Capacity Management':'PR.PT-4','Malware Protection':'DE.CM-4','Employee Training & Awareness':'PR.AT','Disaster Recovery Planning':'RC.RP','Logging & Auditing':'DE.AE','Password Management':'PR.AC-7','Environmental Controls':'PR.AC-2'}},
+  'NIST 800-53': {cls:'fw-nist', codes:{'Access Control':'AC-1/AC-2','Change Management':'CM-3/CM-5','Segregation of Duties':'AC-5','Data Encryption':'SC-28/SC-8','Incident Response':'IR-1/IR-4','Backup & Recovery':'CP-9/CP-10','System Monitoring':'AU-6/SI-4','Physical Security':'PE-1/PE-3','Patch Management':'SI-2','Data Retention':'AU-11/MP-6','Network Security':'SC-7/SC-22','Vendor Management':'SA-9/SR-3','Configuration Management':'CM-6/CM-7','Remote Access Controls':'AC-17','Capacity Management':'CP-2','Malware Protection':'SI-3','Employee Training & Awareness':'AT-2/AT-3','Disaster Recovery Planning':'CP-2/CP-4','Logging & Auditing':'AU-2/AU-9','Password Management':'IA-5','Environmental Controls':'PE-9/PE-14'}},
+  'SOX ITGC': {cls:'fw-sox', codes:{'Access Control':'SOX §404 – Logical Access','Change Management':'SOX §404 – Change Mgmt','Segregation of Duties':'SOX §404 – SoD','Data Encryption':'SOX §404 – Data Protection','Incident Response':'SOX §404 – Incident Mgmt','Backup & Recovery':'SOX §404 – Backup & DR','System Monitoring':'SOX §404 – Monitoring','Physical Security':'SOX §404 – Physical Sec','Patch Management':'SOX §404 – Patch Mgmt','Data Retention':'SOX §802 – Records Retention','Network Security':'SOX §404 – Network Sec','Vendor Management':'SOX §404 – Vendor Risk','Configuration Management':'SOX §404 – Config Mgmt','Remote Access Controls':'SOX §404 – Remote Access','Capacity Management':'SOX §404 – Availability','Malware Protection':'SOX §404 – Malware','Employee Training & Awareness':'SOX §404 – Training','Disaster Recovery Planning':'SOX §404 – BCP/DR','Logging & Auditing':'SOX §302/§404 – Audit Logs','Password Management':'SOX §404 – Auth Controls','Environmental Controls':'SOX §404 – Physical Env'}},
+  'ISO 27001': {cls:'fw-iso', codes:{'Access Control':'A.9.1/A.9.2','Change Management':'A.12.1.2','Segregation of Duties':'A.6.1.2','Data Encryption':'A.10.1','Incident Response':'A.16.1','Backup & Recovery':'A.12.3/A.17.1','System Monitoring':'A.12.4','Physical Security':'A.11.1','Patch Management':'A.12.6.1','Data Retention':'A.18.1.3','Network Security':'A.13.1','Vendor Management':'A.15.1','Configuration Management':'A.12.1','Remote Access Controls':'A.9.4.2','Capacity Management':'A.12.1.3','Malware Protection':'A.12.2','Employee Training & Awareness':'A.7.2.2','Disaster Recovery Planning':'A.17.1','Logging & Auditing':'A.12.4','Password Management':'A.9.3/A.9.4','Environmental Controls':'A.11.2'}},
+  'PCI-DSS': {cls:'fw-pci', codes:{'Access Control':'Req 7/8','Change Management':'Req 6.4','Segregation of Duties':'Req 6.4.2','Data Encryption':'Req 3/4','Incident Response':'Req 12.10','Backup & Recovery':'Req 12.10.1','System Monitoring':'Req 10','Physical Security':'Req 9','Patch Management':'Req 6.3.3','Data Retention':'Req 3.2.1','Network Security':'Req 1/2','Vendor Management':'Req 12.8','Configuration Management':'Req 2.2','Remote Access Controls':'Req 8.2.8','Capacity Management':'Req 12.3.4','Malware Protection':'Req 5','Employee Training & Awareness':'Req 12.6','Disaster Recovery Planning':'Req 12.10','Logging & Auditing':'Req 10.2','Password Management':'Req 8.3','Environmental Controls':'Req 9.4'}},
+  'COBIT': {cls:'fw-cob', codes:{'Access Control':'DSS05.04','Change Management':'BAI06.01','Segregation of Duties':'DSS05.04','Data Encryption':'DSS05.02','Incident Response':'DSS02.01','Backup & Recovery':'DSS04.07','System Monitoring':'DSS05.07','Physical Security':'DSS05.05','Patch Management':'BAI10.01','Data Retention':'APO09.04','Network Security':'DSS05.02','Vendor Management':'APO10.03','Configuration Management':'BAI10.02','Remote Access Controls':'DSS05.04','Capacity Management':'BAI04.01','Malware Protection':'DSS05.01','Employee Training & Awareness':'APO07.03','Disaster Recovery Planning':'DSS04.02','Logging & Auditing':'DSS06.03','Password Management':'DSS05.04','Environmental Controls':'DSS05.05'}}
+};
+
+// ══════════════════════════════════════════════════════════════
+// MITRE ATT&CK ENRICHMENT
+// ══════════════════════════════════════════════════════════════
+const MITRE_MAP = {
+  'Access Control':[
+    {id:'T1078',tactic:'Initial Access',name:'Valid Accounts',desc:'Adversaries use compromised credentials to gain access to systems.'},
+    {id:'T1110',tactic:'Credential Access',name:'Brute Force',desc:'Attempts to guess or crack account passwords using automated tools.'},
+    {id:'T1548',tactic:'Privilege Escalation',name:'Abuse Elevation Control',desc:'Exploiting weaknesses in access control to gain elevated privileges.'}
+  ],
+  'Change Management':[
+    {id:'T1565',tactic:'Impact',name:'Data Manipulation',desc:'Adversaries may insert, delete, or manipulate data to influence outcomes.'},
+    {id:'T1601',tactic:'Defense Evasion',name:'Modify System Image',desc:'Modify OS or firmware to persist or alter behavior.'}
+  ],
+  'Segregation of Duties':[
+    {id:'T1078.004',tactic:'Privilege Escalation',name:'Cloud Accounts',desc:'Adversaries exploit excessive permissions in cloud or privileged accounts.'},
+    {id:'T1098',tactic:'Persistence',name:'Account Manipulation',desc:'Modifying account settings to maintain or expand access.'}
+  ],
+  'Data Encryption':[
+    {id:'T1005',tactic:'Collection',name:'Data from Local System',desc:'Adversaries collect sensitive data from local systems before exfiltration.'},
+    {id:'T1041',tactic:'Exfiltration',name:'Exfiltration Over C2 Channel',desc:'Data exfiltrated over the existing command-and-control channel.'},
+    {id:'T1486',tactic:'Impact',name:'Data Encrypted for Impact',desc:'Ransomware encrypts data to extort victims.'}
+  ],
+  'Incident Response':[
+    {id:'T1489',tactic:'Impact',name:'Service Stop',desc:'Adversaries may stop services to inhibit incident response.'},
+    {id:'T1070',tactic:'Defense Evasion',name:'Indicator Removal',desc:'Deleting or tampering with artifacts to remove evidence of compromise.'}
+  ],
+  'Backup & Recovery':[
+    {id:'T1490',tactic:'Impact',name:'Inhibit System Recovery',desc:'Adversaries delete shadow copies and backups to prevent recovery.'},
+    {id:'T1486',tactic:'Impact',name:'Data Encrypted for Impact',desc:'Ransomware targets backups to maximize leverage.'}
+  ],
+  'System Monitoring':[
+    {id:'T1562',tactic:'Defense Evasion',name:'Impair Defenses',desc:'Disabling monitoring tools, logs, or security software.'},
+    {id:'T1036',tactic:'Defense Evasion',name:'Masquerading',desc:'Renaming malicious processes to evade monitoring detection.'}
+  ],
+  'Physical Security':[
+    {id:'T1200',tactic:'Initial Access',name:'Hardware Additions',desc:'Inserting unauthorized hardware (USB, keyloggers) into physical systems.'},
+    {id:'T1091',tactic:'Lateral Movement',name:'Replication Through Removable Media',desc:'Spreading malware via removable media left near physical assets.'}
+  ],
+  'Patch Management':[
+    {id:'T1190',tactic:'Initial Access',name:'Exploit Public-Facing App',desc:'Exploiting unpatched vulnerabilities in internet-facing applications.'},
+    {id:'T1203',tactic:'Execution',name:'Exploitation for Client Execution',desc:'Exploiting vulnerabilities in client software to execute code.'}
+  ],
+  'Data Retention':[
+    {id:'T1530',tactic:'Collection',name:'Data from Cloud Storage',desc:'Accessing cloud storage objects containing retained sensitive data.'},
+    {id:'T1213',tactic:'Collection',name:'Data from Information Repositories',desc:'Mining retained logs and repositories for sensitive information.'}
+  ],
+  'Network Security':[
+    {id:'T1046',tactic:'Discovery',name:'Network Service Discovery',desc:'Adversaries scan networks to identify open services and vulnerabilities.'},
+    {id:'T1021',tactic:'Lateral Movement',name:'Remote Services',desc:'Using remote services to move laterally across the network.'},
+    {id:'T1071',tactic:'C&C',name:'Application Layer Protocol',desc:'Using standard protocols (HTTP/S, DNS) for command and control.'}
+  ],
+  'Vendor Management':[
+    {id:'T1195',tactic:'Initial Access',name:'Supply Chain Compromise',desc:'Compromising software or hardware before delivery to the target.'},
+    {id:'T1199',tactic:'Initial Access',name:'Trusted Relationship',desc:'Leveraging trusted third-party access to gain entry to target systems.'}
+  ],
+  'Configuration Management':[
+    {id:'T1562.001',tactic:'Defense Evasion',name:'Disable/Modify Tools',desc:'Adversaries modify security tool configurations to evade detection.'},
+    {id:'T1059',tactic:'Execution',name:'Command and Scripting Interpreter',desc:'Executing scripts via misconfigured interpreters (PowerShell, bash).'}
+  ],
+  'Remote Access Controls':[
+    {id:'T1133',tactic:'Initial Access',name:'External Remote Services',desc:'Abusing VPN, RDP, or other remote access services.'},
+    {id:'T1021.001',tactic:'Lateral Movement',name:'Remote Desktop Protocol',desc:'Using RDP to move laterally with stolen credentials.'}
+  ],
+  'Capacity Management':[
+    {id:'T1499',tactic:'Impact',name:'Endpoint Denial of Service',desc:'Overwhelming resources to cause service disruption.'},
+    {id:'T1498',tactic:'Impact',name:'Network Denial of Service',desc:'DDoS attacks targeting network bandwidth and capacity.'}
+  ],
+  'Malware Protection':[
+    {id:'T1059.001',tactic:'Execution',name:'PowerShell',desc:'Using PowerShell to execute malicious scripts that evade AV.'},
+    {id:'T1204',tactic:'Execution',name:'User Execution',desc:'Tricking users into executing malicious files or code.'},
+    {id:'T1027',tactic:'Defense Evasion',name:'Obfuscated Files',desc:'Using obfuscation, packing, or encoding to evade malware detection.'}
+  ],
+  'Employee Training & Awareness':[
+    {id:'T1566',tactic:'Initial Access',name:'Phishing',desc:'Sending deceptive emails to steal credentials or deliver malware.'},
+    {id:'T1534',tactic:'Lateral Movement',name:'Internal Spearphishing',desc:'Using compromised internal accounts for targeted phishing.'}
+  ],
+  'Disaster Recovery Planning':[
+    {id:'T1485',tactic:'Impact',name:'Data Destruction',desc:'Irreversibly destroying data to disrupt business continuity.'},
+    {id:'T1491',tactic:'Impact',name:'Defacement',desc:'Modifying systems to impair recovery or reputation.'}
+  ],
+  'Logging & Auditing':[
+    {id:'T1070.001',tactic:'Defense Evasion',name:'Clear Windows Event Logs',desc:'Deleting audit logs to cover tracks and impede forensics.'},
+    {id:'T1070.002',tactic:'Defense Evasion',name:'Clear Linux/Mac Logs',desc:'Clearing system logs to evade detection on non-Windows systems.'}
+  ],
+  'Password Management':[
+    {id:'T1003',tactic:'Credential Access',name:'OS Credential Dumping',desc:'Dumping password hashes from OS (LSASS, SAM, NTDS.dit).'},
+    {id:'T1110.003',tactic:'Credential Access',name:'Password Spraying',desc:'Attempting common passwords across many accounts to avoid lockout.'}
+  ],
+  'Environmental Controls':[
+    {id:'T1485',tactic:'Impact',name:'Data Destruction',desc:'Physical environmental failures can lead to permanent data loss.'},
+    {id:'T1200',tactic:'Initial Access',name:'Hardware Additions',desc:'Physical access enables insertion of malicious hardware implants.'}
+  ]
+};
+
+// ══════════════════════════════════════════════════════════════
+// SEED CONTROLS
+// ══════════════════════════════════════════════════════════════
+const SEED = [
+  {id:1,name:"Access Control",custom:false,risks:["Unauthorized Access","Data Breach","Privilege Escalation","Insider Threat","Credential Theft"],checklists:["Ensure only authorized users have access to systems and data","Implement Multi-Factor Authentication (MFA) on all critical systems","Enforce least-privilege access principles","Maintain User Access Review (UAR) cycle – minimum quarterly","Implement Privileged Identity/Access Management (PIM/PAM)","Document and enforce role-based access control (RBAC) matrix"],docs:["Logical Access Management Policy","MFA/SSO Configuration Evidence","User Access Review Reports","PIM/PAM Tool Screenshots","RBAC Matrix Documentation","Account Lockout & Password Policy"]},
+  {id:2,name:"Change Management",custom:false,risks:["Unauthorized System Changes","Production Outages","Rollback Failures","Inadequate Testing","Emergency Change Abuse"],checklists:["All changes must have approved Change Requests (CRs)","Test changes in non-production environment before deployment","Obtain multi-level approvals (developer, manager, CAB)","Maintain change logs with rollback procedures","Perform post-implementation review for all major changes","Separate duties between developer, tester, and deployer"],docs:["Change Management Policy","Change Request Tickets (sample)","CAB Meeting Minutes","Test Evidence from Non-Prod","Post-Implementation Review Reports","Emergency Change Procedures"]},
+  {id:3,name:"Segregation of Duties",custom:false,risks:["Fraud via Conflicting Access","Unauthorized Transactions","Lack of Audit Trail","Collusion Risk","SOD Matrix Gaps"],checklists:["Implement Maker-Checker process for all critical transactions","Ensure different individuals handle request, approval, and implementation","Regularly review and remediate SoD conflicts","Implement compensating controls where SoD is not feasible","Document SoD matrix and exceptions register"],docs:["SoD Matrix Document","Maker-Checker Process Evidence","SoD Conflict Report","Exception Register","Compensating Controls Log"]},
+  {id:4,name:"Data Encryption",custom:false,risks:["Data Theft / Exfiltration","Interception in Transit","Unauthorized Access at Rest","Weak Key Management","Ransomware Encryption"],checklists:["Implement AES-256 encryption for data at rest","Enforce TLS 1.2+ for all data in transit","Implement a formal Key Management Procedure","Classify data before applying encryption controls","Encrypt backup drives and cloud storage","Audit encryption configurations quarterly"],docs:["Data Classification Policy","Cryptography Policy","SSL/TLS Certificate Inventory","Key Management Procedure","Backup Encryption Evidence","Encryption Audit Report"]},
+  {id:5,name:"Incident Response",custom:false,risks:["Delayed Incident Containment","Evidence Tampering","Regulatory Notification Failure","Uncontained Breach Spread","Repeat Incidents"],checklists:["Maintain a documented and approved Incident Response Plan (IRP)","Define and train an Incident Response Team (IRT)","Implement automated detection, alerting, and ticketing","Conduct tabletop exercises at least annually","Establish regulatory notification timelines","Document lessons learned post-incident"],docs:["Incident Response Plan (IRP)","IRT Contact List & RACI","Incident Tickets (sample)","Tabletop Exercise Report","Past Incident Post-Mortems","Regulatory Notification Templates"]},
+  {id:6,name:"Backup & Recovery",custom:false,risks:["Total Data Loss","Ransomware","RTO/RPO Breach","Untested Backups","Offsite Failure"],checklists:["Define and document RTO and RPO for all critical systems","Perform daily incremental and weekly full backups","Store backups offsite or in geographically separated cloud","Test backup restoration at least semi-annually","Encrypt all backup media","Monitor backup job success/failure daily"],docs:["BCP/DR Policy","Backup Schedule Evidence","Offsite Backup Confirmation","Restore Test Reports","Backup Failure Alert Logs","RTO/RPO SLA Documentation"]},
+  {id:7,name:"System Monitoring",custom:false,risks:["Undetected Intrusions","Alert Fatigue","Log Tampering","Insider Activity","APT Persistence"],checklists:["Deploy SIEM with baseline alerting rules","Monitor all privileged account activity in real-time","Implement IDS/IPS on all network segments","Review security alerts daily — document disposition","Configure automated anomaly detection","Ensure log integrity (centralized, tamper-proof storage)"],docs:["SIEM Architecture Diagram","Alert Rules Configuration","IDS/IPS Deployment Evidence","Daily Alert Review Log","Anomaly Detection Reports","Log Integrity Verification"]},
+  {id:8,name:"Physical Security",custom:false,risks:["Theft of Hardware","Unauthorized Physical Access","Tailgating","Removable Media Threats","Environmental Damage"],checklists:["Control physical access to data centers with badge/biometric","Install CCTV surveillance covering all entry/exit points","Maintain visitor logs for all data center access","Implement clean desk and clear screen policies","Control and log removable media usage","Conduct physical security audits annually"],docs:["Physical Security Policy","Data Center Access Logs","CCTV System Evidence","Visitor Log Samples","Physical Audit Reports","Clean Desk Policy"]},
+  {id:9,name:"Patch Management",custom:false,risks:["Unpatched CVE Exploitation","Zero-Day Attacks","Patch-Induced Downtime","Compliance Violations"],checklists:["Maintain an asset inventory with patch status","Patch critical/high CVEs within 30 days of release","Test patches in dev/staging before production deployment","Use automated patch management tools (WSUS, Intune, etc.)","Maintain patch compliance reports","Define and test emergency patching procedures"],docs:["Asset Inventory with Patch Status","Patch Management Policy","WSUS/Intune Reports","Patch Compliance Reports","Emergency Patching Procedure","CVE Remediation Evidence"]},
+  {id:10,name:"Data Retention",custom:false,risks:["Regulatory Non-Compliance","Data Hoarding Liability","Legal Hold Failures","Premature Disposal"],checklists:["Define retention schedules aligned to legal/regulatory requirements","Implement automated data lifecycle management","Document and execute data disposal procedures","Maintain legal hold processes for litigation","Review and update retention policy annually"],docs:["Data Retention Policy","Retention Schedule Matrix","Data Disposal Evidence","Legal Hold Records","Policy Review Sign-off"]},
+  {id:11,name:"Network Security",custom:false,risks:["Network Intrusion","Lateral Movement","DDoS Attack","Unauthorized Wi-Fi Access","Rogue Devices"],checklists:["Implement network segmentation and DMZ architecture","Configure and review firewall rules quarterly","Deploy WAF for all internet-facing applications","Enforce VPN with MFA for remote access","Scan for rogue devices on the network monthly","Review network architecture diagram annually"],docs:["Network Architecture Diagram","Firewall Rule Review Evidence","WAF Configuration","VPN+MFA Evidence","Rogue Device Scan Reports","Network Security Policy"]},
+  {id:12,name:"Vendor Management",custom:false,risks:["Third-Party Data Breach","Supply Chain Attack","Contract Non-Compliance","Vendor SLA Failure"],checklists:["Maintain a vendor register with risk classification","Obtain and review SOC 2 / ISO 27001 reports annually","Include security clauses in all vendor contracts","Conduct vendor risk assessments before onboarding","Monitor vendor SLA performance quarterly"],docs:["Vendor Register","Third-Party Risk Assessment Templates","Vendor SOC2/ISO Reports","Master Service Agreements","SLA Performance Reports","TPRM Policy"]},
+  {id:13,name:"Configuration Management",custom:false,risks:["Misconfiguration Exploitation","Configuration Drift","CIS Benchmark Gaps","Unauthorized Baseline Changes"],checklists:["Define and document secure baseline configurations (CIS Benchmarks)","Use automated tools to detect configuration drift","Harden all servers and endpoints before production deployment","Review and update configurations quarterly","Document all baseline exceptions with risk acceptance"],docs:["CIS Benchmark Hardening Reports","Configuration Management Policy","Drift Detection Tool Evidence","Baseline Exception Register","System Hardening Checklists"]},
+  {id:14,name:"Remote Access Controls",custom:false,risks:["VPN Credential Compromise","Unauthorized Remote Access","Session Hijacking","Data Exfiltration via Remote"],checklists:["Enforce MFA for all VPN and remote desktop connections","Set session timeout policies (max 30 min idle)","Log and monitor all remote access sessions","Limit remote access to authorized users and devices","Review remote access permissions quarterly"],docs:["VPN+MFA Configuration Evidence","Session Timeout Policy","Remote Access Logs","Authorized User/Device List","Remote Access Policy"]},
+  {id:15,name:"Capacity Management",custom:false,risks:["Resource Exhaustion","Performance Degradation","System Downtime","Capacity Planning Failures"],checklists:["Monitor CPU, memory, storage, and network utilization continuously","Set automated alerts at 80% capacity thresholds","Conduct capacity planning reviews quarterly","Document scalability procedures","Test capacity under load before major events"],docs:["Monitoring Tool Dashboards","Capacity Alert Configuration","Quarterly Capacity Reports","Scalability Plan","Load Test Results"]},
+  {id:16,name:"Malware Protection",custom:false,risks:["Ransomware","Spyware/Keylogger","Fileless Malware","Supply Chain Malware"],checklists:["Deploy EDR/XDR solution on all endpoints","Update antivirus/EDR signatures daily","Run full malware scans weekly","Implement application whitelisting where feasible","Conduct phishing simulation quarterly","Block macro execution in Office documents"],docs:["EDR/AV Deployment Coverage","Signature Update Evidence","Scan Reports","Application Whitelist Policy","Phishing Simulation Results","Macro Blocking Configuration"]},
+  {id:17,name:"Employee Training & Awareness",custom:false,risks:["Phishing Susceptibility","Social Engineering","Insider Threat","Policy Non-Compliance"],checklists:["Deliver security awareness training at onboarding and annually","Run phishing simulations quarterly and track click rates","Train employees on data handling and classification","Document and track training completion rates","Conduct role-based training for privileged users"],docs:["Training Completion Reports","Phishing Simulation Results","Training Content/Curriculum","Policy Acknowledgment Records","Role-Based Training Evidence"]},
+  {id:18,name:"Disaster Recovery Planning",custom:false,risks:["Extended System Outages","RTO/RPO Breach","Uncoordinated Recovery","Single Point of Failure"],checklists:["Document a comprehensive BCP/DR Plan","Assign DR roles and responsibilities clearly","Test DR Plan at least annually (full failover test)","Align DR with business-defined RTO and RPO","Integrate DR with backup and incident response plans"],docs:["BCP/DR Plan Document","DR Team RACI","DR Test Results & RTO/RPO Evidence","BCP/DR Policy","Integration with IR Plan"]},
+  {id:19,name:"Logging & Auditing",custom:false,risks:["Evidence Destruction","Undetected Unauthorized Activity","Audit Trail Gaps","Regulatory Non-Compliance"],checklists:["Collect logs from all critical systems into centralized SIEM","Define minimum log retention period (typically 12 months)","Protect logs from unauthorized modification (WORM storage)","Review privileged user activity logs weekly","Conduct formal log audits quarterly"],docs:["Log Collection Architecture","Log Retention Policy","SIEM Integration Evidence","Privileged Access Log Reviews","Quarterly Audit Reports","WORM Storage Configuration"]},
+  {id:20,name:"Password Management",custom:false,risks:["Weak Credential Attacks","Credential Stuffing","Password Reuse","Shared Account Abuse"],checklists:["Enforce minimum 12-character passwords with complexity","Implement 90-day password rotation for privileged accounts","Deploy enterprise password manager","Prohibit password sharing and generic/shared accounts","Implement breach-detection password screening (e.g., HaveIBeenPwned API)"],docs:["Password Policy Document","Password Manager Deployment Evidence","MFA Enforcement Evidence","Account Audit Reports","Breach Detection Configuration"]},
+  {id:21,name:"Environmental Controls",custom:false,risks:["Fire / Flood Damage","Power Failure","Temperature/Humidity Failure","HVAC Failure"],checklists:["Maintain appropriate temperature (18-27°C) and humidity (40-60%) in data centers","Install fire suppression systems (FM-200 or equivalent)","Deploy UPS and generator backup power","Conduct environmental inspection quarterly","Test fire suppression and UPS failover annually"],docs:["Environmental Monitoring Logs","Fire Suppression System Evidence","UPS/Generator Test Reports","Quarterly Inspection Reports","Environmental Control Policy"]}
+];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let controls = [];
+let ST = {};
+let selId = null;
+let editId = null;
+let selectedReport = 'pdf';
+
+function initState() {
+  const sc = localStorage.getItem('itgc_ctrl_v5'); controls = sc ? JSON.parse(sc) : JSON.parse(JSON.stringify(SEED));
+  const sa = localStorage.getItem('itgc_st_v5'); ST = sa ? JSON.parse(sa) : {};
+  controls.forEach(c => ensureST(c));
+  const sm = localStorage.getItem('itgc_meta_v5');
+  if (sm) { const m=JSON.parse(sm); ['entityName','auditPeriod','auditorName'].forEach((k,i)=>{ const v=[m.e,m.p,m.a][i]; if(v) document.getElementById(k).value=v; }); }
+  document.getElementById('rep_date').value = new Date().toISOString().slice(0,10);
+  syncRepMeta();
+}
+function ensureST(c) {
+  if (!ST[c.id]) ST[c.id]={status:'pending',checks:new Array(c.checklists.length).fill(false),risks:[...c.risks],docs:[...c.docs],links:{},note:'',finding:'',risk:'low',rec:'',evRef:'',reviewer:'',revDate:'',lastSaved:null};
+  else {
+    while(ST[c.id].checks.length<c.checklists.length) ST[c.id].checks.push(false);
+    ST[c.id].checks=ST[c.id].checks.slice(0,c.checklists.length);
+    if(!ST[c.id].risks) ST[c.id].risks=[...c.risks];
+    if(!ST[c.id].docs) ST[c.id].docs=[...c.docs];
+    if(!ST[c.id].links) ST[c.id].links={};
+    // Migrate old files data if present
+    if(ST[c.id].files) delete ST[c.id].files;
+  }
+}
+function persist() {
+  localStorage.setItem('itgc_ctrl_v5',JSON.stringify(controls));
+  localStorage.setItem('itgc_st_v5',JSON.stringify(ST));
+  localStorage.setItem('itgc_meta_v5',JSON.stringify({e:document.getElementById('entityName').value,p:document.getElementById('auditPeriod').value,a:document.getElementById('auditorName').value}));
+  syncRepMeta();
+}
+function syncRepMeta() {
+  const e=document.getElementById('entityName').value;
+  const p=document.getElementById('auditPeriod').value;
+  const a=document.getElementById('auditorName').value;
+  const re=document.getElementById('rep_entity'); if(re&&!re.value) re.value=e;
+  const rp=document.getElementById('rep_period'); if(rp&&!rp.value) rp.value=p;
+  const ra=document.getElementById('rep_auditor'); if(ra&&!ra.value) ra.value=a;
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB SYSTEM
+// ══════════════════════════════════════════════════════════════
+function switchTab(t) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('tabt-'+t).classList.add('active');
+  if(t==='dash') renderDashboard();
+  if(t==='reports') syncRepMeta();
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIDEBAR + LIST
+// ══════════════════════════════════════════════════════════════
+function renderList() {
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const sf=document.getElementById('statusFilter').value;
+  const ff=document.getElementById('fwFilter').value;
+  const filtered=controls.filter(c=>{
+    const s=ST[c.id];
+    const txt=[c.name,...(s.risks||c.risks),...c.checklists,...(s.docs||c.docs)].join(' ').toLowerCase();
+    const fwMatch=!ff||Object.values(FW_META[ff]?.codes||{}).some((_,__)=>__===c.name||(FW_META[ff]?.codes[c.name]));
+    return (!q||txt.includes(q))&&(!sf||s.status===sf)&&(!ff||(FW_META[ff]?.codes[c.name]));
+  });
+
+  const cnt={pass:0,fail:0,partial:0,pending:0,na:0};
+  controls.forEach(c=>cnt[ST[c.id]?.status||'pending']++);
+
+  // Stats pills
+  const ss=document.getElementById('sidebarStats');
+  ss.innerHTML=['','pass','fail','partial','pending','na'].map(s=>{
+    const map={'':'all','pass':'pass','fail':'fail','partial':'partial','pending':'pending','na':'na'};
+    const lbl={'':'All','pass':'Pass','fail':'Fail','partial':'Partial','pending':'Pending','na':'N/A'};
+    const val=s?cnt[s]:controls.length;
+    return `<div class="spill sp-${s||'all'}${document.getElementById('statusFilter').value===s?' active':''}" onclick="document.getElementById('statusFilter').value='${s}';renderList();"><span class="n">${val}</span>${lbl[s]}</div>`;
+  }).join('');
+
+  const list=document.getElementById('controlList');
+  const addBtn=`<button style="border:none;background:none;cursor:pointer;color:var(--accent);font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:0.5px;display:flex;align-items:center;gap:3px;" onclick="openAddModal()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>ADD</button>`;
+  list.innerHTML=`<div class="list-hdr"><span>${filtered.length} Control${filtered.length!==1?'s':''}</span>${addBtn}</div>`;
+  if(!filtered.length){list.innerHTML+=`<div class="no-results">No controls match.</div>`;return;}
+
+  filtered.forEach((c,i)=>{
+    const s=ST[c.id];
+    const fws=Object.keys(FW_META).filter(fw=>FW_META[fw].codes[c.name]);
+    const div=document.createElement('div');
+    div.className=`ctrl-item${selId===c.id?' sel':''}${c.custom?' is-custom':''}`;
+    div.onclick=()=>selectControl(c.id);
+    div.innerHTML=`<div class="ci-num">${String(i+1).padStart(2,'0')}</div><div class="ci-body"><div class="ci-name">${c.name}</div><div class="ci-sub">${(s.risks||c.risks).slice(0,2).join(' · ')}${(s.risks||c.risks).length>2?' …':''}</div><div class="ci-chips">${fws.slice(0,3).map(fw=>`<span class="fw-chip ${FW_META[fw].cls}">${fw}</span>`).join('')}${c.custom?'<span class="fw-chip fw-custom">Custom</span>':''}</div></div><div class="sdot dot-${s.status}"></div>`;
+    list.appendChild(div);
+  });
+  updateStats();
+}
+
+// ══════════════════════════════════════════════════════════════
+// DETAIL RENDER
+// ══════════════════════════════════════════════════════════════
+function selectControl(id) { selId=id; renderList(); renderDetail(id); }
+
+function renderDetail(id) {
+  const c=controls.find(x=>x.id===id);
+  const s=ST[id];
+  const risks=s.risks||c.risks;
+  const docs=s.docs||c.docs;
+  const clDone=s.checks.filter(Boolean).length;
+  const mitre=MITRE_MAP[c.name]||[];
+  const fws=Object.keys(FW_META).filter(fw=>FW_META[fw].codes[c.name]);
+  const statusOpts=['pass','fail','partial','pending','na'].map(v=>`<option value="${v}" ${s.status===v?'selected':''}>${v[0].toUpperCase()+v.slice(1)}</option>`).join('');
+  const riskOpts=['critical','high','medium','low','informational'].map(v=>`<option value="${v}" ${s.risk===v?'selected':''}>${v[0].toUpperCase()+v.slice(1)}</option>`).join('');
+
+  const fwHTML=fws.length?fws.map(fw=>{const code=FW_META[fw].codes[c.name];return`<div class="fw-badge ${FW_META[fw].cls}"><span class="fw-code">${fw}:</span><span class="fw-ref">${code}</span></div>`;}).join(''):'<span style="font-size:11px;color:var(--txt3);">No framework mapping for this control.</span>';
+
+  const mitreHTML=mitre.length?mitre.map(m=>`<div class="mitre-row"><span class="mitre-id">${m.id}</span><span class="mitre-tactic">${m.tactic}</span><div><div class="mitre-name">${m.name}</div><div class="mitre-desc">${m.desc}</div></div></div>`).join(''):'<span style="font-size:11px;color:var(--txt3);">No MITRE ATT&CK mapping for this control.</span>';
+
+  const risksHTML=risks.map((r,i)=>`<span class="rtag">${r}<button class="dx" onclick="delRisk(${id},${i})">×</button></span>`).join('');
+
+  const clHTML=c.checklists.map((item,i)=>`<div class="cli${s.checks[i]?' checked':''}" id="cw-${id}-${i}"><input type="checkbox" id="cb-${id}-${i}" ${s.checks[i]?'checked':''} onchange="toggleCL(${id},${i},this.checked)"><label class="clt" for="cb-${id}-${i}">${item}</label><button class="dx" onclick="delCL(${id},${i})">×</button></div>`).join('');
+
+  const docsHTML=docs.map((d,i)=>{
+    const links=(s.links&&s.links[i])||[];
+    const linksHTML=links.length
+      ? links.map((l,li)=>`<div class="link-row"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg><a href="${l.url}" target="_blank" title="${l.url}">${l.label||l.url}</a><button class="lx" onclick="removeLink(${id},${i},${li})" title="Remove link">×</button></div>`).join('')
+      : `<span class="link-empty">No links added — paste a Google Drive, SharePoint, or any URL below</span>`;
+    return`<div class="doc-item"><div class="doc-row"><div class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="doc-text">${d}</div><div class="doc-actions"><button class="btn btn-danger btn-xs" onclick="delDoc(${id},${i})">Remove</button></div></div><div class="doc-link-zone"><div id="lz-${id}-${i}">${linksHTML}</div><div class="link-add-row"><input type="text" id="li-${id}-${i}" placeholder="Paste Google Drive / SharePoint / any URL…" onkeydown="if(event.key==='Enter')addLink(${id},${i})"><button class="btn btn-secondary btn-xs" onclick="addLink(${id},${i})">+ Add Link</button></div></div></div>`;
+  }).join('');
+
+  document.getElementById('detailPane').innerHTML=`<div class="dcontent">
+  <div class="dhead">
+    <div><div class="did">Control ${String(id).slice(-6)}${c.custom?' · Custom':''}</div><div class="dtitle">${c.name}</div></div>
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
+      ${c.custom?`<button class="btn btn-secondary btn-sm" onclick="openEditModal(${id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button><button class="btn btn-danger btn-sm" onclick="deleteControl(${id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>Delete</button>`:''}
+      <select id="ssel-${id}" onchange="setStatus(${id},this.value)" style="padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid var(--border);outline:none;background:var(--surface);font-family:var(--sans);">${statusOpts}</select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Compliance Framework Mapping</div></div>
+    <div class="card-bd"><div class="fw-map">${fwHTML}</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>MITRE ATT&CK Threat Techniques</div><span style="font-size:9px;color:var(--txt3);">enterprise.attack.mitre.org</span></div>
+    <div class="card-bd"><div class="mitre-grid">${mitreHTML}</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Associated Risks</div><span style="font-size:9px;color:var(--txt3);" id="rc-${id}">${risks.length} risks · hover to remove</span></div>
+    <div class="card-bd"><div class="risk-tags" id="rt-${id}">${risksHTML}</div>
+    <div class="add-row"><input type="text" id="nr-${id}" placeholder="Add a risk (Enter or click +)" onkeydown="if(event.key==='Enter')addRisk(${id})"><button class="btn btn-secondary btn-xs" onclick="addRisk(${id})">+ Add Risk</button></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Audit Checklist</div><span style="font-size:9px;color:var(--txt3);" id="cc-${id}">${clDone}/${c.checklists.length} completed</span></div>
+    <div class="card-bd"><div class="checklist" id="cl-${id}">${clHTML}</div>
+    <div class="add-row"><input type="text" id="ncl-${id}" placeholder="Add a checklist step (Enter or click +)" onkeydown="if(event.key==='Enter')addCL(${id})"><button class="btn btn-secondary btn-xs" onclick="addCL(${id})">+ Add Step</button></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Documentation &amp; Evidence Links</div><span style="font-size:9px;color:var(--txt3);">Paste Google Drive, SharePoint, OneDrive, or any URL per item</span></div>
+    <div class="card-bd"><div class="doc-list" id="dl-${id}">${docsHTML}</div>
+    <div class="add-row"><input type="text" id="nd-${id}" placeholder="Add a documentation reference (Enter or click +)" onkeydown="if(event.key==='Enter')addDoc(${id})"><button class="btn btn-secondary btn-xs" onclick="addDoc(${id})">+ Add Doc</button></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Auditor Assessment</div></div>
+    <div class="card-bd">
+      <div class="two-col" style="margin-bottom:11px;">
+        <div class="fg"><div class="fl">Overall Status</div><select class="fs" onchange="setStatus(${id},this.value)">${statusOpts}</select></div>
+        <div class="fg"><div class="fl">Finding Risk Rating</div><select class="fs" onchange="setField(${id},'risk',this.value)">${riskOpts}</select></div>
+        <div class="fg"><div class="fl">Reviewed By</div><input class="fi" type="text" placeholder="Auditor name/ID" value="${s.reviewer}" onchange="setField(${id},'reviewer',this.value)"></div>
+        <div class="fg"><div class="fl">Review Date</div><input class="fi" type="date" value="${s.revDate}" onchange="setField(${id},'revDate',this.value)"></div>
+      </div>
+      <div class="fg" style="margin-bottom:11px;"><div class="fl">Evidence Reference</div><input class="fi" type="text" placeholder="Ticket #, SharePoint URL, folder path, document ID…" value="${s.evRef}" onchange="setField(${id},'evRef',this.value)"></div>
+      <div class="fg" style="margin-bottom:11px;"><div class="fl">Auditor Notes / Observations</div><textarea class="fta" placeholder="Testing approach, scope, observations, and context…" onchange="setField(${id},'note',this.value)">${s.note}</textarea></div>
+      <div class="two-col">
+        <div class="fg"><div class="fl">Finding Description</div><textarea class="fta" style="min-height:65px;" placeholder="Gaps, deficiencies, or exceptions found…" onchange="setField(${id},'finding',this.value)">${s.finding}</textarea></div>
+        <div class="fg"><div class="fl">Recommendation</div><textarea class="fta" style="min-height:65px;" placeholder="Corrective actions for management…" onchange="setField(${id},'rec',this.value)">${s.rec}</textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dfooter">
+    <div class="lu" id="lu-${id}">${s.lastSaved?'Saved: '+new Date(s.lastSaved).toLocaleString():'Not yet saved'}</div>
+    <div style="display:flex;gap:7px;">
+      <button class="btn btn-secondary btn-sm" onclick="resetControl(${id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Reset</button>
+      <button class="btn btn-primary btn-sm" onclick="saveControl(${id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Control</button>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ── LINK MANAGEMENT ──
+function addLink(cid, docIdx) {
+  const inp = document.getElementById(`li-${cid}-${docIdx}`);
+  let url = inp.value.trim();
+  if (!url) return;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+  if (!ST[cid].links) ST[cid].links = {};
+  if (!ST[cid].links[docIdx]) ST[cid].links[docIdx] = [];
+  // Auto-label common cloud services
+  let label = url;
+  if (url.includes('drive.google.com')) label = 'Google Drive';
+  else if (url.includes('sharepoint.com')) label = 'SharePoint';
+  else if (url.includes('onedrive.live.com') || url.includes('1drv.ms')) label = 'OneDrive';
+  else if (url.includes('dropbox.com')) label = 'Dropbox';
+  else if (url.includes('docs.google.com')) label = url.includes('/spreadsheets') ? 'Google Sheet' : url.includes('/presentation') ? 'Google Slides' : 'Google Doc';
+  else { try { label = new URL(url).hostname.replace('www.',''); } catch(e) { label = url.length > 40 ? url.slice(0,38)+'…' : url; } }
+  ST[cid].links[docIdx].push({ url, label });
+  inp.value = '';
+  persist();
+  refreshLinks(cid, docIdx);
+  showToast('Link added ✓');
+}
+function removeLink(cid, docIdx, linkIdx) {
+  ST[cid].links[docIdx].splice(linkIdx, 1);
+  persist();
+  refreshLinks(cid, docIdx);
+}
+function refreshLinks(cid, docIdx) {
+  const el = document.getElementById(`lz-${cid}-${docIdx}`);
+  if (!el) return;
+  const links = (ST[cid].links && ST[cid].links[docIdx]) || [];
+  if (!links.length) {
+    el.innerHTML = `<span class="link-empty">No links added — paste a Google Drive, SharePoint, or any URL below</span>`;
+    return;
+  }
+  el.innerHTML = links.map((l, li) =>
+    `<div class="link-row"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg><a href="${l.url}" target="_blank" title="${l.url}">${l.label}</a><button class="lx" onclick="removeLink(${cid},${docIdx},${li})">×</button></div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// INLINE ADD/DELETE
+// ══════════════════════════════════════════════════════════════
+function addRisk(id){const i=document.getElementById(`nr-${id}`);const v=i.value.trim();if(!v)return;ST[id].risks.push(v);i.value='';persist();const el=document.getElementById(`rt-${id}`);if(el){el.innerHTML=ST[id].risks.map((r,j)=>`<span class="rtag">${r}<button class="dx" onclick="delRisk(${id},${j})">×</button></span>`).join('');const rc=document.getElementById(`rc-${id}`);if(rc)rc.textContent=ST[id].risks.length+' risks · hover to remove';}}
+function delRisk(id,i){ST[id].risks.splice(i,1);persist();const el=document.getElementById(`rt-${id}`);if(el)el.innerHTML=ST[id].risks.map((r,j)=>`<span class="rtag">${r}<button class="dx" onclick="delRisk(${id},${j})">×</button></span>`).join('');}
+function addCL(id){const i=document.getElementById(`ncl-${id}`);const v=i.value.trim();if(!v)return;const c=controls.find(x=>x.id===id);c.checklists.push(v);ST[id].checks.push(false);i.value='';persist();const el=document.getElementById(`cl-${id}`);if(el){el.innerHTML=c.checklists.map((item,j)=>`<div class="cli${ST[id].checks[j]?' checked':''}" id="cw-${id}-${j}"><input type="checkbox" id="cb-${id}-${j}" ${ST[id].checks[j]?'checked':''} onchange="toggleCL(${id},${j},this.checked)"><label class="clt" for="cb-${id}-${j}">${item}</label><button class="dx" onclick="delCL(${id},${j})">×</button></div>`).join('');const cc=document.getElementById(`cc-${id}`);if(cc)cc.textContent=`${ST[id].checks.filter(Boolean).length}/${c.checklists.length} completed`;}}
+function delCL(id,i){const c=controls.find(x=>x.id===id);c.checklists.splice(i,1);ST[id].checks.splice(i,1);persist();const el=document.getElementById(`cl-${id}`);if(el){el.innerHTML=c.checklists.map((item,j)=>`<div class="cli${ST[id].checks[j]?' checked':''}" id="cw-${id}-${j}"><input type="checkbox" id="cb-${id}-${j}" ${ST[id].checks[j]?'checked':''} onchange="toggleCL(${id},${j},this.checked)"><label class="clt" for="cb-${id}-${j}">${item}</label><button class="dx" onclick="delCL(${id},${j})">×</button></div>`).join('');}}
+function addDoc(id){const i=document.getElementById(`nd-${id}`);const v=i.value.trim();if(!v)return;ST[id].docs.push(v);i.value='';persist();renderDetail(id);}
+function delDoc(id,i){ST[id].docs.splice(i,1);if(ST[id].links&&ST[id].links[i]){delete ST[id].links[i];const nl={};Object.keys(ST[id].links).forEach(k=>{const kn=parseInt(k);if(kn<i)nl[k]=ST[id].links[k];else if(kn>i)nl[kn-1]=ST[id].links[k];});ST[id].links=nl;}persist();renderDetail(id);}
+function toggleCL(id,i,val){ST[id].checks[i]=val;const w=document.getElementById(`cw-${id}-${i}`);if(w)w.classList.toggle('checked',val);const c=controls.find(x=>x.id===id);const cc=document.getElementById(`cc-${id}`);if(cc)cc.textContent=`${ST[id].checks.filter(Boolean).length}/${c.checklists.length} completed`;persist();}
+function setStatus(id,val){ST[id].status=val;document.querySelectorAll(`[id^="ssel-${id}"]`).forEach(el=>el.value=val);persist();renderList();updateStats();}
+function setField(id,f,v){ST[id][f]=v;persist();}
+function saveControl(id){ST[id].lastSaved=Date.now();persist();renderList();updateStats();const lu=document.getElementById(`lu-${id}`);if(lu)lu.textContent='Saved: '+new Date().toLocaleString();showToast('Control saved ✓');}
+function resetControl(id){if(!confirm('Reset assessment data?'))return;const c=controls.find(x=>x.id===id);ST[id]={status:'pending',checks:new Array(c.checklists.length).fill(false),risks:[...c.risks],docs:[...c.docs],links:{},note:'',finding:'',risk:'low',rec:'',evRef:'',reviewer:'',revDate:'',lastSaved:null};persist();renderDetail(id);renderList();updateStats();showToast('Reset ✓');}
+function saveAll(){persist();updateStats();showToast('All data saved ✓');}
+
+// ══════════════════════════════════════════════════════════════
+// ADD/EDIT MODAL
+// ══════════════════════════════════════════════════════════════
+function addDyn(listId,ph){const l=document.getElementById(listId);const d=document.createElement('div');d.className='dynitem';d.innerHTML=`<input type="text" placeholder="${ph}"><button class="ddel" onclick="this.parentElement.remove()">×</button>`;l.appendChild(d);d.querySelector('input').focus();}
+function getDynVals(id){return[...document.querySelectorAll(`#${id} input`)].map(i=>i.value.trim()).filter(Boolean);}
+function setDynVals(id,vals,ph){const l=document.getElementById(id);l.innerHTML='';vals.forEach(v=>{const d=document.createElement('div');d.className='dynitem';d.innerHTML=`<input type="text" value="${v.replace(/"/g,'&quot;')}" placeholder="${ph}"><button class="ddel" onclick="this.parentElement.remove()">×</button>`;l.appendChild(d);});}
+function openAddModal(){editId=null;document.getElementById('modalTitle').textContent='Add Custom Control';document.getElementById('mc_name').value='';setDynVals('mc_risks',[''],'Enter a risk…');setDynVals('mc_checks',[''],'Checklist step…');setDynVals('mc_docs',[''],'Policy / procedure / tool reference…');document.getElementById('controlModal').classList.add('open');}
+function openEditModal(id){const c=controls.find(x=>x.id===id);const s=ST[id];editId=id;document.getElementById('modalTitle').textContent='Edit: '+c.name;document.getElementById('mc_name').value=c.name;setDynVals('mc_risks',s.risks.length?s.risks:c.risks,'Enter a risk…');setDynVals('mc_checks',c.checklists,'Checklist step…');setDynVals('mc_docs',s.docs.length?s.docs:c.docs,'Policy / procedure / tool reference…');document.getElementById('controlModal').classList.add('open');}
+function closeModal(){document.getElementById('controlModal').classList.remove('open');editId=null;}
+function saveFromModal(){
+  const name=document.getElementById('mc_name').value.trim();if(!name){alert('Name required.');return;}
+  const risks=getDynVals('mc_risks');if(!risks.length){alert('Add at least one risk.');return;}
+  const checks=getDynVals('mc_checks');const docs=getDynVals('mc_docs');
+  if(editId!==null){const c=controls.find(x=>x.id===editId);c.name=name;c.checklists=checks;while(ST[c.id].checks.length<checks.length)ST[c.id].checks.push(false);ST[c.id].checks=ST[c.id].checks.slice(0,checks.length);ST[c.id].risks=risks;ST[c.id].docs=docs;persist();closeModal();renderList();renderDetail(editId);updateStats();showToast('Control updated ✓');}
+  else{const nid=Date.now();controls.push({id:nid,name,custom:true,risks,checklists:checks,docs});ST[nid]={status:'pending',checks:new Array(checks.length).fill(false),risks:[...risks],docs:[...docs],links:{},note:'',finding:'',risk:'low',rec:'',evRef:'',reviewer:'',revDate:'',lastSaved:null};persist();closeModal();renderList();updateStats();selectControl(nid);showToast('Custom control added ✓');}
+}
+function deleteControl(id){if(!confirm('Delete this custom control?'))return;controls=controls.filter(x=>x.id!==id);delete ST[id];persist();selId=null;renderList();updateStats();document.getElementById('detailPane').innerHTML='<div class="d-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg><h3>Control Deleted</h3><p>Select another control.</p></div>';showToast('Deleted');}
+
+// ══════════════════════════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════════════════════════
+function updateStats(){
+  const cnt={pass:0,fail:0,partial:0,pending:0,na:0};
+  controls.forEach(c=>cnt[ST[c.id]?.status||'pending']++);
+  const total=controls.length,done=cnt.pass+cnt.fail+cnt.partial+cnt.na,pct=total?Math.round(done/total*100):0;
+  document.getElementById('progressLabel').textContent=`${pct}% Complete`;
+  document.getElementById('progressPass').style.width=total?(cnt.pass/total*100)+'%':'0%';
+  document.getElementById('progressPartial').style.width=total?(cnt.partial/total*100)+'%':'0%';
+  document.getElementById('progressFail').style.width=total?(cnt.fail/total*100)+'%':'0%';
+}
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════
+function renderDashboard(){
+  const cnt={pass:0,fail:0,partial:0,pending:0,na:0};
+  controls.forEach(c=>cnt[ST[c.id]?.status||'pending']++);
+  const total=controls.length,done=cnt.pass+cnt.fail+cnt.partial+cnt.na;
+  const entity=document.getElementById('entityName').value||'—';
+  const period=document.getElementById('auditPeriod').value||'—';
+  const auditor=document.getElementById('auditorName').value||'—';
+
+  // Compliance coverage
+  const fwCoverage={};
+  Object.keys(FW_META).forEach(fw=>{
+    const mapped=controls.filter(c=>FW_META[fw].codes[c.name]);
+    const passed=mapped.filter(c=>ST[c.id]?.status==='pass').length;
+    fwCoverage[fw]={total:mapped.length,pass:passed,pct:mapped.length?Math.round(passed/mapped.length*100):0};
+  });
+
+  // Risk distribution
+  const riskDist={critical:0,high:0,medium:0,low:0,informational:0};
+  controls.forEach(c=>{if(ST[c.id]?.finding)riskDist[ST[c.id].risk||'low']++;});
+
+  // Controls needing attention
+  const attention=controls.filter(c=>['fail','partial'].includes(ST[c.id]?.status)).slice(0,8);
+
+  // Checklist completion
+  const clTotal=controls.reduce((s,c)=>s+c.checklists.length,0);
+  const clDone=controls.reduce((s,c)=>s+ST[c.id].checks.filter(Boolean).length,0);
+  const clPct=clTotal?Math.round(clDone/clTotal*100):0;
+
+  // Link count
+  const linkCount=controls.reduce((s,c)=>s+Object.values(ST[c.id].links||{}).reduce((ss,la)=>ss+(la?.length||0),0),0);
+
+  // Donut SVG
+  function donut(data,size=120){
+    const total=data.reduce((s,d)=>s+d.v,0);if(!total)return`<svg width="${size}" height="${size}"><circle cx="${size/2}" cy="${size/2}" r="${size/2-10}" fill="none" stroke="#E0E0E0" stroke-width="18"/></svg>`;
+    let offset=0;const r=size/2-12;const cx=size/2;const circ=2*Math.PI*r;
+    let paths='';
+    data.forEach(d=>{
+      if(!d.v)return;
+      const pct=d.v/total;const dash=circ*pct;
+      paths+=`<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${d.c}" stroke-width="20" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset*circ/total*circ}" transform="rotate(-90 ${cx} ${cx})" opacity="0.9"/>`;
+      offset+=d.v;
+    });
+    return`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}<text x="${cx}" y="${cx+5}" text-anchor="middle" font-family="IBM Plex Mono" font-size="16" font-weight="700" fill="#1C1B18">${total}</text></svg>`;
+  }
+
+  const statusData=[{v:cnt.pass,c:'#1A5C36',l:'Pass'},{v:cnt.fail,c:'#B83232',l:'Fail'},{v:cnt.partial,c:'#A04A00',l:'Partial'},{v:cnt.pending,c:'#3D2B80',l:'Pending'},{v:cnt.na,c:'#888480',l:'N/A'}];
+  const riskData=[{v:riskDist.critical,c:'#7B0000',l:'Critical'},{v:riskDist.high,c:'#B83232',l:'High'},{v:riskDist.medium,c:'#A04A00',l:'Medium'},{v:riskDist.low,c:'#1A5C36',l:'Low'},{v:riskDist.informational,c:'#888480',l:'Info'}];
+
+  // Framework coverage bars
+  const fwBarsHTML=Object.entries(fwCoverage).map(([fw,{total:ft,pass:fp,pct}])=>`
+    <div class="bar-row">
+      <div class="bar-label">${fw}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)'};"></div></div>
+      <div class="bar-pct">${pct}%</div>
+      <div style="font-size:10px;color:var(--txt3);font-family:var(--mono);min-width:40px;">${fp}/${ft}</div>
+    </div>`).join('');
+
+  // Attention table
+  const attnHTML=attention.length?attention.map(c=>{
+    const s=ST[c.id];
+    const sc={fail:'var(--red)',partial:'var(--amber)'};
+    const fws=Object.keys(FW_META).filter(fw=>FW_META[fw].codes[c.name]).slice(0,2);
+    return`<tr onclick="switchTab('audit');setTimeout(()=>selectControl(${c.id}),50)" style="cursor:pointer;"><td style="font-weight:600;">${c.name}</td><td><span style="color:${sc[s.status]};font-weight:700;font-size:11px;">${s.status.toUpperCase()}</span></td><td style="font-size:11px;">${fws.map(fw=>`<span class="fw-chip ${FW_META[fw].cls}">${fw}</span>`).join(' ')}</td><td style="font-size:11px;color:var(--txt2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.finding||'—'}</td></tr>`;
+  }).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--txt3);padding:16px;">No failing or partial controls</td></tr>';
+
+  document.getElementById('dashContent').innerHTML=`
+  <div style="padding:22px;">
+    <div class="dash-topbar">
+      <div>
+        <div class="dash-title">Audit Dashboard</div>
+        <div class="dash-meta">${entity} · ${period} · Lead: ${auditor} · Generated: ${new Date().toLocaleString()}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('reports')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Reports
+        </button>
+        <button class="btn btn-accent btn-sm" onclick="window.print()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi"><span class="kpi-val" style="color:var(--accent)">${total}</span><div class="kpi-label">Total Controls</div><div class="kpi-sub">${controls.filter(c=>c.custom).length} custom added</div></div>
+      <div class="kpi"><span class="kpi-val" style="color:var(--green)">${cnt.pass}</span><div class="kpi-label">Pass</div><div class="kpi-sub">${total?Math.round(cnt.pass/total*100):0}% of controls</div></div>
+      <div class="kpi"><span class="kpi-val" style="color:var(--red)">${cnt.fail}</span><div class="kpi-label">Fail</div><div class="kpi-sub">${total?Math.round(cnt.fail/total*100):0}% of controls</div></div>
+      <div class="kpi"><span class="kpi-val" style="color:var(--amber)">${cnt.partial}</span><div class="kpi-label">Partial</div><div class="kpi-sub">${total?Math.round(cnt.partial/total*100):0}% of controls</div></div>
+      <div class="kpi"><span class="kpi-val" style="color:var(--purple)">${cnt.pending}</span><div class="kpi-label">Pending</div><div class="kpi-sub">Not yet assessed</div></div>
+      <div class="kpi"><span class="kpi-val" style="color:var(--gold)">${clPct}%</span><div class="kpi-label">Checklist Done</div><div class="kpi-sub">${clDone}/${clTotal} steps completed</div></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dcard">
+        <div class="dcard-hd">Control Status Distribution</div>
+        <div class="dcard-bd" style="display:flex;align-items:center;gap:24px;">
+          <div class="chart-wrap">${donut(statusData,130)}</div>
+          <div class="donut-legend" style="flex:1;">${statusData.map(d=>`<div class="dl-row"><div class="dl-dot" style="background:${d.c}"></div><div class="dl-label">${d.l}</div><div class="dl-val">${d.v}</div></div>`).join('')}</div>
+        </div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-hd">Framework Compliance Coverage</div>
+        <div class="dcard-bd">${fwBarsHTML}</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dcard">
+        <div class="dcard-hd">Finding Risk Distribution</div>
+        <div class="dcard-bd" style="display:flex;align-items:center;gap:24px;">
+          <div class="chart-wrap">${donut(riskData,120)}</div>
+          <div class="donut-legend" style="flex:1;">${riskData.map(d=>`<div class="dl-row"><div class="dl-dot" style="background:${d.c}"></div><div class="dl-label">${d.l}</div><div class="dl-val">${d.v}</div></div>`).join('')}</div>
+        </div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-hd">Evidence &amp; Coverage Summary</div>
+        <div class="dcard-bd">
+          ${[
+            ['Controls Completed',done,total,'var(--green)'],
+            ['Controls with Findings',controls.filter(c=>ST[c.id].finding).length,total,'var(--amber)'],
+            ['Controls with Evidence Refs',controls.filter(c=>ST[c.id].evRef).length,total,'var(--blue)'],
+            ['Evidence Links Added',linkCount,'— links across all controls','var(--purple)'],
+            ['Checklist Completion',clPct+'%',clDone+'/'+clTotal+' steps','var(--gold)']
+          ].map(([lbl,val,sub,col])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><div style="font-size:12.5px;font-weight:600;">${lbl}</div><div style="font-size:10.5px;color:var(--txt3);">${sub}</div></div><div style="font-family:var(--mono);font-size:16px;font-weight:700;color:${col};">${val}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="dcard" style="margin-bottom:14px;">
+      <div class="dcard-hd">Controls Requiring Attention (Fail / Partial) <span style="font-weight:400;font-size:9px;">— click row to open control</span></div>
+      <div class="dcard-bd" style="padding:0;">
+        <table class="risk-table">
+          <thead><tr><th>Control</th><th>Status</th><th>Frameworks</th><th>Finding</th></tr></thead>
+          <tbody>${attnHTML}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// REPORTS
+// ══════════════════════════════════════════════════════════════
+function selectReport(type){
+  selectedReport=type;
+  document.querySelectorAll('.rep-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('rcard-'+type).classList.add('selected');
+}
+function generateReport(){
+  const entity=document.getElementById('rep_entity').value||document.getElementById('entityName').value||'Unknown Entity';
+  const period=document.getElementById('rep_period').value||document.getElementById('auditPeriod').value||'';
+  const auditor=document.getElementById('rep_auditor').value||document.getElementById('auditorName').value||'';
+  const date=document.getElementById('rep_date').value||new Date().toISOString().slice(0,10);
+  const classification=document.getElementById('rep_class').value||'CONFIDENTIAL';
+  const scope=document.getElementById('rep_scope').value||'full';
+  if(selectedReport==='xls') exportCSV(entity,period,auditor,classification,scope);
+  else if(selectedReport==='doc') exportDoc(entity,period,auditor,date,classification,scope);
+  else exportPDF();
+}
+function exportCSV(entity,period,auditor,cls,scope){
+  const cnt={pass:0,fail:0,partial:0,pending:0,na:0};
+  controls.forEach(c=>cnt[ST[c.id]?.status||'pending']++);
+  let rows=controls;
+  if(scope==='failed') rows=controls.filter(c=>['fail','partial'].includes(ST[c.id]?.status));
+  const h=['#','Control Name','Type','Status','Risk Rating','NIST CSF','NIST 800-53','SOX ITGC','ISO 27001','PCI-DSS','COBIT','Risks','Checklist Done','Checklist Total','Reviewer','Review Date','Evidence Ref','Evidence Links','Finding','Recommendation','Notes'];
+  const data=rows.map((c,i)=>{const s=ST[c.id];const getFw=fw=>FW_META[fw]?.codes[c.name]||'—';
+    const allLinks=Object.values(s.links||{}).flat().map(l=>l.url).join(' | ');
+    return[i+1,c.name,c.custom?'Custom':'Standard',s.status.toUpperCase(),s.risk,(s.risks||c.risks).join('; '),getFw('NIST CSF'),getFw('NIST 800-53'),getFw('SOX ITGC'),getFw('ISO 27001'),getFw('PCI-DSS'),getFw('COBIT'),s.checks.filter(Boolean).length,c.checklists.length,s.reviewer,s.revDate,s.evRef,allLinks,s.finding,s.rec,s.note].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',');});
+  const csv=[`"${cls} — ITGC Audit Report"`,`"Entity: ${entity} | Period: ${period} | Auditor: ${auditor}"`,`"Total: ${controls.length} | Pass: ${cnt.pass} | Fail: ${cnt.fail} | Partial: ${cnt.partial} | Pending: ${cnt.pending}"`,``,h.map(x=>`"${x}"`).join(','),...data].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`ITGC_Report_${entity.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  showToast('CSV exported ✓');
+}
+function exportDoc(entity,period,auditor,date,cls,scope){
+  const cnt={pass:0,fail:0,partial:0,pending:0,na:0};
+  controls.forEach(c=>cnt[ST[c.id]?.status||'pending']++);
+  const total=controls.length,done=cnt.pass+cnt.fail+cnt.partial+cnt.na;
+  let rows=controls;
+  if(scope==='failed') rows=controls.filter(c=>['fail','partial'].includes(ST[c.id]?.status));
+  else if(scope==='findings') rows=controls.filter(c=>ST[c.id].finding);
+
+  const tableRows=rows.map((c,i)=>{const s=ST[c.id];const fws=Object.keys(FW_META).filter(fw=>FW_META[fw].codes[c.name]).map(fw=>`${fw}: ${FW_META[fw].codes[c.name]}`).join('<br>');const sc={pass:'#1A5C36',fail:'#B83232',partial:'#A04A00',pending:'#3D2B80',na:'#888'}[s.status];
+    const allLinks=Object.values(s.links||{}).flat().map(l=>`<a href="${l.url}">${l.label}</a>`).join('<br>')||'—';
+    return`<tr><td>${i+1}</td><td><strong>${c.name}</strong>${c.custom?'<br><em style="font-size:10px;color:#A67C00;">Custom</em>':''}</td><td><span style="color:${sc};font-weight:700;">${s.status.toUpperCase()}</span></td><td style="font-size:11px;">${s.risk||'—'}</td><td style="font-size:10px;">${fws}</td><td>${s.finding||'—'}</td><td>${s.rec||'—'}</td><td>${s.evRef||'—'}</td><td style="font-size:10px;">${allLinks}</td><td>${s.reviewer||'—'}</td><td>${s.revDate||'—'}</td></tr>`;}).join('');
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ITGC Audit Report</title><style>
+    body{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#1C1B18;margin:0;padding:20px 40px;}
+    .cover{text-align:center;padding:60px 0 40px;border-bottom:3px solid #0F2D4A;margin-bottom:30px;}
+    .cover-cls{font-size:11px;font-weight:700;letter-spacing:2px;color:#B83232;text-transform:uppercase;margin-bottom:12px;}
+    .cover-title{font-size:28px;font-weight:700;color:#0F2D4A;margin-bottom:8px;}
+    .cover-sub{font-size:14px;color:#52504A;margin-bottom:20px;}
+    .cover-meta{font-size:11px;color:#888480;}
+    .section{margin-bottom:28px;}
+    .section-title{font-size:14px;font-weight:700;color:#0F2D4A;border-bottom:2px solid #0F2D4A;padding-bottom:5px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;}
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+    .kpi{border:1px solid #D9D6CE;border-radius:6px;padding:12px;text-align:center;}
+    .kpi-v{font-size:24px;font-weight:700;display:block;}
+    .kpi-l{font-size:10px;color:#888480;text-transform:uppercase;letter-spacing:0.5px;}
+    table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+    th{background:#0F2D4A;color:#fff;padding:7px 8px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;}
+    td{padding:7px 8px;border-bottom:1px solid #D9D6CE;vertical-align:top;}
+    tr:nth-child(even) td{background:#F6F5F1;}
+    .footer{margin-top:30px;padding-top:10px;border-top:1px solid #D9D6CE;font-size:10px;color:#888480;display:flex;justify-content:space-between;}
+    @page{margin:1.5cm;}
+  </style></head><body>
+  <div class="cover">
+    <div class="cover-cls">${cls}</div>
+    <div class="cover-title">ITGC Audit Report</div>
+    <div class="cover-sub">${entity} — ${period}</div>
+    <div class="cover-meta">Prepared by: ${auditor} | Date: ${date} | Total Controls: ${total} | Completed: ${done}/${total}</div>
+  </div>
+  ${scope!=='findings'&&scope!=='failed'?`<div class="section"><div class="section-title">Executive Summary</div>
+  <div class="kpi-grid">
+    <div class="kpi"><span class="kpi-v" style="color:#1A5C36">${cnt.pass}</span><div class="kpi-l">Pass</div></div>
+    <div class="kpi"><span class="kpi-v" style="color:#B83232">${cnt.fail}</span><div class="kpi-l">Fail</div></div>
+    <div class="kpi"><span class="kpi-v" style="color:#A04A00">${cnt.partial}</span><div class="kpi-l">Partial</div></div>
+    <div class="kpi"><span class="kpi-v" style="color:#3D2B80">${cnt.pending}</span><div class="kpi-l">Pending</div></div>
+    <div class="kpi"><span class="kpi-v" style="color:#0F2D4A">${total?Math.round((cnt.pass+cnt.fail+cnt.partial+cnt.na)/total*100):0}%</span><div class="kpi-l">Completed</div></div>
+  </div>
+  <p style="font-size:12px;line-height:1.7;color:#52504A;">This report covers <strong>${total} IT General Controls (ITGC)</strong> assessed during the ${period} audit of <strong>${entity}</strong>. Of controls assessed: <strong>${cnt.pass} passed</strong>, <strong>${cnt.fail} failed</strong>, and <strong>${cnt.partial} were partially compliant</strong>. ${cnt.fail+cnt.partial} controls require management attention and remediation action plans.</p>
+  </div>`:''}
+  <div class="section"><div class="section-title">Control Assessment Details</div>
+  <table><thead><tr><th>#</th><th>Control</th><th>Status</th><th>Risk</th><th>Framework Mapping</th><th>Finding</th><th>Recommendation</th><th>Evidence Ref</th><th>Evidence Links</th><th>Reviewer</th><th>Date</th></tr></thead>
+  <tbody>${tableRows}</tbody></table></div>
+  <div class="footer"><span>${cls} — ${entity} — ${period}</span><span>Generated: ${new Date().toLocaleString()}</span><span>Prepared by: ${auditor}</span></div>
+  </body></html>`;
+
+  const a=document.createElement('a');a.href='data:text/html;charset=utf-8,'+encodeURIComponent(html);a.download=`ITGC_Report_${entity.replace(/\s+/g,'_')}_${date}.html`;a.click();
+  showToast('Word-ready report downloaded ✓');
+}
+function exportPDF(){switchTab('dash');setTimeout(()=>{window.print();},400);}
+
+// ══════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════
+document.querySelectorAll('.moverlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2400);}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+initState();renderList();updateStats();
+</script>
+</body>
+</html>
