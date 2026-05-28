@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Healthcare Workflow & Billing Configuration</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root{
+  --primary:#0066cc; --primary-dark:#004499; --accent:#ff6b35;
+  --success:#27ae60; --warning:#f39c12; --danger:#e74c3c;
+  --text-dark:#1a1a2e; --text-light:#666; --border:#ddd;
+  --bg-light:#ffffff; --bg-secondary:#f0f4f9;
+}
+body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",sans-serif;
+  background:linear-gradient(135deg,#f5f7fa 0%,#ffffff 100%); color:var(--text-dark);
+  line-height:1.6; min-height:100vh; padding:20px; }
+.container{ max-width:1600px; margin:0 auto; }
+.header{ background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  color:white; padding:34px 40px; border-radius:12px; margin-bottom:22px;
+  box-shadow:0 8px 32px rgba(0,102,204,.15); }
+.header h1{ font-size:2em; margin-bottom:6px; font-weight:700; }
+.header p{ font-size:.96em; opacity:.95; }
+
+/* Tabs */
+.tabs{ display:flex; gap:12px; margin-bottom:24px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:10px; }
+.tabs::-webkit-scrollbar{ height:6px; }
+.tabs::-webkit-scrollbar-thumb{ background:var(--primary); border-radius:10px; }
+.tab-btn{ padding:13px 22px; background:var(--bg-light); border:2px solid var(--border);
+  cursor:pointer; font-size:.95em; font-weight:600; color:var(--text-light); border-radius:10px;
+  transition:all .3s ease; white-space:nowrap; display:flex; align-items:center; gap:8px;
+  flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,.05); }
+.tab-btn:hover{ color:var(--primary); border-color:var(--primary); transform:translateY(-2px); }
+.tab-btn.active{ background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:white; border-color:var(--primary); transform:translateY(-4px); }
+.tab-btn::before{ content:attr(data-icon); font-size:1.15em; }
+
+.tab-content{ display:none; animation:fadeIn .4s ease-out; }
+.tab-content.active{ display:block; }
+@keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+
+/* Patient picker bar inside workflow tabs */
+.picker{ background:var(--bg-light); border:2px solid var(--primary); border-radius:10px;
+  padding:18px 20px; margin-bottom:22px; }
+.picker h3{ font-size:1.05em; margin-bottom:12px; color:var(--primary); }
+.picker-row{ display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+.picker-field{ flex:1; min-width:220px; }
+.picker-field label{ display:block; font-size:.8em; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-light); margin-bottom:6px; }
+.picker-field select, .picker-field input{ width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:.92em; }
+.btn{ padding:10px 18px; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:.9em; transition:all .2s; }
+.btn-primary{ background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; }
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,102,204,.3); }
+.btn-ghost{ background:white; border:1px solid var(--primary); color:var(--primary); }
+.btn-ghost:hover{ background:var(--primary); color:white; }
+.active-chip{ margin-top:12px; padding:10px 14px; border-radius:8px; background:rgba(0,102,204,.06); border-left:4px solid var(--primary); font-size:.9em; display:none; }
+.active-chip.show{ display:block; }
+.active-chip strong{ color:var(--primary); }
+
+/* New-patient inline form */
+.newform{ display:none; margin-top:16px; padding:16px; background:var(--bg-secondary); border-radius:8px; }
+.newform.show{ display:block; }
+.newform-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.newform-grid .fg label{ display:block; font-size:.8em; font-weight:600; margin-bottom:4px; }
+.newform-grid .fg input,.newform-grid .fg select{ width:100%; padding:9px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:.9em; }
+
+/* Dashboard */
+.dashboard-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:18px; margin-bottom:24px; }
+.metric-card{ background:linear-gradient(135deg,var(--bg-light) 0%,var(--bg-secondary) 100%);
+  border:2px solid var(--border); border-radius:10px; padding:18px; text-align:center; position:relative; overflow:hidden; transition:all .3s; }
+.metric-card::before{ content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--primary),var(--accent)); }
+.metric-card:hover{ transform:translateY(-6px); box-shadow:0 12px 32px rgba(0,0,0,.1); }
+.metric-icon{ font-size:2.2em; margin-bottom:8px; }
+.metric-label{ font-size:.82em; color:var(--text-light); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+.metric-value{ font-size:1.9em; font-weight:700; color:var(--primary); margin-bottom:4px; }
+.metric-subtext{ font-size:.76em; color:var(--text-light); }
+.metric-card.critical::before{ background:linear-gradient(90deg,var(--danger),#ff7675); } .metric-card.critical .metric-value{ color:var(--danger); }
+.metric-card.warning::before{ background:linear-gradient(90deg,var(--warning),#ffa940); } .metric-card.warning .metric-value{ color:var(--warning); }
+.metric-card.success::before{ background:linear-gradient(90deg,var(--success),#52c41a); } .metric-card.success .metric-value{ color:var(--success); }
+.dash-note{ background:var(--bg-secondary); border-left:4px solid var(--primary); padding:14px 18px; border-radius:8px; font-size:.86em; }
+
+/* Patients tab */
+.patient-section{ display:grid; grid-template-columns:360px 1fr; gap:20px; }
+.patient-form{ background:var(--bg-light); border:2px solid var(--border); border-radius:10px; padding:20px; height:fit-content; position:sticky; top:20px; }
+.form-group{ margin-bottom:14px; }
+.form-group label{ display:block; font-weight:600; font-size:.86em; margin-bottom:6px; }
+.form-group input,.form-group select,.form-group textarea{ width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:.9em; }
+.form-group textarea{ resize:vertical; min-height:56px; }
+.form-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; } .form-row .form-group{ margin-bottom:0; }
+.btn-add{ width:100%; padding:12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:8px; }
+.patient-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.patient-card{ background:var(--bg-light); border:2px solid var(--border); border-radius:10px; padding:16px; transition:all .3s; }
+.patient-card:hover{ border-color:var(--primary); box-shadow:0 8px 24px rgba(0,102,204,.1); transform:translateY(-4px); }
+.patient-card.critical-priority{ border-left:5px solid var(--danger); }
+.patient-card.high-priority{ border-left:5px solid var(--warning); }
+.patient-card.normal-priority{ border-left:5px solid var(--success); }
+.pbadge{ display:inline-block; padding:4px 8px; border-radius:4px; font-size:.7em; font-weight:700; margin-bottom:8px; }
+.pbadge.critical{ background:rgba(231,76,60,.2); color:var(--danger); }
+.pbadge.high{ background:rgba(243,156,18,.2); color:var(--warning); }
+.pbadge.normal{ background:rgba(39,174,96,.2); color:var(--success); }
+.patient-name{ font-size:1.1em; font-weight:700; margin-bottom:6px; }
+.patient-info{ font-size:.82em; color:var(--text-light); line-height:1.6; }
+.card-actions{ margin-top:10px; display:flex; gap:8px; }
+.mini-btn{ flex:1; padding:6px 8px; font-size:.78em; font-weight:600; border-radius:5px; cursor:pointer; border:1px solid var(--primary); background:white; color:var(--primary); }
+.mini-btn:hover{ background:var(--primary); color:white; } .mini-btn.select{ background:var(--primary); color:white; }
+
+/* Modal */
+.overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; align-items:center; justify-content:center; }
+.overlay.active{ display:flex; }
+.modal{ background:var(--bg-light); border-radius:12px; max-width:860px; width:92%; max-height:88vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+.modal-header{ background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; padding:22px 24px; border-radius:12px 12px 0 0; display:flex; justify-content:space-between; align-items:center; }
+.modal-close{ background:none; border:none; color:white; font-size:1.8em; cursor:pointer; }
+.modal-content{ padding:24px; }
+.pstat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:20px; }
+.pstat{ background:var(--bg-secondary); padding:14px; border-radius:8px; border-left:4px solid var(--primary); text-align:center; }
+.pstat-label{ font-size:.78em; color:var(--text-light); margin-bottom:6px; text-transform:uppercase; font-weight:600; }
+.pstat-value{ font-size:1.4em; font-weight:700; color:var(--primary); }
+.sec-title{ font-size:1.02em; font-weight:700; margin:18px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+.drow{ display:grid; grid-template-columns:190px 1fr; gap:14px; padding:9px 0; border-bottom:1px solid var(--border); }
+.dlabel{ font-weight:700; color:var(--primary); font-size:.88em; }
+.recordlist .rec{ padding:8px 10px; background:var(--bg-secondary); border-radius:6px; margin-bottom:6px; border-left:3px solid var(--accent); font-size:.86em; }
+.btn-del{ margin-top:18px; padding:10px 16px; background:rgba(231,76,60,.15); border:1px solid var(--danger); color:var(--danger); border-radius:6px; cursor:pointer; font-weight:600; }
+.btn-del:hover{ background:var(--danger); color:white; }
+
+/* Duplicate warning modal */
+.dup-modal{ background:var(--bg-light); border-radius:12px; max-width:620px; width:92%; box-shadow:0 20px 60px rgba(0,0,0,.3); overflow:hidden; }
+.dup-header{ background:linear-gradient(135deg,var(--warning),#e67e22); color:white; padding:20px 24px; }
+.dup-header h2{ font-size:1.3em; }
+.dup-body{ padding:24px; }
+.dup-match{ background:rgba(243,156,18,.08); border:1px solid var(--warning); border-radius:8px; padding:14px 16px; margin-bottom:12px; }
+.dup-match .mname{ font-weight:700; font-size:1.05em; color:var(--text-dark); }
+.dup-match .mmeta{ font-size:.85em; color:var(--text-light); margin-top:4px; }
+.dup-score{ display:inline-block; padding:3px 10px; border-radius:12px; background:var(--warning); color:white; font-size:.78em; font-weight:700; margin-top:8px; }
+.dup-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+.dup-actions .btn{ flex:1; min-width:150px; padding:12px; }
+.btn-warn{ background:white; border:1px solid var(--danger); color:var(--danger); }
+.btn-warn:hover{ background:var(--danger); color:white; }
+
+/* Workflow fields */
+.workflow-section{ margin-bottom:34px; padding-bottom:20px; border-bottom:3px solid var(--primary); }
+.workflow-section:last-child{ border-bottom:none; }
+.section-title{ font-size:1.28em; font-weight:700; color:var(--primary); margin-bottom:8px; }
+.section-subtitle{ font-size:.9em; color:var(--text-light); margin-bottom:18px; }
+.data-field{ background:var(--bg-light); border:2px solid var(--border); border-radius:10px; padding:16px; margin-bottom:14px; transition:all .3s; }
+.data-field:hover{ border-color:var(--primary); }
+.data-field.updated{ border-color:var(--success); background:rgba(39,174,96,.06); }
+.field-header{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.field-number{ display:flex; align-items:center; justify-content:center; width:38px; height:38px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; border-radius:50%; font-weight:700; font-size:.82em; flex-shrink:0; }
+.field-title{ font-size:1.02em; font-weight:700; }
+.field-input-group{ margin-left:50px; margin-bottom:12px; }
+.field-label{ font-size:.8em; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; display:block; }
+.field-input{ width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:.92em; }
+textarea.field-input{ resize:vertical; min-height:64px; }
+.field-save{ margin-left:50px; padding:9px 18px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:.88em; }
+.field-save:hover{ background:var(--primary-dark); }
+.workflow-trigger{ margin-left:50px; margin-top:12px; padding:10px; background:var(--bg-secondary); border-left:3px solid var(--accent); border-radius:4px; font-size:.82em; }
+.workflow-trigger-title{ font-weight:700; color:var(--accent); margin-bottom:6px; }
+.locked{ opacity:.45; pointer-events:none; }
+
+@media(max-width:768px){
+  .header{ padding:24px; } .header h1{ font-size:1.5em; }
+  .patient-section{ grid-template-columns:1fr; } .patient-form{ position:static; }
+  .drow{ grid-template-columns:1fr; } .field-input-group,.field-save,.workflow-trigger{ margin-left:0 !important; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🏥 Healthcare Workflow & Billing System</h1>
+    <p>Pick or add a patient in any workflow — duplicates flagged on Name + DOB + phone/email</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-icon="📊" onclick="switchTab('dashboard',this)">Dashboard</button>
+    <button class="tab-btn" data-icon="👥" onclick="switchTab('patients',this)">Patients</button>
+    <button class="tab-btn" data-icon="🏥" onclick="switchTab('clinical',this)">Clinical</button>
+    <button class="tab-btn" data-icon="💳" onclick="switchTab('billing',this)">Billing</button>
+    <button class="tab-btn" data-icon="💊" onclick="switchTab('pharmacy',this)">Pharmacy</button>
+    <button class="tab-btn" data-icon="🧾" onclick="switchTab('vendors',this)">Vendors / A-P</button>
+    <button class="tab-btn" data-icon="💰" onclick="switchTab('revenue',this)">Revenue Cycle</button>
+    <button class="tab-btn" data-icon="🖨️" onclick="switchTab('reports',this)">Reports / Print</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="tab-content active">
+    <div class="dashboard-grid">
+      <div class="metric-card"><div class="metric-icon">👥</div><div class="metric-label">Total Patients</div><div class="metric-value" id="m-total">0</div><div class="metric-subtext">Active in system</div></div>
+      <div class="metric-card critical"><div class="metric-icon">🚨</div><div class="metric-label">Emergency Cases</div><div class="metric-value" id="m-emergency">0</div><div class="metric-subtext">Critical priority</div></div>
+      <div class="metric-card warning"><div class="metric-icon">⚠️</div><div class="metric-label">High Priority</div><div class="metric-value" id="m-high">0</div><div class="metric-subtext">High priority patients</div></div>
+      <div class="metric-card"><div class="metric-icon">💵</div><div class="metric-label">Outstanding Bills</div><div class="metric-value" id="m-outstanding">$0</div><div class="metric-subtext">Patient balances due</div></div>
+      <div class="metric-card success"><div class="metric-icon">📥</div><div class="metric-label">Accounts Receivable</div><div class="metric-value" id="m-ar">$0</div><div class="metric-subtext">Submitted, unpaid claims</div></div>
+      <div class="metric-card"><div class="metric-icon">🧾</div><div class="metric-label">Accounts Payable</div><div class="metric-value" id="m-ap">$0</div><div class="metric-subtext">Unpaid vendor invoices</div></div>
+      <div class="metric-card success"><div class="metric-icon">💚</div><div class="metric-label">Collected</div><div class="metric-value" id="m-collected">$0</div><div class="metric-subtext">Paid claims</div></div>
+      <div class="metric-card"><div class="metric-icon">🏥</div><div class="metric-label">Admitted Today</div><div class="metric-value" id="m-admitted">0</div><div class="metric-subtext">New admissions</div></div>
+      <div class="metric-card"><div class="metric-icon">✅</div><div class="metric-label">Discharged</div><div class="metric-value" id="m-discharged">0</div><div class="metric-subtext">Completed</div></div>
+      <div class="metric-card"><div class="metric-icon">📤</div><div class="metric-label">Claims Submitted</div><div class="metric-value" id="m-submitted">0</div><div class="metric-subtext">Sent to payers</div></div>
+      <div class="metric-card warning"><div class="metric-icon">❌</div><div class="metric-label">Denied Claims</div><div class="metric-value" id="m-denied">0</div><div class="metric-subtext">Actual denials</div></div>
+      <div class="metric-card success"><div class="metric-icon">📊</div><div class="metric-label">Clean Claim Rate</div><div class="metric-value" id="m-clean">—</div><div class="metric-subtext">Paid ÷ submitted</div></div>
+    </div>
+    <div class="dash-note"><strong>Every number is a live sum of real per-patient data.</strong> Outstanding Bills = patient balances. A/R = charges on Submitted/Accepted claims. Collected = Paid claims. Denied = count of Denied claims. A/P = unpaid vendor invoices. No invented multipliers.</div>
+    <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="printReport('financial')">🖨️ Print Financial Report</button>
+      <button class="btn btn-primary" onclick="printReport('clinical')">🖨️ Print Census Report</button>
+      <button class="btn btn-primary" onclick="printReport('snapshot')">🖨️ Print Full System Snapshot</button>
+    </div>
+  </div>
+
+  <!-- PATIENTS -->
+  <div id="patients" class="tab-content">
+    <div class="patient-section">
+      <div class="patient-form">
+        <h3>➕ Add New Patient</h3>
+        <div class="form-group"><label>First Name *</label><input type="text" id="p-first" placeholder="John"></div>
+        <div class="form-group"><label>Last Name *</label><input type="text" id="p-last" placeholder="Doe"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Date of Birth *</label><input type="date" id="p-dob"></div>
+          <div class="form-group"><label>Gender</label><select id="p-gender"><option value="">—</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+        </div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="p-phone" placeholder="(555) 000-0000"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="p-email" placeholder="john@example.com"></div>
+        <div class="form-group"><label>Insurance Provider</label><input type="text" id="p-insurance" placeholder="e.g., Blue Cross"></div>
+        <div class="form-group"><label>Priority Level</label><select id="p-priority"><option value="normal">Normal</option><option value="high">High</option><option value="critical">Critical / Emergency</option></select></div>
+        <div class="form-group"><label>Status</label><select id="p-status"><option value="admitted">Admitted</option><option value="pending">Pending Admission</option><option value="outpatient">Outpatient</option><option value="discharged">Discharged</option></select></div>
+        <div class="form-group"><label>Chief Complaint / Diagnosis</label><textarea id="p-diagnosis" placeholder="Primary reason for visit"></textarea></div>
+        <div class="form-group"><label>Patient Balance Due ($)</label><input type="number" id="p-balance" placeholder="0.00" step="0.01"></div>
+        <button class="btn-add" onclick="addPatientFromTab()">Add Patient</button>
+      </div>
+      <div>
+        <h3 style="margin-bottom:16px;">👨‍⚕️ Patient Roster</h3>
+        <div class="patient-list" id="patient-list"><div style="grid-column:1/-1; text-align:center; color:var(--text-light); padding:40px;">No patients yet. Add one to get started!</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLINICAL -->
+  <div id="clinical" class="tab-content">
+    <div class="picker" data-tab="clinical"></div>
+    <div class="wf-body" id="clinical-body">
+      <div class="workflow-section">
+        <div class="section-title">🚑 PATIENT ARRIVAL</div>
+        <div class="section-subtitle">Saves to the selected patient and feeds the dashboard</div>
+        <div class="data-field" id="f-checkin">
+          <div class="field-header"><div class="field-number">1.1</div><div class="field-title">Check-in Time</div></div>
+          <div class="field-input-group"><label class="field-label">📅 Check-in Date/Time</label><input type="datetime-local" class="field-input" id="c-checkin"></div>
+          <button class="field-save" onclick="saveClinical('Check-in Time','c-checkin','f-checkin')">Save to Patient</button>
+        </div>
+        <div class="data-field" id="f-arrival">
+          <div class="field-header"><div class="field-number">1.2</div><div class="field-title">Arrival Mode</div></div>
+          <div class="field-input-group"><label class="field-label">🚗 Method</label><select class="field-input" id="c-arrival"><option value="">-- Select --</option><option>Walk-In</option><option>Ambulance (EMS)</option><option>Private Vehicle</option><option>Transfer</option></select></div>
+          <button class="field-save" onclick="saveClinical('Arrival Mode','c-arrival','f-arrival')">Save to Patient</button>
+        </div>
+        <div class="data-field" id="f-cond">
+          <div class="field-header"><div class="field-number">1.3</div><div class="field-title">Patient Condition</div></div>
+          <div class="field-input-group"><label class="field-label">🫀 Condition</label><select class="field-input" id="c-cond"><option value="">-- Select --</option><option>Stable</option><option>Unstable</option><option>Critical</option><option>Alert & Oriented</option><option>Unresponsive</option></select></div>
+          <button class="field-save" onclick="saveClinical('Condition','c-cond','f-cond')">Save to Patient</button>
+          <div class="workflow-trigger"><div class="workflow-trigger-title">🔗 Triggers:</div>→ "Critical" auto-sets patient priority to Emergency</div>
+        </div>
+        <div class="data-field" id="f-room">
+          <div class="field-header"><div class="field-number">1.4</div><div class="field-title">Room / Bed</div></div>
+          <div class="field-input-group"><label class="field-label">🏥 Department</label><input type="text" class="field-input" id="c-dept" placeholder="e.g., Emergency Department"></div>
+          <div class="field-input-group"><label class="field-label">🛏️ Room/Bed</label><input type="text" class="field-input" id="c-room" placeholder="e.g., ED-42"></div>
+          <button class="field-save" onclick="saveClinicalRoom()">Save to Patient</button>
+        </div>
+      </div>
+      <div class="workflow-section">
+        <div class="section-title">⚕️ TRIAGE ASSESSMENT</div>
+        <div class="section-subtitle">Vitals and acuity, each saved separately</div>
+        <div class="data-field" id="f-bp">
+          <div class="field-header"><div class="field-number">3.1</div><div class="field-title">Blood Pressure</div></div>
+          <div class="field-input-group"><label class="field-label">🩸 Systolic / Diastolic</label><div style="display:flex; gap:10px;"><input type="number" class="field-input" id="c-bp-sys" placeholder="120"><input type="number" class="field-input" id="c-bp-dias" placeholder="80"></div></div>
+          <button class="field-save" onclick="saveBP()">Save to Patient</button>
+        </div>
+        <div class="data-field" id="f-hr">
+          <div class="field-header"><div class="field-number">3.2</div><div class="field-title">Heart Rate</div></div>
+          <div class="field-input-group"><label class="field-label">❤️ Heart Rate (bpm)</label><input type="number" class="field-input" id="c-hr" placeholder="72"></div>
+          <button class="field-save" onclick="saveClinical('Heart Rate','c-hr','f-hr','bpm')">Save to Patient</button>
+        </div>
+        <div class="data-field" id="f-temp">
+          <div class="field-header"><div class="field-number">3.3</div><div class="field-title">Temperature</div></div>
+          <div class="field-input-group"><label class="field-label">🌡️ Temp (°F)</label><input type="number" step="0.1" class="field-input" id="c-temp" placeholder="98.6"></div>
+          <button class="field-save" onclick="saveClinical('Temperature','c-temp','f-temp','°F')">Save to Patient</button>
+        </div>
+        <div class="data-field" id="f-cc">
+          <div class="field-header"><div class="field-number">3.4</div><div class="field-title">Chief Complaint</div></div>
+          <div class="field-input-group"><label class="field-label">📝 Complaint</label><textarea class="field-input" id="c-cc" placeholder="e.g., Chest pain for 2 hours"></textarea></div>
+          <button class="field-save" onclick="saveClinical('Chief Complaint','c-cc','f-cc')">Save to Patient</button>
+        </div>
+        <div class="data-field" id="f-acuity">
+          <div class="field-header"><div class="field-number">3.5</div><div class="field-title">Acuity Level (ESI)</div></div>
+          <div class="field-input-group"><label class="field-label">⚠️ Acuity</label><select class="field-input" id="c-acuity"><option value="">-- Select --</option><option>Level 1: Immediate</option><option>Level 2: Emergent</option><option>Level 3: Urgent</option><option>Level 4: Less Urgent</option><option>Level 5: Non-Urgent</option></select></div>
+          <button class="field-save" onclick="saveClinical('Acuity Level','c-acuity','f-acuity')">Save to Patient</button>
+          <div class="workflow-trigger"><div class="workflow-trigger-title">🔗 Triggers:</div>→ Level 1 sets patient priority to Emergency</div>
+        </div>
+        <div class="data-field" id="f-provider">
+          <div class="field-header"><div class="field-number">3.6</div><div class="field-title">Provider</div></div>
+          <div class="field-input-group"><label class="field-label">👨‍⚕️ Provider</label><input type="text" class="field-input" id="c-provider" placeholder="e.g., Dr. Smith"></div>
+          <button class="field-save" onclick="saveClinical('Provider','c-provider','f-provider')">Save to Patient</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILLING -->
+  <div id="billing" class="tab-content">
+    <div class="picker" data-tab="billing"></div>
+    <div class="wf-body" id="billing-body">
+      <div class="workflow-section">
+        <div class="section-title">💳 CHARGE CAPTURE & CLAIM</div>
+        <div class="section-subtitle">Build a claim line — drives A/R, Collected, and Denied metrics</div>
+        <div class="data-field" id="f-claim">
+          <div class="field-header"><div class="field-number">B1</div><div class="field-title">New Claim Line</div></div>
+          <div class="field-input-group"><label class="field-label">📋 CPT Code</label><input type="text" class="field-input" id="b-cpt" placeholder="e.g., 99283"></div>
+          <div class="field-input-group"><label class="field-label">🏷️ ICD-10 Diagnosis</label><input type="text" class="field-input" id="b-icd" placeholder="e.g., R07.9"></div>
+          <div class="field-input-group"><label class="field-label">💰 Charge Amount ($)</label><input type="number" step="0.01" class="field-input" id="b-charge" placeholder="250.00"></div>
+          <div class="field-input-group"><label class="field-label">📤 Claim Status</label><select class="field-input" id="b-status"><option value="Drafted">Drafted</option><option value="Submitted">Submitted</option><option value="Accepted">Accepted</option><option value="Paid">Paid</option><option value="Denied">Denied</option><option value="Appealed">Under Appeal</option></select></div>
+          <button class="field-save" onclick="saveClaim()">Save Claim to Patient</button>
+          <div class="workflow-trigger"><div class="workflow-trigger-title">🔗 Feeds dashboard:</div>→ Submitted/Accepted → A/R<br>→ Paid → Collected<br>→ Denied → Denied Claims count</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHARMACY -->
+  <div id="pharmacy" class="tab-content">
+    <div class="picker" data-tab="pharmacy"></div>
+    <div class="wf-body" id="pharmacy-body">
+      <div class="workflow-section">
+        <div class="section-title">💊 MEDICATION RECORD</div>
+        <div class="section-subtitle">Each medication saves to the selected patient</div>
+        <div class="data-field" id="f-med">
+          <div class="field-header"><div class="field-number">P1</div><div class="field-title">Medication</div></div>
+          <div class="field-input-group"><label class="field-label">💊 Drug Name</label><input type="text" class="field-input" id="ph-drug" placeholder="e.g., Amoxicillin"></div>
+          <div class="field-input-group"><label class="field-label">📊 Dose</label><input type="text" class="field-input" id="ph-dose" placeholder="e.g., 500mg"></div>
+          <div class="field-input-group"><label class="field-label">💉 Route</label><select class="field-input" id="ph-route"><option value="">-- Select --</option><option>Oral (PO)</option><option>IV</option><option>IM</option><option>SubQ</option><option>Topical</option></select></div>
+          <div class="field-input-group"><label class="field-label">⏰ Time Administered</label><input type="datetime-local" class="field-input" id="ph-time"></div>
+          <div class="field-input-group"><label class="field-label">👤 Nurse</label><input type="text" class="field-input" id="ph-nurse" placeholder="e.g., RN Johnson"></div>
+          <button class="field-save" onclick="saveMed()">Save Medication to Patient</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENDORS -->
+  <div id="vendors" class="tab-content">
+    <div class="patient-section">
+      <div class="patient-form">
+        <h3>🧾 Add Vendor Invoice</h3>
+        <div class="form-group"><label>Vendor Name *</label><input type="text" id="v-name" placeholder="e.g., McKesson"></div>
+        <div class="form-group"><label>Invoice Number</label><input type="text" id="v-invoice" placeholder="INV-2026-0042"></div>
+        <div class="form-group"><label>Category</label><select id="v-category"><option>Pharmaceuticals</option><option>Medical Supplies</option><option>Equipment</option><option>Services / Contractors</option><option>Utilities</option><option>Other</option></select></div>
+        <div class="form-group"><label>Amount ($) *</label><input type="number" step="0.01" id="v-amount" placeholder="0.00"></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="v-due"></div>
+        <div class="form-group"><label>Status</label><select id="v-status"><option value="unpaid">Unpaid</option><option value="paid">Paid</option></select></div>
+        <button class="btn-add" onclick="addVendor()">Add Invoice</button>
+      </div>
+      <div>
+        <h3 style="margin-bottom:16px;">📑 Vendor Invoices — drives Accounts Payable</h3>
+        <div class="patient-list" id="vendor-list"><div style="grid-column:1/-1; text-align:center; color:var(--text-light); padding:40px;">No invoices yet. Unpaid invoices add to A/P.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE -->
+  <div id="revenue" class="tab-content">
+    <div class="workflow-section">
+      <div class="section-title">💰 REVENUE CYCLE — LIVE FROM YOUR DATA</div>
+      <div class="section-subtitle">Computed from actual claims entered</div>
+      <div class="dashboard-grid">
+        <div class="metric-card"><div class="metric-icon">📤</div><div class="metric-label">Total Claims</div><div class="metric-value" id="r-total">0</div></div>
+        <div class="metric-card success"><div class="metric-icon">💚</div><div class="metric-label">Paid Claims</div><div class="metric-value" id="r-paid">0</div></div>
+        <div class="metric-card warning"><div class="metric-icon">❌</div><div class="metric-label">Denied Claims</div><div class="metric-value" id="r-denied">0</div></div>
+        <div class="metric-card success"><div class="metric-icon">📊</div><div class="metric-label">Clean Claim Rate</div><div class="metric-value" id="r-clean">—</div></div>
+        <div class="metric-card warning"><div class="metric-icon">⚠️</div><div class="metric-label">Denial Rate</div><div class="metric-value" id="r-denial">—</div></div>
+        <div class="metric-card success"><div class="metric-icon">📥</div><div class="metric-label">Total A/R</div><div class="metric-value" id="r-ar">$0</div></div>
+        <div class="metric-card"><div class="metric-icon">💵</div><div class="metric-label">Total Charges</div><div class="metric-value" id="r-charges">$0</div></div>
+        <div class="metric-card success"><div class="metric-icon">💰</div><div class="metric-label">Total Collected</div><div class="metric-value" id="r-collected">$0</div></div>
+      </div>
+      <div class="dash-note"><strong>Collection Rate</strong> = Collected ÷ Total Charges = <span id="r-collection">—</span></div>
+    </div>
+  </div>
+
+  <!-- REPORTS / PRINT -->
+  <div id="reports" class="tab-content">
+    <div class="workflow-section">
+      <div class="section-title">🖨️ REPORTS & PRINTING</div>
+      <div class="section-subtitle">Generate printable documents (print to paper or Save as PDF in the print dialog)</div>
+
+      <div class="dashboard-grid">
+        <div class="metric-card">
+          <div class="metric-icon">🧍</div>
+          <div class="metric-label">Patient Statement</div>
+          <div style="font-size:.84em; color:var(--text-light); margin:8px 0 14px;">Individual patient: demographics, clinical, billing, balance</div>
+          <select id="rpt-patient" class="field-input" style="margin-bottom:10px;"></select>
+          <button class="btn btn-primary" style="width:100%;" onclick="printPatientStatement(Number(document.getElementById('rpt-patient').value))">🖨️ Print Statement</button>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">💰</div>
+          <div class="metric-label">Financial Report</div>
+          <div style="font-size:.84em; color:var(--text-light); margin:8px 0 14px;">For Finance unit: A/R, A/P, collected, denials, collection rate</div>
+          <button class="btn btn-primary" style="width:100%;" onclick="printReport('financial')">🖨️ Print Financial Report</button>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">🏥</div>
+          <div class="metric-label">Clinical / Census Report</div>
+          <div style="font-size:.84em; color:var(--text-light); margin:8px 0 14px;">For Operations: census, acuity, emergencies, admissions</div>
+          <button class="btn btn-primary" style="width:100%;" onclick="printReport('clinical')">🖨️ Print Census Report</button>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">🧾</div>
+          <div class="metric-label">Vendor / A-P Report</div>
+          <div style="font-size:.84em; color:var(--text-light); margin:8px 0 14px;">For Accounts Payable: vendor invoices, paid vs unpaid</div>
+          <button class="btn btn-primary" style="width:100%;" onclick="printReport('vendor')">🖨️ Print A-P Report</button>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">📊</div>
+          <div class="metric-label">Full System Snapshot</div>
+          <div style="font-size:.84em; color:var(--text-light); margin:8px 0 14px;">Everything: all patients, finances, clinical, vendors</div>
+          <button class="btn btn-primary" style="width:100%;" onclick="printReport('snapshot')">🖨️ Print Full Snapshot</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PATIENT VIEW MODAL -->
+<div class="overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><div><h2 id="md-name" style="margin:0; font-size:1.4em;">Patient</h2><p id="md-mrn" style="margin:4px 0 0; opacity:.9; font-size:.9em;">MRN:</p></div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-content">
+      <div class="pstat-grid">
+        <div class="pstat"><div class="pstat-label">Status</div><div class="pstat-value" id="md-status">—</div></div>
+        <div class="pstat"><div class="pstat-label">Priority</div><div class="pstat-value" id="md-priority">—</div></div>
+        <div class="pstat"><div class="pstat-label">Balance</div><div class="pstat-value" id="md-balance">$0</div></div>
+        <div class="pstat"><div class="pstat-label">Total Charges</div><div class="pstat-value" id="md-charges">$0</div></div>
+      </div>
+      <div class="sec-title">📋 Personal Information</div>
+      <div class="drow"><div class="dlabel">Date of Birth</div><div id="md-dob">—</div></div>
+      <div class="drow"><div class="dlabel">Age</div><div id="md-age">—</div></div>
+      <div class="drow"><div class="dlabel">Gender</div><div id="md-gender">—</div></div>
+      <div class="drow"><div class="dlabel">Phone</div><div id="md-phone">—</div></div>
+      <div class="drow"><div class="dlabel">Email</div><div id="md-email">—</div></div>
+      <div class="sec-title">🏥 Clinical Records</div><div id="md-clinical" class="recordlist"><em style="color:var(--text-light);">None yet</em></div>
+      <div class="sec-title">💳 Billing Records</div><div id="md-billing" class="recordlist"><em style="color:var(--text-light);">None yet</em></div>
+      <div class="sec-title">💊 Pharmacy Records</div><div id="md-pharmacy" class="recordlist"><em style="color:var(--text-light);">None yet</em></div>
+      <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="printPatientStatement(modalId)">🖨️ Print Patient Statement</button>
+        <button class="btn-del" onclick="deletePatient()">Delete Patient Record</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE WARNING MODAL -->
+<div class="overlay" id="dup-overlay">
+  <div class="dup-modal">
+    <div class="dup-header"><h2>⚠️ Possible Duplicate Patient</h2></div>
+    <div class="dup-body">
+      <p style="margin-bottom:14px; font-size:.92em;">The patient you're adding looks similar to existing record(s). Review before continuing:</p>
+      <div id="dup-matches"></div>
+      <p style="margin-top:6px; font-size:.85em; color:var(--text-light);">Matching on Name + Date of Birth + phone/email.</p>
+      <div class="dup-actions">
+        <button class="btn btn-primary" id="dup-use">Use Existing Patient</button>
+        <button class="btn btn-warn" id="dup-create">Create New Anyway</button>
+        <button class="btn btn-ghost" onclick="closeDup()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let patients = JSON.parse(localStorage.getItem('patients3')) || [];
+let vendors  = JSON.parse(localStorage.getItem('vendors3')) || [];
+let activeId = localStorage.getItem('activeId3') ? Number(localStorage.getItem('activeId3')) : null;
+let modalId = null;
+let pendingNew = null;      // patient object awaiting duplicate decision
+let pendingMatchId = null;  // best existing match id
+
+function savePatients(){ localStorage.setItem('patients3',JSON.stringify(patients)); }
+function saveVendors(){ localStorage.setItem('vendors3',JSON.stringify(vendors)); }
+function v(id){ const e=document.getElementById(id); return e? e.value.trim():''; }
+function setText(id,t){ const e=document.getElementById(id); if(e) e.textContent=t; }
+function getActive(){ return patients.find(p=>p.id===activeId); }
+
+/* ---------- Fuzzy matching ---------- */
+function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function lev(a,b){
+  a=norm(a); b=norm(b);
+  if(!a&&!b) return 0; if(!a||!b) return Math.max(a.length,b.length);
+  const m=[]; for(let i=0;i<=a.length;i++) m[i]=[i];
+  for(let j=0;j<=b.length;j++) m[0][j]=j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++)
+    m[i][j]=Math.min(m[i-1][j]+1, m[i][j-1]+1, m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return m[a.length][b.length];
+}
+function sim(a,b){ a=norm(a); b=norm(b); if(!a&&!b) return 1; const d=lev(a,b); const ml=Math.max(a.length,b.length); return ml===0?1:1-d/ml; }
+
+// score 0-100 across Name + DOB + phone/email
+function dupScore(cand,existing){
+  const nameSim = (sim(cand.first,existing.first)*0.5 + sim(cand.last,existing.last)*0.5);
+  const dobMatch = (cand.dob && existing.dob && cand.dob===existing.dob) ? 1 : 0;
+  const phoneSim = (cand.phone&&existing.phone)? sim(cand.phone,existing.phone) : 0;
+  const emailSim = (cand.email&&existing.email)? sim(cand.email,existing.email) : 0;
+  const contact = Math.max(phoneSim,emailSim);
+  // weights: name 45, dob 35, contact 20
+  return Math.round((nameSim*45)+(dobMatch*35)+(contact*20));
+}
+function findDuplicates(cand){
+  return patients.map(p=>({p, score:dupScore(cand,p)}))
+    .filter(x=>x.score>=60)            // threshold
+    .sort((a,b)=>b.score-a.score);
+}
+
+/* ---------- Add patient (with duplicate check) ---------- */
+function buildPatient(d){
+  return { id:Date.now(), mrn:'MRN'+String(patients.length+1).padStart(6,'0'),
+    first:d.first,last:d.last,dob:d.dob,gender:d.gender||'',phone:d.phone||'',email:d.email||'',
+    insurance:d.insurance||'',priority:d.priority||'normal',status:d.status||'admitted',
+    diagnosis:d.diagnosis||'',balance:parseFloat(d.balance)||0,
+    admissionDate:new Date().toISOString(), clinical:[],claims:[],meds:[] };
+}
+function attemptAdd(d, onDone){
+  if(!d.first||!d.last||!d.dob){ alert('First Name, Last Name, and Date of Birth are required.'); return; }
+  const cand=buildPatient(d);
+  const dups=findDuplicates(cand);
+  if(dups.length){
+    pendingNew=cand; pendingMatchId=dups[0].p.id;
+    const box=document.getElementById('dup-matches');
+    box.innerHTML=dups.slice(0,3).map(x=>`
+      <div class="dup-match">
+        <div class="mname">${x.p.first} ${x.p.last}</div>
+        <div class="mmeta">MRN: ${x.p.mrn} · DOB: ${x.p.dob||'—'} · ${x.p.phone||'no phone'} · ${x.p.email||'no email'}</div>
+        <span class="dup-score">${x.score}% match</span>
+      </div>`).join('');
+    document.getElementById('dup-use').onclick=()=>{ activeId=dups[0].p.id; localStorage.setItem('activeId3',activeId); pendingNew=null; closeDup(); renderAll(); if(onDone) onDone(activeId); };
+    document.getElementById('dup-create').onclick=()=>{ commitNew(cand,onDone); };
+    document.getElementById('dup-overlay').classList.add('active');
+    return;
+  }
+  commitNew(cand,onDone);
+}
+function commitNew(cand,onDone){
+  patients.push(cand); savePatients();
+  activeId=cand.id; localStorage.setItem('activeId3',activeId);
+  pendingNew=null; closeDup(); renderAll(); if(onDone) onDone(cand.id);
+}
+function closeDup(){ document.getElementById('dup-overlay').classList.remove('active'); }
+
+function addPatientFromTab(){
+  attemptAdd({ first:v('p-first'),last:v('p-last'),dob:v('p-dob'),gender:v('p-gender'),
+    phone:v('p-phone'),email:v('p-email'),insurance:v('p-insurance'),priority:v('p-priority'),
+    status:v('p-status'),diagnosis:v('p-diagnosis'),balance:v('p-balance') }, ()=>{
+      ['p-first','p-last','p-dob','p-gender','p-phone','p-email','p-insurance','p-diagnosis','p-balance'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('p-priority').value='normal'; document.getElementById('p-status').value='admitted';
+    });
+}
+
+/* ---------- Picker (in each workflow tab) ---------- */
+function renderPickers(){
+  document.querySelectorAll('.picker').forEach(pk=>{
+    const tab=pk.dataset.tab;
+    const opts='<option value="">-- Select existing patient --</option>'+
+      patients.map(p=>`<option value="${p.id}" ${p.id===activeId?'selected':''}>${p.first} ${p.last} (${p.mrn})</option>`).join('');
+    const a=getActive();
+    pk.innerHTML=`
+      <h3>👤 Who are you documenting?</h3>
+      <div class="picker-row">
+        <div class="picker-field">
+          <label>Pick Existing Patient</label>
+          <select onchange="setActive(this.value)">${opts}</select>
+        </div>
+        <button class="btn btn-ghost" onclick="toggleNewForm('${tab}')">+ New Patient</button>
+      </div>
+      <div class="active-chip ${a?'show':''}">Documenting: <strong>${a?a.first+' '+a.last+' — '+a.mrn:''}</strong></div>
+      <div class="newform" id="newform-${tab}">
+        <div class="newform-grid">
+          <div class="fg"><label>First Name *</label><input type="text" id="nf-${tab}-first"></div>
+          <div class="fg"><label>Last Name *</label><input type="text" id="nf-${tab}-last"></div>
+          <div class="fg"><label>Date of Birth *</label><input type="date" id="nf-${tab}-dob"></div>
+          <div class="fg"><label>Phone</label><input type="tel" id="nf-${tab}-phone"></div>
+          <div class="fg"><label>Email</label><input type="email" id="nf-${tab}-email"></div>
+          <div class="fg"><label>Insurance</label><input type="text" id="nf-${tab}-insurance"></div>
+          <div class="fg"><label>Priority</label><select id="nf-${tab}-priority"><option value="normal">Normal</option><option value="high">High</option><option value="critical">Critical</option></select></div>
+          <div class="fg"><label>Balance ($)</label><input type="number" step="0.01" id="nf-${tab}-balance"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="addPatientFromPicker('${tab}')">Add & Select Patient</button>
+      </div>`;
+    // lock/unlock body
+    const body=document.getElementById(tab+'-body');
+    if(body) body.classList.toggle('locked', !a);
+  });
+}
+function toggleNewForm(tab){ document.getElementById('newform-'+tab).classList.toggle('show'); }
+function addPatientFromPicker(tab){
+  attemptAdd({ first:v('nf-'+tab+'-first'),last:v('nf-'+tab+'-last'),dob:v('nf-'+tab+'-dob'),
+    phone:v('nf-'+tab+'-phone'),email:v('nf-'+tab+'-email'),insurance:v('nf-'+tab+'-insurance'),
+    priority:v('nf-'+tab+'-priority'),balance:v('nf-'+tab+'-balance') }, ()=>{
+      document.getElementById('newform-'+tab).classList.remove('show');
+    });
+}
+function setActive(id){ activeId=Number(id)||null; if(activeId) localStorage.setItem('activeId3',activeId); else localStorage.removeItem('activeId3'); renderAll(); }
+
+/* ---------- Roster ---------- */
+function renderRoster(){
+  const list=document.getElementById('patient-list');
+  if(!patients.length){ list.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--text-light); padding:40px;">No patients yet. Add one to get started!</div>'; return; }
+  list.innerHTML=patients.map(p=>`
+    <div class="patient-card ${p.priority}-priority">
+      <div class="pbadge ${p.priority}">${p.priority.toUpperCase()}</div>
+      <div class="patient-name">${p.first} ${p.last}</div>
+      <div class="patient-info"><strong>MRN:</strong> ${p.mrn}<br><strong>Status:</strong> ${p.status}<br><strong>Balance:</strong> $${p.balance.toFixed(2)}<br><strong>Claims:</strong> ${p.claims.length} · <strong>Meds:</strong> ${p.meds.length}</div>
+      <div class="card-actions">
+        <button class="mini-btn ${p.id===activeId?'select':''}" onclick="setActive(${p.id})">${p.id===activeId?'✓ Active':'Set Active'}</button>
+        <button class="mini-btn" onclick="openModal(${p.id})">View</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ---------- Save records ---------- */
+function requireActive(){ if(!getActive()){ alert('Pick or add a patient first (top of this tab).'); return false;} return true; }
+function flash(id){ const c=document.getElementById(id); if(c){ c.classList.add('updated'); setTimeout(()=>c.classList.remove('updated'),1400);} }
+function saveClinical(label,inputId,cardId,unit){
+  if(!requireActive()) return; const val=v(inputId); if(!val){ alert('Enter a value.'); return; }
+  const p=getActive(); p.clinical.push({label,value:val+(unit?' '+unit:''),time:new Date().toLocaleString()});
+  if(label==='Condition'&&val==='Critical') p.priority='critical';
+  if(label==='Acuity Level'&&val.indexOf('Level 1')===0) p.priority='critical';
+  savePatients(); document.getElementById(inputId).value=''; flash(cardId); renderAll();
+}
+function saveClinicalRoom(){ if(!requireActive()) return; const d=v('c-dept'),r=v('c-room'); if(!d&&!r){alert('Enter department or room.');return;}
+  getActive().clinical.push({label:'Room/Bed',value:(d+' '+r).trim(),time:new Date().toLocaleString()}); savePatients(); document.getElementById('c-dept').value='';document.getElementById('c-room').value=''; flash('f-room'); renderAll(); }
+function saveBP(){ if(!requireActive()) return; const s=v('c-bp-sys'),d=v('c-bp-dias'); if(!s||!d){alert('Enter both values.');return;}
+  getActive().clinical.push({label:'Blood Pressure',value:s+'/'+d+' mmHg',time:new Date().toLocaleString()}); savePatients(); document.getElementById('c-bp-sys').value='';document.getElementById('c-bp-dias').value=''; flash('f-bp'); renderAll(); }
+function saveClaim(){ if(!requireActive()) return; const cpt=v('b-cpt'),icd=v('b-icd'),charge=parseFloat(v('b-charge'))||0,status=v('b-status');
+  if(!cpt&&!charge){alert('Enter a CPT code or charge.');return;}
+  getActive().claims.push({id:Date.now(),cpt,icd,charge,status,time:new Date().toLocaleString()}); savePatients();
+  ['b-cpt','b-icd','b-charge'].forEach(id=>document.getElementById(id).value=''); document.getElementById('b-status').value='Drafted'; flash('f-claim'); renderAll(); }
+function saveMed(){ if(!requireActive()) return; const drug=v('ph-drug'); if(!drug){alert('Enter a drug name.');return;}
+  getActive().meds.push({drug,dose:v('ph-dose'),route:v('ph-route'),time:v('ph-time'),nurse:v('ph-nurse')}); savePatients();
+  ['ph-drug','ph-dose','ph-route','ph-time','ph-nurse'].forEach(id=>document.getElementById(id).value=''); flash('f-med'); renderAll(); }
+
+/* ---------- Vendors ---------- */
+function addVendor(){ const name=v('v-name'),amount=parseFloat(v('v-amount'))||0; if(!name||!amount){alert('Enter vendor name and amount.');return;}
+  vendors.push({id:Date.now(),name,invoice:v('v-invoice'),category:v('v-category'),amount,due:v('v-due'),status:v('v-status')}); saveVendors();
+  ['v-name','v-invoice','v-amount','v-due'].forEach(id=>document.getElementById(id).value=''); renderVendors(); dash(); }
+function toggleVendor(id){ const x=vendors.find(v=>v.id===id); if(x){x.status=x.status==='unpaid'?'paid':'unpaid'; saveVendors(); renderVendors(); dash();} }
+function delVendor(id){ vendors=vendors.filter(v=>v.id!==id); saveVendors(); renderVendors(); dash(); }
+function renderVendors(){ const list=document.getElementById('vendor-list');
+  if(!vendors.length){ list.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--text-light); padding:40px;">No invoices yet. Unpaid invoices add to A/P.</div>'; return; }
+  list.innerHTML=vendors.map(x=>`
+    <div class="patient-card ${x.status==='unpaid'?'high-priority':'normal-priority'}">
+      <div class="pbadge ${x.status==='unpaid'?'high':'normal'}">${x.status.toUpperCase()}</div>
+      <div class="patient-name">${x.name}</div>
+      <div class="patient-info"><strong>Invoice:</strong> ${x.invoice||'—'}<br><strong>Category:</strong> ${x.category}<br><strong>Amount:</strong> $${x.amount.toFixed(2)}<br><strong>Due:</strong> ${x.due||'—'}</div>
+      <div class="card-actions"><button class="mini-btn" onclick="toggleVendor(${x.id})">${x.status==='unpaid'?'Mark Paid':'Mark Unpaid'}</button><button class="mini-btn" onclick="delVendor(${x.id})">Delete</button></div>
+    </div>`).join('');
+}
+
+/* ---------- Modal ---------- */
+function openModal(id){ modalId=id; const p=patients.find(x=>x.id===id); if(!p) return;
+  const dob=new Date(p.dob),today=new Date(); let age=today.getFullYear()-dob.getFullYear();
+  if(today<new Date(today.getFullYear(),dob.getMonth(),dob.getDate())) age--;
+  const charges=p.claims.reduce((s,c)=>s+(c.charge||0),0);
+  setText('md-name',p.first+' '+p.last); setText('md-mrn','MRN: '+p.mrn);
+  setText('md-status',p.status.toUpperCase()); setText('md-priority',p.priority.toUpperCase());
+  setText('md-balance','$'+p.balance.toFixed(2)); setText('md-charges','$'+charges.toFixed(2));
+  setText('md-dob',dob.toLocaleDateString()); setText('md-age',age+' years');
+  setText('md-gender',p.gender||'—'); setText('md-phone',p.phone||'—'); setText('md-email',p.email||'—');
+  document.getElementById('md-clinical').innerHTML=p.clinical.length?p.clinical.map(c=>`<div class="rec"><strong>${c.label}:</strong> ${c.value} <span style="color:var(--text-light);">(${c.time})</span></div>`).join(''):'<em style="color:var(--text-light);">None yet</em>';
+  document.getElementById('md-billing').innerHTML=p.claims.length?p.claims.map(c=>`<div class="rec"><strong>CPT ${c.cpt||'—'}</strong>/ICD ${c.icd||'—'} — $${(c.charge||0).toFixed(2)} [${c.status}]</div>`).join(''):'<em style="color:var(--text-light);">None yet</em>';
+  document.getElementById('md-pharmacy').innerHTML=p.meds.length?p.meds.map(m=>`<div class="rec"><strong>${m.drug}</strong> ${m.dose||''} ${m.route||''} ${m.nurse?'· '+m.nurse:''}</div>`).join(''):'<em style="color:var(--text-light);">None yet</em>';
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal(e){ if(e&&e.target.id!=='modal') return; document.getElementById('modal').classList.remove('active'); modalId=null; }
+function deletePatient(){ if(modalId&&confirm('Delete this patient and all records?')){ patients=patients.filter(p=>p.id!==modalId); if(activeId===modalId){activeId=null;localStorage.removeItem('activeId3');} savePatients(); closeModal(); renderAll(); } }
+
+/* ---------- Dashboard ---------- */
+function dash(){
+  const total=patients.length;
+  const emergency=patients.filter(p=>p.priority==='critical').length;
+  const high=patients.filter(p=>p.priority==='high').length;
+  const outstanding=patients.reduce((s,p)=>s+p.balance,0);
+  const today=new Date().toDateString();
+  const admitted=patients.filter(p=>new Date(p.admissionDate).toDateString()===today).length;
+  const discharged=patients.filter(p=>p.status==='discharged').length;
+  let ar=0,collected=0,charges=0,submitted=0,denied=0,paid=0,totalClaims=0;
+  patients.forEach(p=>p.claims.forEach(c=>{ totalClaims++; charges+=c.charge||0;
+    if(c.status==='Submitted'||c.status==='Accepted'){ ar+=c.charge||0; submitted++; }
+    if(c.status==='Paid'){ collected+=c.charge||0; paid++; submitted++; }
+    if(c.status==='Denied') denied++; }));
+  const ap=vendors.filter(x=>x.status==='unpaid').reduce((s,x)=>s+x.amount,0);
+  const clean=submitted>0?Math.round((paid/submitted)*100)+'%':'—';
+  setText('m-total',total); setText('m-emergency',emergency); setText('m-high',high);
+  setText('m-outstanding','$'+outstanding.toFixed(2)); setText('m-ar','$'+ar.toFixed(2));
+  setText('m-ap','$'+ap.toFixed(2)); setText('m-collected','$'+collected.toFixed(2));
+  setText('m-admitted',admitted); setText('m-discharged',discharged);
+  setText('m-submitted',submitted); setText('m-denied',denied); setText('m-clean',clean);
+  setText('r-total',totalClaims); setText('r-paid',paid); setText('r-denied',denied); setText('r-clean',clean);
+  setText('r-denial',totalClaims>0?Math.round((denied/totalClaims)*100)+'%':'—');
+  setText('r-ar','$'+ar.toFixed(2)); setText('r-charges','$'+charges.toFixed(2)); setText('r-collected','$'+collected.toFixed(2));
+  setText('r-collection',charges>0?Math.round((collected/charges)*100)+'%':'—');
+}
+
+function renderAll(){ renderRoster(); renderPickers(); renderVendors(); renderReportSelect(); dash(); }
+
+function renderReportSelect(){
+  const sel=document.getElementById('rpt-patient'); if(!sel) return;
+  sel.innerHTML = patients.length
+    ? patients.map(p=>`<option value="${p.id}">${p.first} ${p.last} (${p.mrn})</option>`).join('')
+    : '<option value="">No patients yet</option>';
+}
+
+/* ---------- PRINT ENGINE ---------- */
+function money(n){ return '$'+(Number(n)||0).toFixed(2); }
+function calcTotals(){
+  let ar=0,collected=0,charges=0,submitted=0,denied=0,paid=0,totalClaims=0;
+  patients.forEach(p=>p.claims.forEach(c=>{ totalClaims++; charges+=c.charge||0;
+    if(c.status==='Submitted'||c.status==='Accepted'){ ar+=c.charge||0; submitted++; }
+    if(c.status==='Paid'){ collected+=c.charge||0; paid++; submitted++; }
+    if(c.status==='Denied') denied++; }));
+  const ap=vendors.filter(x=>x.status==='unpaid').reduce((s,x)=>s+x.amount,0);
+  const apPaid=vendors.filter(x=>x.status==='paid').reduce((s,x)=>s+x.amount,0);
+  const outstanding=patients.reduce((s,p)=>s+p.balance,0);
+  return {ar,collected,charges,submitted,denied,paid,totalClaims,ap,apPaid,outstanding,
+    clean: submitted>0?Math.round((paid/submitted)*100)+'%':'—',
+    denial: totalClaims>0?Math.round((denied/totalClaims)*100)+'%':'—',
+    collection: charges>0?Math.round((collected/charges)*100)+'%':'—'};
+}
+function openPrint(title, bodyHtml){
+  const today=new Date().toLocaleString();
+  const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
+  <style>
+    *{box-sizing:border-box;} body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif; color:#1a1a2e; background:#fff; padding:40px; line-height:1.5;}
+    .doc-header{border-bottom:3px solid #0066cc; padding-bottom:16px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:flex-start;}
+    .doc-header h1{font-size:1.6em; color:#0066cc; margin:0 0 4px;}
+    .doc-header .sub{color:#666; font-size:.9em;}
+    .doc-header .org{text-align:right; font-size:.85em; color:#666;}
+    h2{font-size:1.1em; color:#0066cc; margin:24px 0 10px; padding-bottom:6px; border-bottom:1px solid #ddd;}
+    table{width:100%; border-collapse:collapse; margin-bottom:16px; font-size:.9em;}
+    th,td{text-align:left; padding:8px 10px; border-bottom:1px solid #e0e0e0;}
+    th{background:#f0f4f9; font-weight:700; text-transform:uppercase; font-size:.78em; letter-spacing:.5px;}
+    td.num,th.num{text-align:right;}
+    .kpi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px;}
+    .kpi{border:1px solid #ddd; border-radius:8px; padding:14px; text-align:center;}
+    .kpi .l{font-size:.74em; text-transform:uppercase; color:#666; letter-spacing:.5px; font-weight:700;}
+    .kpi .v{font-size:1.5em; font-weight:700; color:#0066cc; margin-top:4px;}
+    .pair{display:grid; grid-template-columns:200px 1fr; gap:10px; padding:6px 0; border-bottom:1px solid #eee; font-size:.92em;}
+    .pair .k{font-weight:700; color:#0066cc;}
+    .foot{margin-top:30px; padding-top:14px; border-top:1px solid #ddd; font-size:.78em; color:#999; text-align:center;}
+    .confid{background:#fff8e1; border:1px solid #f39c12; color:#b9770e; padding:8px 12px; border-radius:6px; font-size:.8em; margin-bottom:16px;}
+    @media print{ body{padding:20px;} }
+  </style></head><body>
+  ${bodyHtml}
+  <div class="foot">Generated ${today} · Healthcare Workflow & Billing System · Prototype document, not an official medical/financial record.</div>
+  </body></html>`;
+
+  // Method 1: try a real new window
+  let w=null;
+  try { w=window.open('','_blank'); } catch(e){ w=null; }
+  if(w && w.document){
+    w.document.open(); w.document.write(doc); w.document.close();
+    const btn=w.document.createElement('button');
+    btn.textContent='🖨️ Print / Save PDF';
+    btn.style.cssText='position:fixed;top:14px;right:14px;background:#0066cc;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-weight:700;cursor:pointer;';
+    btn.onclick=()=>w.print();
+    w.document.body.appendChild(btn);
+    setTimeout(()=>{ try{ w.focus(); }catch(e){} }, 200);
+    return;
+  }
+
+  // Method 2: hidden iframe (works when pop-ups are blocked / sandboxed)
+  const old=document.getElementById('__printframe'); if(old) old.remove();
+  const iframe=document.createElement('iframe');
+  iframe.id='__printframe';
+  iframe.style.cssText='position:fixed; right:0; bottom:0; width:0; height:0; border:0;';
+  document.body.appendChild(iframe);
+  const idoc=iframe.contentWindow.document;
+  idoc.open(); idoc.write(doc); idoc.close();
+  iframe.onload=()=>{
+    try{
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }catch(e){
+      // Method 3: last-resort fallback — show the document in an in-page overlay with a print button
+      showPrintOverlay(doc);
+    }
+  };
+  // Some browsers fire print synchronously; trigger after a tick as well
+  setTimeout(()=>{ try{ iframe.contentWindow.focus(); iframe.contentWindow.print(); }catch(e){ showPrintOverlay(doc); } }, 300);
+}
+
+function showPrintOverlay(doc){
+  let ov=document.getElementById('__printoverlay');
+  if(ov) ov.remove();
+  ov=document.createElement('div');
+  ov.id='__printoverlay';
+  ov.style.cssText='position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:3000; display:flex; align-items:center; justify-content:center;';
+  ov.innerHTML=`<div style="background:#fff; width:92%; max-width:900px; max-height:90vh; border-radius:12px; overflow:hidden; display:flex; flex-direction:column;">
+    <div style="background:#0066cc; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center;">
+      <strong>Document Preview</strong>
+      <div>
+        <button onclick="document.getElementById('__pf2').contentWindow.print()" style="background:#fff; color:#0066cc; border:none; padding:8px 14px; border-radius:6px; font-weight:700; cursor:pointer; margin-right:8px;">🖨️ Print / Save PDF</button>
+        <button onclick="document.getElementById('__printoverlay').remove()" style="background:none; border:1px solid #fff; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer;">Close</button>
+      </div>
+    </div>
+    <iframe id="__pf2" style="flex:1; width:100%; border:0; min-height:60vh;"></iframe>
+  </div>`;
+  document.body.appendChild(ov);
+  const f=document.getElementById('__pf2').contentWindow.document;
+  f.open(); f.write(doc); f.close();
+}
+function header(title, sub){
+  return `<div class="doc-header"><div><h1>${title}</h1><div class="sub">${sub}</div></div>
+    <div class="org"><strong>General Hospital</strong><br>Revenue Cycle &amp; Operations<br>Confidential</div></div>`;
+}
+
+function printPatientStatement(id){
+  const p=patients.find(x=>x.id===id);
+  if(!p){ alert('Select a patient first.'); return; }
+  const dob=new Date(p.dob), today=new Date();
+  let age=today.getFullYear()-dob.getFullYear();
+  if(today<new Date(today.getFullYear(),dob.getMonth(),dob.getDate())) age--;
+  const charges=p.claims.reduce((s,c)=>s+(c.charge||0),0);
+  const paid=p.claims.filter(c=>c.status==='Paid').reduce((s,c)=>s+(c.charge||0),0);
+  let html=header('Patient Statement', `${p.first} ${p.last} · MRN ${p.mrn}`);
+  html+=`<div class="confid">🔒 Contains Protected Health Information (PHI) — handle per HIPAA.</div>`;
+  html+=`<h2>Patient Information</h2>
+    <div class="pair"><div class="k">Name</div><div>${p.first} ${p.last}</div></div>
+    <div class="pair"><div class="k">MRN</div><div>${p.mrn}</div></div>
+    <div class="pair"><div class="k">Date of Birth</div><div>${dob.toLocaleDateString()} (${age} yrs)</div></div>
+    <div class="pair"><div class="k">Gender</div><div>${p.gender||'—'}</div></div>
+    <div class="pair"><div class="k">Phone</div><div>${p.phone||'—'}</div></div>
+    <div class="pair"><div class="k">Email</div><div>${p.email||'—'}</div></div>
+    <div class="pair"><div class="k">Insurance</div><div>${p.insurance||'—'}</div></div>
+    <div class="pair"><div class="k">Status / Priority</div><div>${p.status} / ${p.priority}</div></div>`;
+  html+=`<h2>Clinical Records</h2>`;
+  html+= p.clinical.length? `<table><thead><tr><th>Item</th><th>Value</th><th>Recorded</th></tr></thead><tbody>${p.clinical.map(c=>`<tr><td>${c.label}</td><td>${c.value}</td><td>${c.time}</td></tr>`).join('')}</tbody></table>` : '<p style="color:#888;">No clinical records.</p>';
+  html+=`<h2>Billing / Claims</h2>`;
+  html+= p.claims.length? `<table><thead><tr><th>CPT</th><th>ICD-10</th><th class="num">Charge</th><th>Status</th></tr></thead><tbody>${p.claims.map(c=>`<tr><td>${c.cpt||'—'}</td><td>${c.icd||'—'}</td><td class="num">${money(c.charge)}</td><td>${c.status}</td></tr>`).join('')}</tbody></table>` : '<p style="color:#888;">No claims.</p>';
+  html+=`<h2>Pharmacy Records</h2>`;
+  html+= p.meds.length? `<table><thead><tr><th>Drug</th><th>Dose</th><th>Route</th><th>Nurse</th></tr></thead><tbody>${p.meds.map(m=>`<tr><td>${m.drug}</td><td>${m.dose||'—'}</td><td>${m.route||'—'}</td><td>${m.nurse||'—'}</td></tr>`).join('')}</tbody></table>` : '<p style="color:#888;">No medications.</p>';
+  html+=`<h2>Account Summary</h2>
+    <table><tbody>
+      <tr><td>Total Charges</td><td class="num">${money(charges)}</td></tr>
+      <tr><td>Insurance Paid</td><td class="num">${money(paid)}</td></tr>
+      <tr><td><strong>Patient Balance Due</strong></td><td class="num"><strong>${money(p.balance)}</strong></td></tr>
+    </tbody></table>`;
+  openPrint('Patient Statement — '+p.first+' '+p.last, html);
+}
+
+function printReport(type){
+  const t=calcTotals();
+  if(type==='financial'){
+    let html=header('Financial Report', 'Revenue Cycle Summary · For Finance Unit');
+    html+=`<div class="kpi-grid">
+      <div class="kpi"><div class="l">Accounts Receivable</div><div class="v">${money(t.ar)}</div></div>
+      <div class="kpi"><div class="l">Accounts Payable</div><div class="v">${money(t.ap)}</div></div>
+      <div class="kpi"><div class="l">Collected</div><div class="v">${money(t.collected)}</div></div>
+      <div class="kpi"><div class="l">Outstanding Patient Bills</div><div class="v">${money(t.outstanding)}</div></div>
+      <div class="kpi"><div class="l">Total Charges</div><div class="v">${money(t.charges)}</div></div>
+      <div class="kpi"><div class="l">Collection Rate</div><div class="v">${t.collection}</div></div>
+    </div>
+    <h2>Claims Performance</h2>
+    <table><tbody>
+      <tr><td>Total Claims</td><td class="num">${t.totalClaims}</td></tr>
+      <tr><td>Paid Claims</td><td class="num">${t.paid}</td></tr>
+      <tr><td>Denied Claims</td><td class="num">${t.denied}</td></tr>
+      <tr><td>Clean Claim Rate</td><td class="num">${t.clean}</td></tr>
+      <tr><td>Denial Rate</td><td class="num">${t.denial}</td></tr>
+    </tbody></table>
+    <h2>Accounts Payable Detail</h2>
+    <table><thead><tr><th>Vendor</th><th>Category</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>
+      ${vendors.length? vendors.map(v=>`<tr><td>${v.name}</td><td>${v.category}</td><td class="num">${money(v.amount)}</td><td>${v.status}</td></tr>`).join('') : '<tr><td colspan="4" style="color:#888;">No vendor invoices.</td></tr>'}
+    </tbody></table>`;
+    openPrint('Financial Report', html);
+  }
+  else if(type==='clinical'){
+    const emergency=patients.filter(p=>p.priority==='critical').length;
+    const high=patients.filter(p=>p.priority==='high').length;
+    const today=new Date().toDateString();
+    const admitted=patients.filter(p=>new Date(p.admissionDate).toDateString()===today).length;
+    const discharged=patients.filter(p=>p.status==='discharged').length;
+    let html=header('Clinical / Census Report', 'Patient Census & Acuity · For Operations Unit');
+    html+=`<div class="kpi-grid">
+      <div class="kpi"><div class="l">Total Patients</div><div class="v">${patients.length}</div></div>
+      <div class="kpi"><div class="l">Emergency Cases</div><div class="v">${emergency}</div></div>
+      <div class="kpi"><div class="l">High Priority</div><div class="v">${high}</div></div>
+      <div class="kpi"><div class="l">Admitted Today</div><div class="v">${admitted}</div></div>
+      <div class="kpi"><div class="l">Discharged</div><div class="v">${discharged}</div></div>
+      <div class="kpi"><div class="l">Active Encounters</div><div class="v">${patients.filter(p=>p.status==='admitted').length}</div></div>
+    </div>
+    <h2>Patient Census</h2>
+    <table><thead><tr><th>MRN</th><th>Name</th><th>Priority</th><th>Status</th><th>Diagnosis</th></tr></thead><tbody>
+      ${patients.length? patients.map(p=>`<tr><td>${p.mrn}</td><td>${p.first} ${p.last}</td><td>${p.priority}</td><td>${p.status}</td><td>${p.diagnosis||'—'}</td></tr>`).join('') : '<tr><td colspan="5" style="color:#888;">No patients.</td></tr>'}
+    </tbody></table>`;
+    openPrint('Clinical / Census Report', html);
+  }
+  else if(type==='vendor'){
+    let html=header('Vendor / Accounts Payable Report', 'For Accounts Payable Unit');
+    html+=`<div class="kpi-grid">
+      <div class="kpi"><div class="l">Unpaid (A/P)</div><div class="v">${money(t.ap)}</div></div>
+      <div class="kpi"><div class="l">Paid</div><div class="v">${money(t.apPaid)}</div></div>
+      <div class="kpi"><div class="l">Total Invoices</div><div class="v">${vendors.length}</div></div>
+    </div>
+    <h2>Invoice Detail</h2>
+    <table><thead><tr><th>Vendor</th><th>Invoice #</th><th>Category</th><th class="num">Amount</th><th>Due</th><th>Status</th></tr></thead><tbody>
+      ${vendors.length? vendors.map(v=>`<tr><td>${v.name}</td><td>${v.invoice||'—'}</td><td>${v.category}</td><td class="num">${money(v.amount)}</td><td>${v.due||'—'}</td><td>${v.status}</td></tr>`).join('') : '<tr><td colspan="6" style="color:#888;">No invoices.</td></tr>'}
+    </tbody></table>`;
+    openPrint('Vendor / A-P Report', html);
+  }
+  else if(type==='snapshot'){
+    const emergency=patients.filter(p=>p.priority==='critical').length;
+    let html=header('Full System Snapshot', 'Complete operational & financial overview');
+    html+=`<div class="kpi-grid">
+      <div class="kpi"><div class="l">Total Patients</div><div class="v">${patients.length}</div></div>
+      <div class="kpi"><div class="l">Emergency Cases</div><div class="v">${emergency}</div></div>
+      <div class="kpi"><div class="l">Outstanding Bills</div><div class="v">${money(t.outstanding)}</div></div>
+      <div class="kpi"><div class="l">Accounts Receivable</div><div class="v">${money(t.ar)}</div></div>
+      <div class="kpi"><div class="l">Accounts Payable</div><div class="v">${money(t.ap)}</div></div>
+      <div class="kpi"><div class="l">Collected</div><div class="v">${money(t.collected)}</div></div>
+    </div>
+    <h2>All Patients</h2>
+    <table><thead><tr><th>MRN</th><th>Name</th><th>Priority</th><th>Status</th><th class="num">Balance</th><th class="num">Claims</th></tr></thead><tbody>
+      ${patients.length? patients.map(p=>`<tr><td>${p.mrn}</td><td>${p.first} ${p.last}</td><td>${p.priority}</td><td>${p.status}</td><td class="num">${money(p.balance)}</td><td class="num">${p.claims.length}</td></tr>`).join('') : '<tr><td colspan="6" style="color:#888;">No patients.</td></tr>'}
+    </tbody></table>
+    <h2>Claims Performance</h2>
+    <table><tbody>
+      <tr><td>Total Claims</td><td class="num">${t.totalClaims}</td></tr>
+      <tr><td>Paid</td><td class="num">${t.paid}</td></tr>
+      <tr><td>Denied</td><td class="num">${t.denied}</td></tr>
+      <tr><td>Clean Claim Rate</td><td class="num">${t.clean}</td></tr>
+      <tr><td>Collection Rate</td><td class="num">${t.collection}</td></tr>
+    </tbody></table>
+    <h2>Vendor Invoices</h2>
+    <table><thead><tr><th>Vendor</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>
+      ${vendors.length? vendors.map(v=>`<tr><td>${v.name}</td><td class="num">${money(v.amount)}</td><td>${v.status}</td></tr>`).join('') : '<tr><td colspan="3" style="color:#888;">No invoices.</td></tr>'}
+    </tbody></table>`;
+    openPrint('Full System Snapshot', html);
+  }
+}
+function switchTab(name,btn){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(name).classList.add('active'); btn.classList.add('active'); }
+window.addEventListener('load',renderAll);
+</script>
+</body>
+</html>
